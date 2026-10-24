@@ -1,0 +1,187 @@
+// Systemy — Personal Life OS database schema
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ─── المال: الحسابات ────────────────────────────────────────────
+model Account {
+  id        String   @id @default(cuid())
+  name      String
+  type      String // cash | bank | wallet | credit | savings
+  currency  String   @default("SAR")
+  balance   Float    @default(0)
+  color     String   @default("#F5B95C")
+  icon      String   @default("wallet")
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  transactions Transaction[]
+}
+
+// ─── الفئات (أظرف الميزانية) ─────────────────────────────────────
+model Category {
+  id       String  @id @default(cuid())
+  name     String
+  icon     String  @default("tag")
+  color    String  @default("#5CE1E6")
+  kind     String  @default("expense") // expense | income
+  budget   Float? // مظروف الشهر
+  keywords String  @default("") // للتصنيف الذكي: "ستاربكس,قهوة"
+  transactions Transaction[]
+}
+
+// ─── المعاملات ───────────────────────────────────────────────────
+model Transaction {
+  id          String    @id @default(cuid())
+  type        String    @default("expense") // expense | income | transfer
+  amount      Float
+  currency    String    @default("SAR")
+  description String
+  merchant    String?
+  accountId   String
+  account     Account   @relation(fields: [accountId], references: [id])
+  categoryId  String?
+  category    Category? @relation(fields: [categoryId], references: [id])
+  date        DateTime
+  source      String    @default("manual") // manual | ai | sms | ocr | import
+  tags        String    @default("")
+  person      String?
+  notes       String?
+  createdAt   DateTime  @default(now())
+
+  @@index([date])
+  @@index([categoryId])
+}
+
+// ─── العادات ─────────────────────────────────────────────────────
+model Habit {
+  id          String   @id @default(cuid())
+  name        String
+  icon        String   @default("check")
+  color       String   @default("#F5B95C")
+  target      Int      @default(1) // عدد مرات الهدف اليومي
+  unit        String   @default("")
+  frequency   String   @default("daily") // daily | weekly
+  streak      Int      @default(0)
+  bestStreak  Int      @default(0)
+  saveAmount  Float? // ربط العادة بمبلغ ادخار لكل إنجاز
+  systemKey   String   @default("habits")
+  createdAt   DateTime @default(now())
+  logs        HabitLog[]
+}
+
+model HabitLog {
+  id        String   @id @default(cuid())
+  habitId   String
+  habit     Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  date      DateTime // اليوم (بداية اليوم)
+  count     Int      @default(1)
+  createdAt DateTime @default(now())
+
+  @@unique([habitId, date])
+}
+
+// ─── المزاج ──────────────────────────────────────────────────────
+model Mood {
+  id        String   @id @default(cuid())
+  score     Int // 1..5
+  factors   String   @default("") // "نوم,عمل,مال"
+  note      String?
+  date      DateTime @unique
+  createdAt DateTime @default(now())
+}
+
+// ─── المهام ──────────────────────────────────────────────────────
+model Task {
+  id        String   @id @default(cuid())
+  title     String
+  done      Boolean  @default(false)
+  date      DateTime
+  priority  String   @default("normal") // low | normal | high
+  createdAt DateTime @default(now())
+}
+
+// ─── الملاحظات واليوميات ─────────────────────────────────────────
+model Note {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  type      String   @default("note") // note | journal
+  mood      String?
+  tags      String   @default("")
+  pinned    Boolean  @default(false)
+  secret    Boolean  @default(false)
+  date      DateTime
+  createdAt DateTime @default(now())
+
+  @@index([type])
+}
+
+// ─── الأهداف ─────────────────────────────────────────────────────
+model Goal {
+  id          String   @id @default(cuid())
+  name        String
+  targetAmount Float
+  savedAmount Float    @default(0)
+  targetDate  DateTime
+  emoji       String   @default("🎯")
+  color       String   @default("#F5B95C")
+  monthly     Float    @default(0) // المساهمة الشهرية المخططة
+  createdAt   DateTime @default(now())
+}
+
+// ─── الأنظمة ─────────────────────────────────────────────────────
+model SystemModel {
+  id          String   @id @default(cuid()) @map("system_id")
+  key         String   @unique // money | habits | health | goals | learning | projects | people | home
+  name        String
+  icon        String   @default("shapes")
+  color       String   @default("#F5B95C")
+  description String
+  trackCount  Int      @default(0)
+  config      String   @default("{}")
+  createdAt   DateTime @default(now())
+
+  @@map("systems")
+}
+
+// ─── المعاملات المتكررة والاشتراكات ──────────────────────────────
+model Recurring {
+  id         String    @id @default(cuid())
+  name       String
+  amount     Float
+  type       String    @default("expense")
+  frequency  String    @default("monthly") // monthly | weekly | yearly
+  nextDate   DateTime
+  icon       String    @default("repeat")
+  categoryId String?
+  createdAt  DateTime  @default(now())
+}
+
+// ─── الأصول (ذهب، عملات رقمية، عقارات…) ──────────────────────────
+model Asset {
+  id        String   @id @default(cuid())
+  name      String
+  type      String // gold | crypto | realestate | car | stocks
+  value     Float
+  currency  String   @default("SAR")
+  unit      String? // "غرام 24"
+  icon      String   @default("gem")
+  createdAt DateTime @default(now())
+}
+
+// ─── الديون: لي وعليّ ────────────────────────────────────────────
+model Debt {
+  id        String    @id @default(cuid())
+  name      String
+  amount    Float
+  paid      Float     @default(0)
+  direction String   @default("receivable") // receivable=لي | payable=عليّ
+  dueDate   DateTime?
+  person    String
+  createdAt DateTime  @default(now())
+}
