@@ -60,3 +60,4 @@ server.log
 apk/test-file-*.png
 apk/final-*.png
 *.pid
+upload/repomix-output.xml
