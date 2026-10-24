@@ -1132,3 +1132,20 @@ Work Log:
 
 Stage Summary:
 - الحالة المحلية كما هي: main @ 90ed8a7 جاهز للدفع. بانتظار توكن صالح.
+
+---
+Task ID: GH-PUSH-5
+Agent: main (Z.ai Code)
+Task: الرفع الناجح الكامل ل github.com/Jh4k5/sysremy — التوكن الكلاسيكي صلح أخيراً
+
+Work Log:
+- توكن كلاسيكي صالح (ghp_… بنطاق repo) بعد تصحيح المستخدم لحرف نسخ خاطئ — probes: identity Jh4k5 + scopes repo + contents PUT 201.
+- قناة git مع 45MB حزمة واحدة تفشل (بروكسي يقطع TLS للاتصالات الكبيرة) — channel-test بملف واحد نجح → الحل: الرفع على 7 دفعات تدريجية ≤ 9MB لكل دفعة عبر HTTP/1.1:
+  B1 الكود المصدري 195 ملفاً (force لاستبدال Initial الأوتوماتيكي) → B2 الأصول+PWA+APK 17 ملفاً 8.9MB → B3 أدوات أندرويد 18 ملفاً → B4 مصادر التصميم والتوثيق 11 ملفاً → B5 لقطات v5 53 ملفاً → B6 لقطات تاريخية+.env 69 ملفاً → B7 apk-icon-raw.
+- 🛡️ GitHub Push Protection رصد OpenRouter API Key مكشوفاً داخل upload/repomix-output.xml (snapshot قديم) — استُبعد الملف نهائياً وأُضيف لـ.gitignore ثم قُبلت الدفعة. (يُنصح المستخدم بإبطال مفتاح OpenRouter القديم).
+- التنظيف: فرع channel-test التجريبي حُذف من GitHub بعد التحقق.
+- التحقق النهائي عبر API: 363 blob على الريمو == 363 متتبَّع محلياً · APK public/downloads/Systemy-v5.0.apk بحجم مطابق بايتياً (3,444,002) · 7 commits برسائل عربية · اللغات: TypeScript/Shell/CSS/Java/JS · سجل نظيف بلا أسرار (keystore خارج الشجرة، .env بلا أسرار، repomix ممنوع).
+
+Stage Summary:
+- **المشروع كامل على github.com/Jh4k5/sysremy (main)** — المصادر كلها + APK v5.0 + أندرويد + أصول الشعار + التوثيق + worklog. جاهز للاستنساخ: bun install && bun run dev.
+- درس مستقبلي: الرفعات الكبيرة من هذه الشبكة تتم فقط بالتقسيم التدريجي (HTTP/1.1) وأي ملف snapshot للمشروع يمر عبر فحص الأسرار قبل الرفع.
