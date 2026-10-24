@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- خلفية Systemy الداكنة -->
+    <color name="app_bg">#070A12</color>
+    <!-- خلفية الأيقونة المتكيفة -->
+    <color name="ic_bg">#F8F6F0</color>
+</resources>
