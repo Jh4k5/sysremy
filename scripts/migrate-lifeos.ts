@@ -17,9 +17,28 @@
  *  - الوضع الافتراضي dry-run: يطبع جدول الجرد بلا كتابة أي ملف.
  *  - السجلات التالفة/المجهولة تُتخطى مع عدّها — لا سقوط صامت.
  *  - لا ترحيل لأسرار أو تفضيلات جهاز (settings/profile) — هذه بيئة مختلفة.
+ *  - كل جدول مخرج موصوف بنوع Systemy الحقيقي من src/lib/types — تحقق
+ *    زمن الترجمة أن المخرج مطابق للمخطط الذي ستستورده قاعدة البيانات.
  */
 
 import { readFileSync, writeFileSync } from "node:fs";
+import type {
+  Course,
+  Flashcard,
+  FocusSession,
+  Habit,
+  HabitLog,
+  HealthKind,
+  HealthLog,
+  Mood,
+  Note,
+  Project,
+  Task,
+  TimeBlock,
+  WellbeingActivity,
+  WellbeingLog,
+  WellbeingRule,
+} from "../src/lib/types";
 
 // ─────────────────────────── أنواع خفيفة ───────────────────────────
 
@@ -65,10 +84,13 @@ function isoDate(v: unknown): string | undefined {
   return undefined;
 }
 
-/** 'HH:mm' صالح أو undefined */
+/** 'HH:mm' صالح أو undefined — يقبل الوقت الحر أو داخل ISO datetime
+ *  (مثل '2026-10-30T10:30:00Z' ← '10:30' — اكتُشف بالاختبار على المخطط الحقيقي:
+ *  المطابقة من بداية السلسلة كانت تفشل أمام بادئة التاريخ فيسقط كل شيء للاحتياط) */
 function hhmm(v: unknown): string | undefined {
   const s = normDigits(v);
-  const m = s.match(/^(\d{1,2}):(\d{2})/);
+  // وقت داخل ISO datetime أولاً (بعد حرف T)، وإلا وقت حر ببداية السلسلة
+  const m = s.match(/T(\d{1,2}):(\d{2})/) ?? s.match(/^(\d{1,2}):(\d{2})/);
   if (!m) return undefined;
   return `${m[1].padStart(2, "0")}:${m[2]}`;
 }
@@ -87,8 +109,17 @@ const asArray = (v: unknown): string => (Array.isArray(v) ? v.join(", ") : normD
 
 // ─────────────────────────── قارئ التصدير ───────────────────────────
 
-/** يقبل { collections: {...} } أو { <name>: [...] } المسطح */
+/** يقبل التنسيقات الثلاثة:
+ *  1) { exportedAt, app: "Life OS", data: { <name>: rows[] } } — تنسيق exportAll
+ *     الحقيقي في Life-os (db/local.ts:195-199) — الأصل المعتمد.
+ *  2) { collections: { ... } } — تنسيق اختيارنا السابق (عينات الاختبار).
+ *  3) { <name>: [...] } المسطح — احتياط. */
 function readCollections(source: LoExport): Record<string, LoRow[]> {
+  // التنسيق الحقيقي أولاً — مجموعات exportAll تحت مفتاح data لا collections
+  const data = (source as Record<string, unknown>).data;
+  if (data && typeof data === "object" && !Array.isArray(data)) {
+    return data as Record<string, LoRow[]>;
+  }
   if (source.collections && typeof source.collections === "object") {
     return source.collections as Record<string, LoRow[]>;
   }
@@ -111,7 +142,7 @@ function buildTables(c: Record<string, LoRow[]>) {
 
   // ── المهام ──
   {
-    const out = [];
+    const out: Task[] = [];
     let skipped = 0;
     for (const r of rows("tasks")) {
       const title = normDigits(r.title);
@@ -137,7 +168,7 @@ function buildTables(c: Record<string, LoRow[]>) {
 
   // ── العادات ──
   {
-    const out = [];
+    const out: Habit[] = [];
     let skipped = 0;
     for (const r of rows("habits")) {
       const name = normDigits(r.name);
@@ -148,7 +179,8 @@ function buildTables(c: Record<string, LoRow[]>) {
         id: oid(r),
         name,
         icon: "flame",
-        color: "#FF8E7A",
+        // لون العادة الحقيقي من Life-os يُنقل كما هو (hex صالح)، والاحتياط مرجاني Systemy
+        color: /^#[0-9a-fA-F]{6}$/.test(normDigits(r.color)) ? normDigits(r.color) : "#FF8E7A",
         target: target > 0 ? target : 1,
         unit: normDigits(r.unit) || "مرة",
         cadence: freq.includes("week") ? "weekly" : "daily",
@@ -164,7 +196,7 @@ function buildTables(c: Record<string, LoRow[]>) {
 
   // ── سجلات العادات ──
   {
-    const out = [];
+    const out: HabitLog[] = [];
     let skipped = 0;
     for (const r of rows("habit_logs")) {
       const habitId = normDigits(r.habit_id);
@@ -175,7 +207,7 @@ function buildTables(c: Record<string, LoRow[]>) {
         habitId: `lo-${habitId}`,
         date,
         count: num(r.value, 1) > 0 ? num(r.value, 1) : 1,
-        createdAt: stamp(r),
+        // HabitLog في مخطط Systemy لا يملك createdAt — الطابع الزمني في updatedAt
         updatedAt: stamp(r),
       });
     }
@@ -185,7 +217,7 @@ function buildTables(c: Record<string, LoRow[]>) {
 
   // ── اليوميات ──
   {
-    const out = [];
+    const out: Note[] = [];
     let skipped = 0;
     for (const r of rows("journal_entries")) {
       const content = normDigits(r.content) || normDigits(r.title);
@@ -210,7 +242,7 @@ function buildTables(c: Record<string, LoRow[]>) {
 
   // ── مكتبة التعلم → ملاحظات ──
   {
-    const out = (t.notes ?? []) as unknown[];
+    const out = (t.notes ?? []) as Note[];
     let skipped = 0;
     for (const r of rows("learning_items")) {
       const title = normDigits(r.title);
@@ -237,7 +269,7 @@ function buildTables(c: Record<string, LoRow[]>) {
 
   // ── المقررات ──
   {
-    const out = [];
+    const out: Course[] = [];
     let skipped = 0;
     for (const r of rows("study_courses")) {
       const name = normDigits(r.name);
@@ -259,7 +291,7 @@ function buildTables(c: Record<string, LoRow[]>) {
 
   // ── البطاقات (SM-2 → لايتنر) ──
   {
-    const out = [];
+    const out: Flashcard[] = [];
     let skipped = 0;
     for (const r of rows("flashcards")) {
       const q = normDigits(r.front);
@@ -285,7 +317,7 @@ function buildTables(c: Record<string, LoRow[]>) {
 
   // ── الأحداث → كتل تقويم ──
   {
-    const out = [];
+    const out: TimeBlock[] = [];
     let skipped = 0;
     for (const r of rows("events")) {
       const title = normDigits(r.title);
@@ -316,8 +348,8 @@ function buildTables(c: Record<string, LoRow[]>) {
 
   // ── الامتحانات → مهمة عالية الأولوية + كتلة يوم كامل ──
   {
-    const taskOut = (t.tasks ?? []) as unknown[];
-    const blockOut = (t.blocks ?? []) as unknown[];
+    const taskOut = (t.tasks ?? []) as Task[];
+    const blockOut = (t.blocks ?? []) as TimeBlock[];
     let skipped = 0;
     for (const r of rows("exams")) {
       const name = normDigits(r.name);
@@ -352,12 +384,12 @@ function buildTables(c: Record<string, LoRow[]>) {
 
   // ── قياسات الصحة ──
   {
-    const out = [];
+    const out: HealthLog[] = [];
     let skipped = 0;
     for (const r of rows("health_metrics")) {
       const date = isoDate(r.day);
       if (!date) { skipped++; continue; }
-      const entries: Array<[string, number, string, string]> = [
+      const entries: Array<[HealthKind, number, string, string]> = [
         ["water", num(r.water_ml, 0) / 250, "كوب", "water_ml÷250→أكواب"],
         ["sleep", num(r.sleep_min, 0) / 60, "ساعة", "sleep_min÷60→ساعات"],
         ["steps", num(r.steps, 0), "خطوة", ""],
@@ -375,7 +407,7 @@ function buildTables(c: Record<string, LoRow[]>) {
 
   // ── التمارين → سجل نشاط ──
   {
-    const out = (t.healthLogs ?? []) as unknown[];
+    const out = (t.healthLogs ?? []) as HealthLog[];
     let skipped = 0;
     for (const r of rows("workouts")) {
       const date = isoDate(r.done_at) ?? isoDate(r.created_at);
@@ -397,7 +429,7 @@ function buildTables(c: Record<string, LoRow[]>) {
 
   // ── جلسات التركيز ──
   {
-    const out = [];
+    const out: FocusSession[] = [];
     let skipped = 0;
     for (const r of rows("focus_sessions")) {
       const date = isoDate(r.created_at);
@@ -409,6 +441,8 @@ function buildTables(c: Record<string, LoRow[]>) {
         technique: tech.includes("52") ? "52-17" : tech.includes("deep") ? "deep" : tech.includes("custom") ? "custom" : "pomodoro",
         task: normDigits(r.task) || "جلسة منقولة",
         minutes,
+        // طاقة ما قبل الجلسة موجودة فعلًا في Life-os (energy_before) — تُنقل إن صحّت 1-5
+        energyBefore: (() => { const e = num(r.energy_before, 0); return e >= 1 && e <= 5 ? e : undefined; })(),
         completed: true,
         date,
         createdAt: stamp(r),
@@ -420,7 +454,7 @@ function buildTables(c: Record<string, LoRow[]>) {
 
   // ── العافية ──
   {
-    const acts = [];
+    const acts: WellbeingActivity[] = [];
     let skippedA = 0;
     const kindMap = new Map<string, "healthy" | "draining">();
     for (const r of rows("wellbeing_activities")) {
@@ -440,7 +474,7 @@ function buildTables(c: Record<string, LoRow[]>) {
     t.wellbeingActivities = acts;
     track("wellbeingActivities", acts.length, skippedA);
 
-    const logs = [];
+    const logs: WellbeingLog[] = [];
     let skippedL = 0;
     for (const r of rows("wellbeing_logs")) {
       const activityId = normDigits(r.activity_id);
@@ -451,7 +485,7 @@ function buildTables(c: Record<string, LoRow[]>) {
     t.wellbeingLogs = logs;
     track("wellbeingLogs", logs.length, skippedL);
 
-    const rules = [];
+    const rules: WellbeingRule[] = [];
     let skippedR = 0;
     for (const r of rows("wellbeing_rules")) {
       const text = normDigits(r.text);
@@ -470,7 +504,7 @@ function buildTables(c: Record<string, LoRow[]>) {
 
   // ── المناطق والمشاريع → مشاريع ──
   {
-    const out = [];
+    const out: Project[] = [];
     let skipped = 0;
     const areaName = new Map<string, string>();
     for (const r of rows("areas")) {
@@ -493,7 +527,7 @@ function buildTables(c: Record<string, LoRow[]>) {
       });
     }
     // الأهداف الميتة في Life-os → معالم مهام داخل المشاريع المرتبطة
-    const taskOut = (t.tasks ?? []) as unknown[];
+    const taskOut = (t.tasks ?? []) as Task[];
     let goalSkipped = 0;
     for (const r of rows("goals")) {
       const title = normDigits(r.title);
@@ -516,7 +550,7 @@ function buildTables(c: Record<string, LoRow[]>) {
 
   // ── المزاج من إشارات اليوميات (إن وجدت journal_signals) ──
   {
-    const out = [];
+    const out: Mood[] = [];
     let skipped = 0;
     for (const r of rows("journal_signals")) {
       const date = isoDate(r.created_at) ?? isoDate(r.day);
