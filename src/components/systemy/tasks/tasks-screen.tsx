@@ -52,7 +52,7 @@ export function TasksScreen() {
   const setView = useUIStore((s) => s.setView);
   const goToCalendar = useUIStore((s) => s.goToCalendar);
 
-  // قراءة واحدة حية: المهام + جداول الروابط + كتل التقويم (لجلسات التركيز)
+  // قراءة واحدة حية: المهام + جداول الروابط + جلسات التركيز (إحصاء صادق يشمل الجزئية)
   const data = useLive(
     () =>
       Promise.all([
@@ -62,7 +62,7 @@ export function TasksScreen() {
         db.people.toArray(),
         db.goals.toArray(),
         db.trips.toArray(),
-        db.blocks.toArray(),
+        db.focusSessions.toArray(),
       ]),
     [],
   );
@@ -90,7 +90,7 @@ export function TasksScreen() {
     );
   }
 
-  const [tasks, projects, courses, people, goals, trips, blocks] = data;
+  const [tasks, projects, courses, people, goals, trips, focusSessions] = data;
   const links: TaskLinkOptions = { projects, courses, people, goals, trips };
 
   // ---------- مشتقات حية ----------
@@ -116,8 +116,8 @@ export function TasksScreen() {
         : "التالي · فات وقتها"
       : `التالي · ${relativeDay(nextTask.date)}`;
 
-  /** جلسات التركيز هذا الأسبوع: كتل عمل خلال آخر 7 أيام */
-  const focusWeek = blocks.filter((b) => b.type === "work" && b.date >= weekAgo && b.date <= today).length;
+  /** جلسات التركيز هذا الأسبوع — من focusSessions مباشرة (المكتملة والجزئية سواءً) */
+  const focusWeek = focusSessions.filter((s) => s.date >= weekAgo && s.date <= today).length;
 
   // ---------- ترتيب القوائم ----------
   const todaySorted = [...todayOpen].sort((a, b) => {

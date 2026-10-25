@@ -18,6 +18,7 @@ import {
   Check,
   ChevronDown,
   Flame,
+  LayoutTemplate,
   MoreVertical,
   Pencil,
   Play,
@@ -85,6 +86,8 @@ export function HabitsScreen() {
 
   const [formOpen, setFormOpen] = useState(false);
   const [formHabit, setFormHabit] = useState<Habit | null>(null);
+  /** فتح النموذج مع لوحة القوالب الجاهزة مفتوحة مسبقاً (زر «قوالب» في الرأس) */
+  const [formTemplates, setFormTemplates] = useState(false);
   const [timerHabitId, setTimerHabitId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<Habit | null>(null);
   const [statsOpen, setStatsOpen] = useState(false);
@@ -199,8 +202,9 @@ export function HabitsScreen() {
     celebrate(h, await logHabit(h.id, countToday + 1));
   };
 
-  const openForm = (h: Habit | null) => {
+  const openForm = (h: Habit | null, withTemplates = false) => {
     setFormHabit(h);
+    setFormTemplates(withTemplates);
     setFormOpen(true);
   };
 
@@ -242,15 +246,28 @@ export function HabitsScreen() {
             )}
           </p>
         </div>
-        <motion.button
-          type="button"
-          whileTap={{ scale: 0.9 }}
-          onClick={() => openForm(null)}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-primary/40 bg-primary/15 text-primary transition-colors hover:bg-primary/25"
-          aria-label="إضافة عادة"
-        >
-          <Plus className="h-5 w-5" strokeWidth={2.4} aria-hidden="true" />
-        </motion.button>
+        <div className="flex shrink-0 items-center gap-2">
+          {/* قوالب جاهزة — ٢١ فكرة تعبّئ النموذج فوراً (من Life-os) */}
+          <motion.button
+            type="button"
+            whileTap={{ scale: 0.92 }}
+            onClick={() => openForm(null, true)}
+            className="flex h-11 items-center gap-1.5 rounded-2xl border border-primary/40 bg-primary/15 px-3 text-[11.5px] font-bold text-primary transition-colors hover:bg-primary/25"
+            aria-label="قوالب جاهزة — تصفح ٢١ فكرة عادة"
+          >
+            <LayoutTemplate className="h-4 w-4" strokeWidth={2.4} aria-hidden="true" />
+            قوالب
+          </motion.button>
+          <motion.button
+            type="button"
+            whileTap={{ scale: 0.9 }}
+            onClick={() => openForm(null)}
+            className="flex h-11 w-11 items-center justify-center rounded-2xl border border-primary/40 bg-primary/15 text-primary transition-colors hover:bg-primary/25"
+            aria-label="إضافة عادة"
+          >
+            <Plus className="h-5 w-5" strokeWidth={2.4} aria-hidden="true" />
+          </motion.button>
+        </div>
       </motion.header>
 
       {/* ═══ بداية نظيفة ═══ */}
@@ -503,6 +520,7 @@ export function HabitsScreen() {
         nextOrder={habits.length + 1}
         digits={settings.digits}
         currency={currency}
+        templatesAutoOpen={formTemplates}
       />
 
       <HabitTimer habit={timerHabit} onClose={() => setTimerHabitId(null)} />

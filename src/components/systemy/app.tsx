@@ -45,6 +45,12 @@ import { HomeScreen } from "./home/home-screen";
 import { NotesScreen } from "./notes/notes-screen";
 import { VaultScreen } from "./vault/vault-screen";
 import { TravelScreen } from "./travel/travel-screen";
+// v4 — من Life-os (شريحة E1)
+import { WellbeingScreen } from "./wellbeing/wellbeing-screen";
+import { TrustCenter } from "./trust-center";
+
+/** (E1) قفل بذر الأنظمة على مستوى الوحدة — مرة واحدة لكل تحميل صفحة */
+let systemsSeedStarted = false;
 
 /** جهاز Systemy — كل الشاشات والطبقات */
 export function SystemyApp() {
@@ -68,7 +74,14 @@ export function SystemyApp() {
   const settings = useLive(() => getSettings(), []);
 
   // v3: ترحيل أنظمة v2 القائمة — إضافة مفاتيح الأنظمة الجديدة بلا مساس بالتخصيصات
+  // (E1): قفل وحدة يمنع سباق البذر المزدوج — وضع ?standalone يسبب عدم تطابق
+  // hydration في page.tsx فيُركَّب SystemyApp مرتين متتاليتين، فيطلق الأثران
+  // seedSystems معاً على جدول فارغ فتتضاعف الأنظمة كلها (32 بدل 16 — رُصد
+  // بالتحقق الحي). الجذر في seedSystems (db.ts، خارج حدّي) يبقى بلا قفل؛
+  // هذا القفل يزيل المتسابق الثاني من جهة app.tsx حصراً.
   useEffect(() => {
+    if (systemsSeedStarted) return;
+    systemsSeedStarted = true;
     void seedSystems().catch(() => undefined);
   }, []);
 
@@ -157,6 +170,9 @@ export function SystemyApp() {
                   {view === "notes" && <NotesScreen />}
                   {view === "vault" && <VaultScreen />}
                   {view === "travel" && <TravelScreen />}
+                  {/* v4 — من Life-os */}
+                  {view === "wellbeing" && <WellbeingScreen />}
+                  {view === "trust" && <TrustCenter />}
                 </motion.div>
               </AnimatePresence>
             </div>

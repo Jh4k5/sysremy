@@ -14,7 +14,7 @@
 
 import { createElement, useMemo, useState } from "react";
 import { Reorder, motion, useDragControls } from "framer-motion";
-import { Check, ChevronDown, ChevronUp, GripVertical, SlidersHorizontal } from "lucide-react";
+import { Check, ChevronDown, ChevronUp, GripVertical, HeartHandshake, SlidersHorizontal } from "lucide-react";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
@@ -44,6 +44,8 @@ const NAV: Record<string, ViewId> = {
   vault: "vault",
   travel: "travel",
   calendar: "calendar",
+  // v4 — من Life-os
+  wellbeing: "wellbeing",
 };
 
 /** شرائح المميزات لكل نظام — لمحة سريعة عما بداخل كل عالم */
@@ -63,6 +65,7 @@ const SYSTEM_FEATURES: Record<string, string[]> = {
   travel: ["ميزانية رحلة", "برنامج", "تجهيز"],
   calendar: ["أحداث", "كتل يوم", "دمج"],
   sys: ["محادثة", "تلخيص", "اقتراحات"],
+  wellbeing: ["أنشطة", "رصيد الأسبوع", "قواعد"],
 };
 
 /** صياغة عربية سليمة للعدد مع جمعه (مفرد/مثنى/جمع قليل/جمع كثير) */
@@ -103,6 +106,8 @@ interface SystemsData {
   homeItemsCount: number;
   // v4
   blocksUpcoming: number;
+  wellbeingActivities: number;
+  wellbeingLogCount: number;
 }
 
 /**
@@ -178,6 +183,10 @@ function liveIndicator(key: string, d: SystemsData): { text: string; action: str
         : { text: "", action: "مواعيدك في مكان واحد" };
     case "sys":
       return { text: "", action: "اسألني أي شيء" };
+    case "wellbeing":
+      return d.wellbeingActivities > 0
+        ? { text: `${formatNumber(d.wellbeingActivities)} ${d.wellbeingActivities === 1 ? "نشاط" : "أنشطة"} · ${formatNumber(d.wellbeingLogCount)} تسجيل`, action: "" }
+        : { text: "", action: "أضف أول نشاط" };
     default:
       return { text: "", action: "" };
   }
@@ -190,7 +199,9 @@ function tint(color: string, alpha = "22"): string {
 }
 
 function SysGlyph({ icon, className }: { icon: string; className?: string }) {
-  return createElement(iconByName(icon), { className, "aria-hidden": true });
+  // v4: أيقونة نظام العافية (heart-hands) ليست في خريطة ui-bits — بديل محلي
+  const Comp = icon === "heart-hands" ? HeartHandshake : iconByName(icon);
+  return createElement(Comp, { className, "aria-hidden": true });
 }
 
 function IconBubble({
@@ -473,7 +484,7 @@ export function SystemsScreen() {
 
   /* ─── القراءة التفاعلية: الأنظمة + أعداد حية من كل الجداول ─── */
   const data = useLive(async (): Promise<SystemsData> => {
-    const [systems, accounts, txs, habits, habitLogs, moods, notes, goals, tasks, debts, recurrings, assets, healthLogs, courses, flashcards, projects, people, documents, trips, listItems, homeItems, blocks] =
+    const [systems, accounts, txs, habits, habitLogs, moods, notes, goals, tasks, debts, recurrings, assets, healthLogs, courses, flashcards, projects, people, documents, trips, listItems, homeItems, blocks, wellbeingActs, wellbeingLogs] =
       await Promise.all([
         db.systems.toArray(),
         db.accounts.toArray(),
@@ -497,6 +508,8 @@ export function SystemsScreen() {
         db.listItems.toArray(),
         db.homeItems.toArray(),
         db.blocks.toArray(),
+        db.wellbeingActivities.toArray(),
+        db.wellbeingLogs.toArray(),
       ]);
     const today = new Date().toISOString().slice(0, 10);
     const soon = new Date(Date.now() + 45 * 86400_000).toISOString().slice(0, 10);
@@ -534,6 +547,9 @@ export function SystemsScreen() {
       groceryPending: listItems.filter((i) => i.scope === "grocery" && !i.done).length,
       homeItemsCount: homeItems.length,
       blocksUpcoming: blocks.filter((b) => b.date >= today && b.date <= weekAhead).length,
+      // v4 — العافية
+      wellbeingActivities: wellbeingActs.filter((a) => !a.archived).length,
+      wellbeingLogCount: wellbeingLogs.length,
     };
   }, []);
 

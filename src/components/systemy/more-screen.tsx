@@ -18,6 +18,8 @@ import {
   Loader2,
   CheckSquare,
   HeartPulse,
+  HeartHandshake,
+  ShieldCheck,
   GraduationCap,
   Target,
   Kanban,
@@ -68,7 +70,7 @@ export function MoreScreen() {
   };
 
   const data = useLive(async () => {
-    const [settings, habits, habitLogs, tasks, notes, healthLogs, courses, flashcards, projects, people, documents, trips, listItems] = await Promise.all([
+    const [settings, habits, habitLogs, tasks, notes, healthLogs, courses, flashcards, projects, people, documents, trips, listItems, wellbeingActivities] = await Promise.all([
       getSettings(),
       db.habits.toArray(),
       db.habitLogs.toArray(),
@@ -82,6 +84,7 @@ export function MoreScreen() {
       db.documents.toArray(),
       db.trips.toArray(),
       db.listItems.toArray(),
+      db.wellbeingActivities.toArray(),
     ]);
     const today = todayISO();
     const soon = new Date(Date.now() + 45 * 86400_000).toISOString().slice(0, 10);
@@ -108,6 +111,8 @@ export function MoreScreen() {
       documentsExpiring: documents.filter((d) => d.expiryDate && d.expiryDate <= soon).length,
       tripsUpcoming: trips.filter((t) => t.status !== "done").length,
       coursesCount: courses.filter((c) => !c.archived).length,
+      // v4 — العافية
+      wellbeingCount: wellbeingActivities.filter((a) => !a.archived).length,
     };
   }, []);
 
@@ -123,12 +128,14 @@ export function MoreScreen() {
   const rows: Array<{ id: ViewId; label: string; icon: typeof Flame; desc: string }> = [
     { id: "settings", label: "الإعدادات", icon: SettingsIcon, desc: "ملفك، المظهر، الإشعارات، القفل، بياناتك" },
     { id: "calendar", label: "التقويم", icon: CalendarDays, desc: "أسبوعك وأحداثك في شبكة واحدة" },
+    { id: "trust", label: "الثقة والخصوصية", icon: ShieldCheck, desc: "بياناتك على جهازك، تصدير حر، وحذف نهائي" },
   ];
 
-  /* أنظمة v3 — صفوف مضغوطة بشارات حية */
+  /* أنظمة v3/v4 — صفوف مضغوطة بشارات حية */
   const systemRows: Array<{ id: ViewId; label: string; icon: typeof Flame; color: string; badge?: number; badgeLabel: string }> = [
     { id: "tasks", label: "المهام والتركيز", icon: CheckSquare, color: "#5CE1E6", badge: data?.openTasksToday, badgeLabel: "مفتوحة اليوم" },
     { id: "health", label: "الصحة والجسم", icon: HeartPulse, color: "#6EE7A8", badge: data?.healthToday, badgeLabel: "قياسات اليوم" },
+    { id: "wellbeing", label: "العافية والدوبامين", icon: HeartHandshake, color: "#6EE7A8", badge: data?.wellbeingCount, badgeLabel: "أنشطة" },
     { id: "learning", label: "التعلم والدراسة", icon: GraduationCap, color: "#F5D565", badge: data?.flashcardsDue, badgeLabel: "بطاقات مستحقة" },
     { id: "goals", label: "الأهداف والادخار", icon: Target, color: "#FFB4A2", badge: data?.goalsActive, badgeLabel: "أهداف نشطة" },
     { id: "projects", label: "المشاريع والعمل", icon: Kanban, color: "#8EC5FF", badge: data?.projectsActive, badgeLabel: "مشاريع نشطة" },
@@ -248,7 +255,7 @@ export function MoreScreen() {
       </div>
 
       <motion.p {...widgetEnter(0.5)} className="mt-6 text-center text-[10px] text-muted-foreground/60">
-        Systemy v3.0 · نظام تشغيلك الشخصي · 13 نظاماً مترابطاً · بياناتك على جهازك دائماً
+        Systemy v5.0 · نظام تشغيلك الشخصي · 16 نظاماً مترابطاً · بياناتك على جهازك دائماً
       </motion.p>
     </div>
   );

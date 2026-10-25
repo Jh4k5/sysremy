@@ -3,6 +3,12 @@
  * يفهم: المبالغ (عربية/فارسية/مفصولة)، التواريخ النسبية، الوسوم #،
  * الأشخاص (من/لـ/إلى)، نوع الإدخال (مصروف/دخل/مهمة/مزاج/ملاحظة)،
  * والفئة عبر الكلمات المفتاحية. يعمل محلياً 100% — نفسه في الويب والـAPK.
+ *
+ * (تكامل Life-os): دُمجت قواعد التاريخ من Life-os `services/dateResolve.ts`
+ * بأسلوب capture-rules الإضافي — جدول أيام اللهجات (الاتنين/تلاتا/خميس…)،
+ * علامات القادم (الجاي/القادم/اللي بييجي) لليوم، «باجر بعد» المعكوس،
+ * الأسبوع/الشهر القادم، و بعد/قبل N أسابيع/شهور. كل قاعدة قديمة نتيجتها
+ * كما كانت حرفياً — الإضافات توسّع التغطية فقط.
  */
 import type { Category } from "./types";
 import type { ISODate } from "./format";
@@ -38,14 +44,33 @@ function collapseSpaces(s: string): string {
 }
 
 const DAY_WORDS: Record<string, number> = {
+  // الأشكال الفصحى بـ«ال» أولاً (أولوية المطابقة — كما كانت)
   الأحد: 0, الاحد: 0, الإثنين: 1, الاثنين: 1, الثلاثاء: 2, الأربعاء: 3, الاربعاء: 3,
   الخميس: 4, الجمعة: 5, السبت: 6,
+  // جدول لهجات Life-os (dateResolve.ts:14-22): خليجي/مصري/شامي
+  الاتنين: 1, اثنين: 1, الثلاثا: 2, ثلاثاء: 2, تلاتا: 2,
+  اربعاء: 3, أربعاء: 3, احد: 0, خميس: 4, جمعة: 5, سبت: 6,
 };
 
 const WORD_UNITS: Record<string, number> = {
   اسبوعين: 14, أسبوعين: 14, شهرين: 60, يومين: 2, يومان: 2,
   اسبوع: 7, أسبوع: 7, شهر: 30, يوم: 1,
 };
+
+/** وحدات العدد الرقمي — أيام/أسابيع/شهور (بعد/قبل N …) */
+const NUM_UNITS = "أيام|ايام|يوم|أسابيع|اسابيع|أسبوع|اسبوع|شهور|شهر";
+const WEEK_UNIT_RE = /^(?:أسابيع|اسابيع|أسبوع|اسبوع)$/;
+const MONTH_UNIT_RE = /^(?:شهور|شهر)$/;
+
+/** يحول «٣ أسابيع»/«٢ شهر» إلى أيام (الشهر ≈ ٣٠ يوماً كعلامة WORD_UNITS القائمة) */
+function unitDays(unit: string, n: number): number {
+  if (WEEK_UNIT_RE.test(unit)) return n * 7;
+  if (MONTH_UNIT_RE.test(unit)) return n * 30;
+  return n;
+}
+
+/** سقف النتيجة بالأيام — الأيام ٣٦٥ (كما كانت)، الأسابيع/الشهور أوسع */
+const unitCap = (unit: string) => (WEEK_UNIT_RE.test(unit) || MONTH_UNIT_RE.test(unit) ? 3650 : 365);
 
 function addDaysISO(base: ISODate, days: number): ISODate {
   const d = new Date(base + "T12:00:00");
@@ -59,6 +84,32 @@ function lastPastWeekday(target: number): ISODate {
   return addDaysISO(todayISO(), -diff);
 }
 
+/** القادم من يوم الأسبوع — «السبت الجاي» (اليوم نفسه يتجاوز للأسبوع القادم) */
+function nextWeekday(target: number): ISODate {
+  const now = new Date();
+  let diff = (target - now.getDay() + 7) % 7;
+  if (diff === 0) diff = 7;
+  return addDaysISO(todayISO(), diff);
+}
+
+/** الشهر القادم بنفس يوم الشهر — مع تثبيت نهاية الشهر (٣١ ← ٢٨/٣٠) */
+function addMonthsISO(base: ISODate, months: number): ISODate {
+  const d = new Date(base + "T12:00:00");
+  const day = d.getDate();
+  d.setDate(1); // منع التدحرج التلقائي للشهور القصيرة
+  d.setMonth(d.getMonth() + months);
+  const last = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+  d.setDate(Math.min(day, last));
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+/** علامات «القادم» اللهجية الملتصقة بيوم الأسبوع — من جدول Life-os */
+const NEXT_MARKER_RE =
+  /(?<![\u0621-\u064A])(?:القادمة|القادم|اللي\s+بييجي|اللي\s+جاي|الجايلة|الجاية|الجايل|الجاي)(?![\u0621-\u064A])/;
+
+/** «الأسبوع/الشهر القادم» — علامات القادم نفسها */
+const NEXT_WORD = "القادمة|القادم|الجايلة|الجاية|الجايل|الجاي";
+
 interface DateExtract {
   text: string;
   date: ISODate;
@@ -71,11 +122,12 @@ function extractRelativeDate(text: string): DateExtract {
   let matched = false;
   let out = text;
 
-  // قبل/منذ N أيام — تُحذف أولاً كي لا يُقرأ رقمها مبلغاً
-  const relDays = out.match(/(?:قبل|منذ)\s*(\d+)\s*(?:أيام|ايام|يوم)/);
-  if (relDays) {
-    out = out.replace(/(?:قبل|منذ)\s*\d+\s*(?:أيام|ايام|يوم)/, " ");
-    date = addDaysISO(now, -Math.min(365, parseInt(relDays[1], 10)));
+  // قبل/منذ N أيام/أسابيع/شهور — تُحذف أولاً كي لا يُقرأ رقمها مبلغاً
+  const relNum = out.match(new RegExp(`(?:قبل|منذ)\\s*(\\d+)\\s*(${NUM_UNITS})`));
+  if (relNum) {
+    out = out.replace(new RegExp(`(?:قبل|منذ)\\s*\\d+\\s*(?:${NUM_UNITS})`), " ");
+    const n = parseInt(relNum[1], 10);
+    date = addDaysISO(now, -Math.min(unitCap(relNum[2]), unitDays(relNum[2], n)));
     matched = true;
   } else {
     for (const [word, days] of Object.entries(WORD_UNITS)) {
@@ -89,11 +141,12 @@ function extractRelativeDate(text: string): DateExtract {
     }
   }
 
-  // بعد N أيام
-  const aftDays = out.match(/بعد\s*(\d+)\s*(?:أيام|ايام|يوم)/);
-  if (aftDays) {
-    out = out.replace(/بعد\s*\d+\s*(?:أيام|ايام|يوم)/, " ");
-    date = addDaysISO(now, Math.min(365, parseInt(aftDays[1], 10)));
+  // بعد N أيام/أسابيع/شهور
+  const aftNum = out.match(new RegExp(`بعد\\s*(\\d+)\\s*(${NUM_UNITS})`));
+  if (aftNum) {
+    out = out.replace(new RegExp(`بعد\\s*\\d+\\s*(?:${NUM_UNITS})`), " ");
+    const n = parseInt(aftNum[1], 10);
+    date = addDaysISO(now, Math.min(unitCap(aftNum[2]), unitDays(aftNum[2], n)));
     matched = true;
   } else {
     for (const [word, days] of Object.entries(WORD_UNITS)) {
@@ -112,6 +165,12 @@ function extractRelativeDate(text: string): DateExtract {
     date = addDaysISO(now, 2);
     matched = true;
   }
+  // «باجر بعد» / «بكرة بعد» — بعد غد بترتيب معكوس (لهجات الخليج)
+  if (out.match(/(?<![\u0621-\u064A])(?:بكرة|بكره|باجر|غداً|غدا|غد)\s+بعد(?![\u0621-\u064A])/)) {
+    out = out.replace(/(?<![\u0621-\u064A])(?:بكرة|بكره|باجر|غداً|غدا|غد)\s+بعد(?![\u0621-\u064A])/, " ");
+    date = addDaysISO(now, 2);
+    matched = true;
+  }
   if (out.match(/(?<![\u0621-\u064A])(?:البارحة|البارحه|البارح|الأمس|الامس|أمس|امس)(?![\u0621-\u064A])/)) {
     out = out.replace(/(?<![\u0621-\u064A])(?:البارحة|البارحه|البارح|الأمس|الامس|أمس|امس)(?![\u0621-\u064A])/, " ");
     date = addDaysISO(now, -1);
@@ -123,12 +182,32 @@ function extractRelativeDate(text: string): DateExtract {
     matched = true;
   }
 
-  // أسماء الأيام → آخر ماضٍ من ذلك اليوم
+  // «الأسبوع القادم/الجاي/الجايل» — الأسبوع القادم بنفس يوم الأسبوع
+  if (out.match(new RegExp(`(?:الأسبوع|الاسبوع)\\s*(?:${NEXT_WORD})(?![\\u0621-\\u064A])`))) {
+    out = out.replace(new RegExp(`(?:الأسبوع|الاسبوع)\\s*(?:${NEXT_WORD})(?![\\u0621-\\u064A])`), " ");
+    date = addDaysISO(now, 7);
+    matched = true;
+  }
+  // «الشهر القادم/الجاي» — الشهر القادم بنفس يوم الشهر ("بعد شهر" يبقى ٣٠ يوماً كما كان)
+  if (out.match(new RegExp(`(?<![\\u0621-\\u064A])(?:الشهر|شهر)\\s*(?:${NEXT_WORD})(?![\\u0621-\\u064A])`))) {
+    out = out.replace(new RegExp(`(?<![\\u0621-\\u064A])(?:الشهر|شهر)\\s*(?:${NEXT_WORD})(?![\\u0621-\\u064A])`), " ");
+    date = addMonthsISO(now, 1);
+    matched = true;
+  }
+
+  // أسماء الأيام (فصحى + لهجات Life-os) → آخر ماضٍ من ذلك اليوم،
+  // ومع «الجاي/القادم/اللي بييجي» → القادم حتماً (اليوم نفسه يتخطى أسبوعاً)
   for (const [word, wd] of Object.entries(DAY_WORDS)) {
-    const re = new RegExp(`${word}(?![\\u0621-\\u064A])`);
+    const bare = !word.startsWith("ال"); // الأشكال القصيرة تحتاج حماية من كلمات أطول (كـ«كسبت»)
+    const re = new RegExp(`${bare ? "(?<![\\u0621-\\u064A])" : ""}${word}(?![\\u0621-\\u064A])`);
     if (re.test(out)) {
       out = out.replace(re, " ");
-      date = lastPastWeekday(wd);
+      if (NEXT_MARKER_RE.test(out)) {
+        out = out.replace(NEXT_MARKER_RE, " ");
+        date = nextWeekday(wd);
+      } else {
+        date = lastPastWeekday(wd);
+      }
       matched = true;
       break;
     }

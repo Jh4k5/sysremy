@@ -5,9 +5,12 @@
  * اسم + أيقونة + لون + هدف يومي (لوحة أرقام) + وحدة + إيقاع (يومية/أسبوعية
  * بأيام الالتزام) + مؤقت اختياري + تذكير يومي + ربط ادخار بمبلغ يُضاف
  * للهدف عند إنجاز اليوم — وأرشفة/حذف للعادات الموجودة.
+ * v4 (تكامل Life-os): زر «قوالب جاهزة» يفتح لوحة الـ٢١ قالباً واختيارُها
+ * يعبّئ النموذج فوراً (إصلاح خلل Life-os: القوالب لم تكن تعبّئ شيئاً).
  */
 
 import { useEffect, useState } from "react";
+import { Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import {
   Drawer,
@@ -32,6 +35,7 @@ import {
   inputCls,
 } from "@/components/systemy/ui-bits";
 import { cn } from "@/lib/utils";
+import { HabitTemplatesSheet, RIBBON_PRESS, RIBBON_SOFT, type HabitTemplate } from "./habit-templates";
 
 const TIMER_PRESETS = [5, 10, 15, 20, 30, 45];
 
@@ -66,6 +70,8 @@ export interface HabitFormDialogProps {
   nextOrder: number;
   digits: DigitStyle;
   currency: string;
+  /** فتح لوحة القوالب الجاهزة تلقائياً مع فتح النموذج (من زر «قوالب» في الشاشة) */
+  templatesAutoOpen?: boolean;
 }
 
 export function HabitFormDialog({
@@ -76,6 +82,7 @@ export function HabitFormDialog({
   nextOrder,
   digits,
   currency,
+  templatesAutoOpen = false,
 }: HabitFormDialogProps) {
   const [name, setName] = useState("");
   const [icon, setIcon] = useState("flame");
@@ -93,6 +100,8 @@ export function HabitFormDialog({
   const [goalId, setGoalId] = useState("");
   const [busy, setBusy] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  /** لوحة القوالب الجاهزة — تفتح فوق النموذج وتعبّئه عند الاختيار */
+  const [templatesOpen, setTemplatesOpen] = useState(false);
 
   // تعبئة النموذج عند كل فتح
   useEffect(() => {
@@ -112,7 +121,25 @@ export function HabitFormDialog({
     setSaveAmount(String(habit?.saveAmount ?? 5));
     setGoalId(habit?.goalId ?? "");
     setConfirmDelete(false);
-  }, [open, habit]);
+    setTemplatesOpen(templatesAutoOpen);
+  }, [open, habit, templatesAutoOpen]);
+
+  /** اختيار قالب جاهز — تعبئة فورية لكل حقول النموذج (إصلاح خلل Life-os) */
+  const applyTemplate = (t: HabitTemplate) => {
+    setName(t.name);
+    setIcon(t.icon.toLowerCase());
+    setColor(t.color);
+    setTarget(String(Math.max(1, t.target ?? 1)));
+    setUnit(t.unit ?? "");
+    setCadence(t.cadence);
+    setTimerOn(t.timerMinutes != null);
+    if (t.timerMinutes != null) setTimerMinutes(String(t.timerMinutes));
+    setRemindOn(t.remindAt != null);
+    if (t.remindAt) setRemindAt(t.remindAt);
+    toast.success("عبّأنا النموذج من القالب ✓", {
+      description: `${t.name} — راجعه وعدّل ما يشاء لك ثم احفظ`,
+    });
+  };
 
   const activeGoals = goals.filter((g) => !g.archived);
   const linkedGoal = activeGoals.find((g) => g.id === goalId);
@@ -222,6 +249,23 @@ export function HabitFormDialog({
         </DrawerHeader>
 
         <div className="sys-scroll max-h-[72vh] space-y-4 overflow-y-auto px-4 pb-4 pt-2">
+          {/* قوالب جاهزة — للعادة الجديدة فقط: فكرة جاهزة تعبّئ النموذج فوراً */}
+          {!habit && (
+            <button
+              type="button"
+              onClick={() => setTemplatesOpen(true)}
+              aria-label="تصفح القوالب الجاهزة — ٢١ فكرة عادة"
+              className={cn(
+                "flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-white/[0.10] text-[12.5px] font-bold text-foreground/90 hover:border-primary/30",
+                RIBBON_PRESS
+              )}
+              style={{ background: RIBBON_SOFT }}
+            >
+              <Sparkles className="h-4 w-4 text-cyan" aria-hidden="true" />
+              قوالب جاهزة — ٢١ فكرة عادة بضغطة
+            </button>
+          )}
+
           {/* الاسم */}
           <Field label="اسم العادة">
             <input
@@ -455,6 +499,13 @@ export function HabitFormDialog({
           </FormShell>
         </div>
       </DrawerContent>
+
+      {/* لوحة القوالب — خارج درج النموذج حتى تطفو فوقه */}
+      <HabitTemplatesSheet
+        open={templatesOpen}
+        onOpenChange={setTemplatesOpen}
+        onPick={applyTemplate}
+      />
     </Drawer>
   );
 }
