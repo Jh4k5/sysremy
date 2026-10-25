@@ -17,6 +17,8 @@ import type {
   Debt,
   DocumentRecord,
   Flashcard,
+  FocusSession,
+  FocusTechnique,
   Goal,
   GradeItem,
   Habit,
@@ -33,6 +35,9 @@ import type {
   TimeBlock,
   Transaction,
   Trip,
+  WellbeingActivity,
+  WellbeingLog,
+  WellbeingRule,
 } from "./types";
 import { DOC_TYPE_LABELS, HEALTH_META, LEITNER_INTERVALS } from "./types";
 import { advanceRecurringDate, guessCategory } from "./money";
@@ -1268,4 +1273,132 @@ export async function deleteHomeItem(id: string): Promise<void> {
     await db.reminders.where("sourceId").equals(id).delete();
   });
   ok("حُذف الممتلك ✓");
+}
+
+// ═══════════════════════ العافية/الدوبامين (v4 — منقول من Life-os) ═══════════════════════
+
+export async function addWellbeingActivity(input: Omit<WellbeingActivity, "id" | "createdAt">): Promise<WellbeingActivity> {
+  const a: WellbeingActivity = { ...input, id: uid(), createdAt: nowISO() };
+  await db.wellbeingActivities.add(a);
+  ok("أُضيف النشاط ✓", a.name);
+  return a;
+}
+
+export async function updateWellbeingActivity(id: string, patch: Partial<WellbeingActivity>): Promise<void> {
+  await db.wellbeingActivities.update(id, patch);
+  ok("حُدّث النشاط ✓");
+}
+
+export async function deleteWellbeingActivity(id: string): Promise<void> {
+  await db.transaction("rw", db.wellbeingActivities, db.wellbeingLogs, db.reminders, async () => {
+    await db.wellbeingActivities.delete(id);
+    await db.wellbeingLogs.where("activityId").equals(id).delete();
+  });
+  ok("حُذف النشاط ✓");
+}
+
+/** تسجيل/إلغاء نشاط عافية لليوم — upsert بحسب (activityId, date) */
+export async function toggleWellbeingToday(activityId: string, date: string = todayISO()): Promise<boolean> {
+  const existing = await db.wellbeingLogs.where("activityId").equals(activityId).and((l) => l.date === date).first();
+  if (existing) {
+    await db.wellbeingLogs.delete(existing.id);
+    return false;
+  }
+  const log: WellbeingLog = { id: uid(), activityId, date, createdAt: nowISO() };
+  await db.wellbeingLogs.add(log);
+  return true;
+}
+
+/** رصيد الأسبوع الصافي: +1 لكل نشاط صحي، -1 لكل مستنزف — آخر 7 أيام */
+export async function wellbeingWeek(): Promise<{ date: string; net: number; healthy: number; draining: number }[]> {
+  const logs = await db.wellbeingLogs.toArray();
+  const activities = await db.wellbeingActivities.toArray();
+  const kindById = new Map(activities.map((a) => [a.id, a.kind]));
+  const days: { date: string; net: number; healthy: number; draining: number }[] = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    let healthy = 0;
+    let draining = 0;
+    for (const l of logs.filter((x) => x.date === iso)) {
+      if (kindById.get(l.activityId) === "draining") draining++;
+      else healthy++;
+    }
+    days.push({ date: iso, net: healthy - draining, healthy, draining });
+  }
+  return days;
+}
+
+/** إضافة قاعدة شخصية — مع جدولة تذكير يومي عبر محرك التذكيرات القائم */
+export async function addWellbeingRule(input: Omit<WellbeingRule, "id" | "createdAt">): Promise<WellbeingRule> {
+  const r: WellbeingRule = { ...input, id: uid(), createdAt: nowISO() };
+  await db.wellbeingRules.add(r);
+  if (r.enabled && r.remindAt) await scheduleWellbeingRuleReminder(r);
+  ok("أُضيفت القاعدة ✓", r.text);
+  return r;
+}
+
+export async function updateWellbeingRule(id: string, patch: Partial<WellbeingRule>): Promise<void> {
+  const r = await db.wellbeingRules.get(id);
+  if (!r) return;
+  const next = { ...r, ...patch };
+  await db.wellbeingRules.update(id, patch);
+  // مزامنة التذكير مع الحالة الجديدة
+  await db.reminders.where("sourceId").equals(id).delete();
+  if (next.enabled && next.remindAt) await scheduleWellbeingRuleReminder(next);
+  ok("حُدّثت القاعدة ✓");
+}
+
+export async function deleteWellbeingRule(id: string): Promise<void> {
+  await db.transaction("rw", db.wellbeingRules, db.reminders, async () => {
+    await db.wellbeingRules.delete(id);
+    await db.reminders.where("sourceId").equals(id).delete();
+  });
+  ok("حُذفت القاعدة ✓");
+}
+
+/** جدولة تذكير القاعدة لغدٍ (يُعاد جدولته عند إكماله — نفس نمط التذكيرات اليومية) */
+async function scheduleWellbeingRuleReminder(rule: WellbeingRule): Promise<void> {
+  const d = new Date();
+  d.setDate(d.getDate() + 1);
+  const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  await db.reminders.add({
+    id: uid(),
+    title: `قاعدتك: ${rule.text}`,
+    dueAt: `${iso}T${rule.remindAt}`,
+    sourceType: "manual",
+    sourceId: rule.id,
+    done: false,
+    createdAt: nowISO(),
+  });
+}
+
+// ═══════════════════════ جلسات التركيز (v4 — منقول من Life-os) ═══════════════════════
+
+/** تسجيل جلسة تركيز — التسجيل الصادق يشمل الجزئية (minutes < المخطط) */
+export async function addFocusSession(input: Omit<FocusSession, "id" | "createdAt">): Promise<FocusSession> {
+  const s: FocusSession = { ...input, id: uid(), createdAt: nowISO() };
+  await db.focusSessions.add(s);
+  return s;
+}
+
+export async function listFocusSessions(limit = 50): Promise<FocusSession[]> {
+  return db.focusSessions.orderBy("date").reverse().limit(limit).toArray();
+}
+
+/** إحصاءات الأسبوع: إجمالي الدقائق والجلسات لكل تقنية */
+export async function focusWeekStats(): Promise<{ technique: FocusTechnique; minutes: number; sessions: number }[]> {
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - 7);
+  const cutoffISO = `${cutoff.getFullYear()}-${String(cutoff.getMonth() + 1).padStart(2, "0")}-${String(cutoff.getDate()).padStart(2, "0")}`;
+  const sessions = await db.focusSessions.where("date").aboveOrEqual(cutoffISO).toArray();
+  const byTech = new Map<FocusTechnique, { minutes: number; sessions: number }>();
+  for (const s of sessions) {
+    const cur = byTech.get(s.technique) ?? { minutes: 0, sessions: 0 };
+    cur.minutes += s.minutes;
+    cur.sessions += 1;
+    byTech.set(s.technique, cur);
+  }
+  return [...byTech.entries()].map(([technique, v]) => ({ technique, ...v }));
 }

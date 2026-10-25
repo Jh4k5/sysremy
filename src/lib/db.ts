@@ -15,6 +15,7 @@ import type {
   Debt,
   DocumentRecord,
   Flashcard,
+  FocusSession,
   Goal,
   Habit,
   HabitLog,
@@ -33,6 +34,9 @@ import type {
   TimeBlock,
   Transaction,
   Trip,
+  WellbeingActivity,
+  WellbeingLog,
+  WellbeingRule,
 } from "./types";
 
 export class SystemyDB extends Dexie {
@@ -63,6 +67,11 @@ export class SystemyDB extends Dexie {
   trips!: Table<Trip, string>;
   listItems!: Table<ListItem, string>;
   homeItems!: Table<HomeItem, string>;
+  // v4 — من Life-os
+  wellbeingActivities!: Table<WellbeingActivity, string>;
+  wellbeingLogs!: Table<WellbeingLog, string>;
+  wellbeingRules!: Table<WellbeingRule, string>;
+  focusSessions!: Table<FocusSession, string>;
 
   constructor() {
     super("SystemyDB");
@@ -103,6 +112,14 @@ export class SystemyDB extends Dexie {
       tasks: "id, date, done, priority, projectId, courseId",
       transactions: "id, date, type, accountId, categoryId, recurringId, goalId, projectId, tripId",
       blocks: "id, date, type, taskId, habitId, courseId, projectId, tripId",
+    });
+    // v4 (تكامل Life-os): العافية + جلسات التركيز — إضافات تراكمية فقط،
+    // لا يُعاد تشكيل أي جدول قائم فالترقية آمنة لكل البيانات الحية.
+    this.version(4).stores({
+      wellbeingActivities: "id, kind, archived",
+      wellbeingLogs: "id, activityId, date",
+      wellbeingRules: "id, enabled",
+      focusSessions: "id, date, technique, taskId",
     });
   }
 }
@@ -196,6 +213,7 @@ const DEFAULT_SYSTEMS: Array<Partial<SystemModel> & { key: string; name: string 
   { key: "vault", name: "المستندات والخزانة", icon: "shield", color: "#5CE1E6", description: "جوازات وعقود وضمانات، تنبيه انتهاء، مفضلة وأرشفة" },
   { key: "travel", name: "السفر والتجارب", icon: "plane", color: "#C08457", description: "رحلات بميزانية وبرنامج وقائمة تجهيز ومصاريف مرتبطة" },
   { key: "calendar", name: "التقويم والمواعيد", icon: "calendar", color: "#8EC5FF", description: "أحداث ومواعيد وكتل يوم، دمج المهام والالتزامات في عرض واحد" },
+  { key: "wellbeing", name: "العافية والدوبامين", icon: "heart-hands", color: "#6EE7A8", description: "أنشطة تغذيك مقابل ما يستنزفك، رصيد الأسبوع الصافي، وقواعد تضعها لنفسك" },
   { key: "sys", name: "المساعد الذكي Sys", icon: "sparkles", color: "#F5D565", description: "محادثتك مع النظام: سؤال، تلخيص يومك، واقتراح الخطوة التالية" },
 ];
 
@@ -304,6 +322,11 @@ export const ALL_TABLES = [
   "trips",
   "listItems",
   "homeItems",
+  // v4 — تكامل Life-os
+  "wellbeingActivities",
+  "wellbeingLogs",
+  "wellbeingRules",
+  "focusSessions",
 ] as const;
 
 export type TableName = (typeof ALL_TABLES)[number];
@@ -328,6 +351,8 @@ export type ResetScope =
   | "people"
   | "home"
   | "travel"
+  | "wellbeing"
+  | "focus"
 
 export const RESET_SCOPES: Record<ResetScope, readonly string[]> = {
   money: ["transactions", "recurrings", "accounts", "goals", "assets", "debts"],
@@ -340,6 +365,8 @@ export const RESET_SCOPES: Record<ResetScope, readonly string[]> = {
   people: ["people"],
   home: ["homeItems", "listItems"],
   travel: ["trips"],
+  wellbeing: ["wellbeingActivities", "wellbeingLogs", "wellbeingRules"],
+  focus: ["focusSessions"],
   everything: ALL_TABLES,
 };
 
@@ -355,6 +382,8 @@ export const RESET_SCOPE_LABELS: Record<ResetScope, string> = {
   people: "ملفات الأشخاص",
   home: "ممتلكات المنزل وقوائم البقالة",
   travel: "الرحلات",
+  wellbeing: "أنشطة العافية وسجلاتها وقواعدها",
+  focus: "سجل جلسات التركيز",
 };
 
 /** إعادة ضبط نطاق محدد — الفئات والأنظمة تبقى (هيكل) */

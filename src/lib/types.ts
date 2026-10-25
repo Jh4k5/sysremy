@@ -368,6 +368,80 @@ export interface Person {
   createdAt: string
 }
 
+// ═══════════════════════ العافية/الدوبامين (v4 — منقول من Life-os) ═══════════════════════
+
+/** نشاط عافية يحدده المستخدم: صحي (يكافح الدوبامين الرخيص) أو مُستنزف */
+export interface WellbeingActivity {
+  id: string
+  name: string
+  /** healthy = يغذّيك | draining = يستنزفك */
+  kind: "healthy" | "draining"
+  icon: string
+  archived: boolean
+  createdAt: string
+}
+
+/** تسجيل يوم لنشاط عافية — upsert بحسب (activityId, date) */
+export interface WellbeingLog {
+  id: string
+  activityId: string
+  date: ISODate
+  createdAt: string
+}
+
+/** قاعدة شخصية وضعها المستخدم لنفسه — تُجدول عبر محرك التذكيرات القائم */
+export interface WellbeingRule {
+  id: string
+  text: string
+  /** وقت التذكير اليومي 'HH:mm' */
+  remindAt?: string
+  enabled: boolean
+  createdAt: string
+}
+
+// ═══════════════════════ جلسات التركيز (v4 — منقول من Life-os) ═══════════════════════
+
+export type FocusTechnique = "pomodoro" | "52-17" | "deep" | "custom"
+
+export interface FocusTechniqueDef {
+  key: FocusTechnique
+  label: string
+  /** دقائق التركيز لكل دورة */
+  focusMin: number
+  /** دقيقة استراحة قصيرة */
+  shortBreak: number
+  /** دقيقة استراحة طويلة (بعد كل 4 دورات بومودورو أو 2 عميقة) */
+  longBreak: number
+  /** عدد دورات التركيز قبل الاستراحة الطويلة */
+  cycles: number
+  hint: string
+}
+
+/** تقنيات التركيز الأربع — منقولة من Life-os focus/index.tsx:28-33 */
+export const FOCUS_TECHNIQUES: Record<FocusTechnique, FocusTechniqueDef> = {
+  pomodoro: { key: "pomodoro", label: "بومودورو", focusMin: 25, shortBreak: 5, longBreak: 15, cycles: 4, hint: "٤ دورات × ٢٥ دقيقة" },
+  "52-17": { key: "52-17", label: "٥٢/١٧", focusMin: 52, shortBreak: 17, longBreak: 17, cycles: 2, hint: "تركيز عميق بوتيرة يوم العمل" },
+  deep: { key: "deep", label: "عميق", focusMin: 90, shortBreak: 20, longBreak: 20, cycles: 2, hint: "٩٠ دقيقة بلا مقاطعة" },
+  custom: { key: "custom", label: "مخصص", focusMin: 25, shortBreak: 5, longBreak: 15, cycles: 4, hint: "اضبط ما يناسبك" },
+}
+
+/** جلسة تركيز مكتملة أو جزئية — التسجيل الصادق يشمل الجلسات المقطوعة */
+export interface FocusSession {
+  id: string
+  technique: FocusTechnique
+  /** ماذا عملت (وصف حر أو عنوان مهمة) */
+  task: string
+  taskId?: string
+  /** الدقائق الفعلية المستثمرة — جزئية إذا قطعت الجلسة */
+  minutes: number
+  /** طاقة ما قبل الجلسة 1-5 (اختياري) */
+  energyBefore?: number
+  /** اكتملت كما خُطط لها أم انقطعت جزئياً */
+  completed: boolean
+  date: ISODate
+  createdAt: string
+}
+
 // ═══════════════════════ المستندات — الخزانة (v3) ═══════════════════════
 
 export type DocType =
@@ -552,7 +626,10 @@ export type ViewId =
   | "home"
   | "notes"
   | "vault"
-  | "travel";
+  | "travel"
+  // v4 — من Life-os
+  | "wellbeing"
+  | "trust";
 
 export type QuickAddTab =
   | "expense"
