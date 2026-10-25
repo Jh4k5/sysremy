@@ -46,7 +46,7 @@ const COURSE_ICONS = [
 ] as const;
 
 const selectTriggerCls =
-  "h-12 rounded-xl glass-soft border border-white/[0.08] px-4 text-[13.5px] text-foreground focus:ring-0";
+  "h-12 rounded-xl glass-soft border border-black/[0.07] px-4 text-[13.5px] text-foreground focus:ring-0";
 
 /* ═══════════════ حوار إضافة مقرر ═══════════════ */
 export function AddCourseDialog({
@@ -226,7 +226,7 @@ export function AddFlashcardDialog({
               <SelectTrigger className={selectTriggerCls} aria-label="مقرر البطاقة">
                 <SelectValue placeholder="بدون مقرر" />
               </SelectTrigger>
-              <SelectContent className="rounded-xl border-white/10 bg-[#10152a]">
+              <SelectContent className="rounded-xl border-black/[0.08] bg-white">
                 <SelectItem value="none">بدون مقرر</SelectItem>
                 {courses
                   .filter((c) => !c.archived)

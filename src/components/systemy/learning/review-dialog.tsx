@@ -84,7 +84,7 @@ export function ReviewDialog({
               type="button"
               onClick={() => onOpenChange(false)}
               aria-label="إنهاء الجلسة"
-              className="w-11 h-11 shrink-0 rounded-2xl glass-soft flex items-center justify-center text-muted-foreground transition-all hover:bg-white/[0.09] hover:text-foreground active:scale-95"
+              className="w-11 h-11 shrink-0 rounded-2xl glass-soft flex items-center justify-center text-muted-foreground transition-all hover:bg-black/[0.05] hover:text-foreground active:scale-95"
             >
               <X className="w-5 h-5" />
             </button>
@@ -92,7 +92,7 @@ export function ReviewDialog({
 
           {/* شريط تقدم الجلسة */}
           <div
-            className="mt-3 h-2 rounded-full bg-white/[0.06] overflow-hidden"
+            className="mt-3 h-2 rounded-full bg-black/[0.04] overflow-hidden"
             role="progressbar"
             aria-label="تقدم جلسة المراجعة"
             aria-valuemin={0}

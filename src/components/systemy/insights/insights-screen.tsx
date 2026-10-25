@@ -697,20 +697,20 @@ function InsightsSkeleton() {
   return (
     <div className="h-full overflow-y-auto sys-scroll px-4 pt-3 pb-28" aria-busy="true" aria-label="جارٍ تجميع الرؤى">
       <div className="flex items-center justify-between mb-1">
-        <Skeleton className="h-7 w-24 rounded-lg bg-white/[0.06]" />
-        <Skeleton className="h-5 w-16 rounded-full bg-white/[0.06]" />
+        <Skeleton className="h-7 w-24 rounded-lg bg-black/[0.04]" />
+        <Skeleton className="h-5 w-16 rounded-full bg-black/[0.04]" />
       </div>
-      <Skeleton className="h-3.5 w-52 rounded-md bg-white/[0.06] mb-4" />
+      <Skeleton className="h-3.5 w-52 rounded-md bg-black/[0.04] mb-4" />
       <div className="grid grid-cols-3 gap-2 mb-3">
-        <Skeleton className="h-[68px] rounded-2xl bg-white/[0.05]" />
-        <Skeleton className="h-[68px] rounded-2xl bg-white/[0.05]" />
-        <Skeleton className="h-[68px] rounded-2xl bg-white/[0.05]" />
+        <Skeleton className="h-[68px] rounded-2xl bg-black/[0.03]" />
+        <Skeleton className="h-[68px] rounded-2xl bg-black/[0.03]" />
+        <Skeleton className="h-[68px] rounded-2xl bg-black/[0.03]" />
       </div>
       <div className="space-y-3">
-        <Skeleton className="h-[300px] rounded-3xl bg-white/[0.05]" />
-        <Skeleton className="h-[230px] rounded-3xl bg-white/[0.05]" />
-        <Skeleton className="h-[230px] rounded-3xl bg-white/[0.05]" />
-        <Skeleton className="h-14 rounded-3xl bg-white/[0.05]" />
+        <Skeleton className="h-[300px] rounded-3xl bg-black/[0.03]" />
+        <Skeleton className="h-[230px] rounded-3xl bg-black/[0.03]" />
+        <Skeleton className="h-[230px] rounded-3xl bg-black/[0.03]" />
+        <Skeleton className="h-14 rounded-3xl bg-black/[0.03]" />
       </div>
     </div>
   );
@@ -923,7 +923,7 @@ export function InsightsScreen() {
                     {formatNumber(Math.round(f.value))}%
                   </span>
                 </div>
-                <div className="h-1.5 rounded-full bg-white/[0.07] overflow-hidden">
+                <div className="h-1.5 rounded-full bg-black/[0.04] overflow-hidden">
                   <motion.div
                     className="h-full rounded-full"
                     style={{ background: FACTOR_COLORS[i % FACTOR_COLORS.length] }}
@@ -976,7 +976,7 @@ export function InsightsScreen() {
               );
             })}
           </div>
-          <div className="my-3.5 h-px bg-white/[0.07]" />
+          <div className="my-3.5 h-px bg-black/[0.04]" />
           <div className="rounded-2xl border border-dashed border-primary/40 bg-primary/[0.05] px-3.5 py-3">
             <div className="mb-1 text-[10.5px] font-semibold text-primary">جرّب هذا الأسبوع</div>
             <p className="text-[12px] leading-relaxed">{story.suggestion}</p>

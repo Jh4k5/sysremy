@@ -144,7 +144,7 @@ export function HomeScreen() {
       {/* ═══ البطل ═══ */}
       <motion.div {...widgetEnter(0.05)} className="mb-3">
         <GlassCard className="p-4">
-          <div className="grid grid-cols-3 divide-x divide-x-reverse divide-white/[0.06]">
+          <div className="grid grid-cols-3 divide-x divide-x-reverse divide-black/[0.05]">
             <div className="px-2 text-center">
               <p className="num-display text-[24px] font-bold tabular text-cyan">{formatNumber(pendingGrocery)}</p>
               <p className="mt-1 text-[10px] leading-tight text-muted-foreground">بند بقالة معلق</p>
@@ -166,7 +166,7 @@ export function HomeScreen() {
         <button
           type="button"
           onClick={() => goToCalendar()}
-          className="flex h-11 flex-1 items-center justify-center gap-2 rounded-2xl glass-soft border border-white/[0.08] text-[12px] font-medium text-foreground/85 transition-colors hover:bg-white/[0.07] active:scale-[0.98]"
+          className="flex h-11 flex-1 items-center justify-center gap-2 rounded-2xl glass-soft border border-black/[0.07] text-[12px] font-medium text-foreground/85 transition-colors hover:bg-black/[0.04] active:scale-[0.98]"
         >
           <CalendarDays className="h-4 w-4 text-primary" aria-hidden="true" />
           التقويم
@@ -174,7 +174,7 @@ export function HomeScreen() {
         <button
           type="button"
           onClick={() => goToMoney()}
-          className="flex h-11 flex-1 items-center justify-center gap-2 rounded-2xl glass-soft border border-white/[0.08] text-[12px] font-medium text-foreground/85 transition-colors hover:bg-white/[0.07] active:scale-[0.98]"
+          className="flex h-11 flex-1 items-center justify-center gap-2 rounded-2xl glass-soft border border-black/[0.07] text-[12px] font-medium text-foreground/85 transition-colors hover:bg-black/[0.04] active:scale-[0.98]"
         >
           <Wallet className="h-4 w-4 text-primary" aria-hidden="true" />
           المال
@@ -203,7 +203,7 @@ export function HomeScreen() {
                 "flex h-11 shrink-0 items-center gap-1.5 rounded-2xl border px-3.5 text-[12px] font-bold transition-colors",
                 active
                   ? "border-primary/50 bg-primary/20 text-primary"
-                  : "glass-soft border-white/[0.08] text-foreground/75 hover:bg-white/[0.06]"
+                  : "glass-soft border-black/[0.07] text-foreground/75 hover:bg-black/[0.04]"
               )}
             >
               <Icon className="h-4 w-4" aria-hidden="true" />
@@ -299,7 +299,7 @@ function GrocerySection({ items, openQuickAdd }: { items: ListItem[]; openQuickA
             if (e.key === "Enter") void add();
           }}
           placeholder="بند البقالة…"
-          className="h-11 flex-1 min-w-0 rounded-xl glass-soft border border-white/[0.08] px-4 text-[13.5px] text-foreground placeholder:text-muted-foreground/50 focus:border-primary/40 focus:outline-none transition-colors"
+          className="h-11 flex-1 min-w-0 rounded-xl glass-soft border border-black/[0.07] px-4 text-[13.5px] text-foreground placeholder:text-muted-foreground/50 focus:border-primary/40 focus:outline-none transition-colors"
           aria-label="بند بقالة جديد"
         />
         <input
@@ -310,7 +310,7 @@ function GrocerySection({ items, openQuickAdd }: { items: ListItem[]; openQuickA
           }}
           placeholder="كمية"
           inputMode="text"
-          className="h-11 w-[74px] shrink-0 rounded-xl glass-soft border border-white/[0.08] px-3 text-center text-[12.5px] text-foreground placeholder:text-muted-foreground/50 focus:border-primary/40 focus:outline-none transition-colors"
+          className="h-11 w-[74px] shrink-0 rounded-xl glass-soft border border-black/[0.07] px-3 text-center text-[12.5px] text-foreground placeholder:text-muted-foreground/50 focus:border-primary/40 focus:outline-none transition-colors"
           aria-label="كمية البند (اختياري)"
         />
         <button
@@ -340,7 +340,7 @@ function GrocerySection({ items, openQuickAdd }: { items: ListItem[]; openQuickA
               <button
                 type="button"
                 onClick={() => void clearDoneItems("grocery")}
-                className="flex h-11 items-center gap-1.5 rounded-xl glass-soft border border-white/[0.08] px-3 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-white/[0.07] hover:text-foreground"
+                className="flex h-11 items-center gap-1.5 rounded-xl glass-soft border border-black/[0.07] px-3 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-black/[0.04] hover:text-foreground"
               >
                 <Eraser className="h-3.5 w-3.5" aria-hidden="true" />
                 مسح المنجز
@@ -562,7 +562,7 @@ function HomeTasksSection({ tasks }: { tasks: Task[] }) {
             if (e.key === "Enter") void add();
           }}
           placeholder="مهمة منزلية… ترتيب، إصلاح، شراء"
-          className="h-11 flex-1 min-w-0 rounded-xl glass-soft border border-white/[0.08] px-4 text-[13.5px] text-foreground placeholder:text-muted-foreground/50 focus:border-primary/40 focus:outline-none transition-colors"
+          className="h-11 flex-1 min-w-0 rounded-xl glass-soft border border-black/[0.07] px-4 text-[13.5px] text-foreground placeholder:text-muted-foreground/50 focus:border-primary/40 focus:outline-none transition-colors"
           aria-label="مهمة منزلية جديدة"
         />
         <button
@@ -616,7 +616,7 @@ function HomeTaskRow({ task }: { task: Task }) {
       onClick={() => void toggle()}
       aria-pressed={done}
       aria-label={`${done ? "إرجاع" : "إنجاز"} مهمة ${task.title}`}
-      className="flex w-full items-center gap-3 rounded-2xl glass-soft px-3 py-2.5 text-start transition-colors hover:bg-white/[0.05] min-h-[44px]"
+      className="flex w-full items-center gap-3 rounded-2xl glass-soft px-3 py-2.5 text-start transition-colors hover:bg-black/[0.03] min-h-[44px]"
     >
       <span
         className={cn(
@@ -682,7 +682,7 @@ function ItemsSection({
               <span
                 className={cn(
                   "flex h-11 w-11 shrink-0 items-center justify-center rounded-full",
-                  urgent ? "bg-coral/15 text-coral" : "bg-white/[0.06] text-foreground/70"
+                  urgent ? "bg-coral/15 text-coral" : "bg-black/[0.04] text-foreground/70"
                 )}
                 aria-hidden="true"
               >

@@ -71,7 +71,7 @@ function TripCard({
       role="button"
       tabIndex={0}
       aria-label={`فتح رحلة: ${trip.name} إلى ${trip.destination}`}
-      className="glass cursor-pointer rounded-2xl p-3.5 outline-none transition-all duration-200 hover:bg-white/[0.07] hover:scale-[1.01] active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-primary/40"
+      className="glass cursor-pointer rounded-2xl p-3.5 outline-none transition-all duration-200 hover:bg-black/[0.04] hover:scale-[1.01] active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-primary/40"
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex min-w-0 items-start gap-3">
@@ -116,7 +116,7 @@ function TripCard({
             </PrivateAmount>
           </div>
           <div
-            className="h-1.5 overflow-hidden rounded-full bg-white/[0.06]"
+            className="h-1.5 overflow-hidden rounded-full bg-black/[0.04]"
             role="progressbar"
             aria-valuenow={pct}
             aria-valuemin={0}
@@ -146,13 +146,13 @@ function TravelSkeleton() {
   return (
     <div className="h-full overflow-y-auto sys-scroll px-4 pt-3 pb-28">
       <div className="mb-4 space-y-2">
-        <Skeleton className="h-7 w-40 rounded-lg bg-white/[0.06]" />
-        <Skeleton className="h-3.5 w-56 rounded-md bg-white/[0.06]" />
+        <Skeleton className="h-7 w-40 rounded-lg bg-black/[0.04]" />
+        <Skeleton className="h-3.5 w-56 rounded-md bg-black/[0.04]" />
       </div>
-      <Skeleton className="mb-3 h-[120px] rounded-3xl bg-white/[0.05]" />
+      <Skeleton className="mb-3 h-[120px] rounded-3xl bg-black/[0.03]" />
       <div className="space-y-3">
-        <Skeleton className="h-[128px] rounded-2xl bg-white/[0.06]" />
-        <Skeleton className="h-[128px] rounded-2xl bg-white/[0.06]" />
+        <Skeleton className="h-[128px] rounded-2xl bg-black/[0.04]" />
+        <Skeleton className="h-[128px] rounded-2xl bg-black/[0.04]" />
       </div>
     </div>
   );
@@ -245,7 +245,7 @@ export function TravelScreen() {
               onClick={() => goToCalendar()}
               aria-label="فتح التقويم"
               title="التقويم"
-              className="glass flex h-11 w-11 items-center justify-center rounded-2xl text-muted-foreground transition-all duration-200 hover:bg-white/[0.09] hover:text-foreground active:scale-95"
+              className="glass flex h-11 w-11 items-center justify-center rounded-2xl text-muted-foreground transition-all duration-200 hover:bg-black/[0.05] hover:text-foreground active:scale-95"
             >
               <CalendarDays className="h-5 w-5" />
             </button>

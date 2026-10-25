@@ -311,7 +311,7 @@ export function HabitsScreen() {
               </span>
             </div>
             <div
-              className="h-2 overflow-hidden rounded-full bg-white/[0.06]"
+              className="h-2 overflow-hidden rounded-full bg-black/[0.04]"
               role="progressbar"
               aria-valuenow={doneCount}
               aria-valuemin={0}
@@ -378,7 +378,7 @@ export function HabitsScreen() {
               onClick={() => setStatsOpen((o) => !o)}
               aria-expanded={statsOpen}
               aria-controls="habits-stats"
-              className="flex w-full items-center justify-between gap-2 px-4 py-3.5 transition-colors hover:bg-white/[0.03]"
+              className="flex w-full items-center justify-between gap-2 px-4 py-3.5 transition-colors hover:bg-black/[0.02]"
             >
               <span className="flex items-center gap-2 text-[13px] font-semibold">
                 <TrendingUp className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
@@ -398,7 +398,7 @@ export function HabitsScreen() {
               </span>
             </button>
             {statsOpen && (
-              <div id="habits-stats" className="space-y-4 border-t border-white/[0.06] px-4 pb-4 pt-3">
+              <div id="habits-stats" className="space-y-4 border-t border-black/[0.05] px-4 pb-4 pt-3">
                 <div className="grid grid-cols-3 gap-2">
                   <StatTile icon={<Target className="h-4 w-4" />} value={rows.length} label="عادات نشطة" />
                   <StatTile icon={<Flame className="h-4 w-4" />} value={bestRow?.streak ?? 0} label="أفضل سلسلة" />
@@ -428,7 +428,7 @@ export function HabitsScreen() {
                       <span className="h-2.5 w-2.5 rounded-[3px] bg-primary/40" aria-hidden="true" /> جزئي
                     </span>
                     <span className="flex items-center gap-1.5">
-                      <span className="h-2.5 w-2.5 rounded-[3px] bg-white/[0.08]" aria-hidden="true" /> بدون
+                      <span className="h-2.5 w-2.5 rounded-[3px] bg-black/[0.05]" aria-hidden="true" /> بدون
                     </span>
                   </div>
                 </div>
@@ -447,7 +447,7 @@ export function HabitsScreen() {
               onClick={() => setArchivedOpen((o) => !o)}
               aria-expanded={archivedOpen}
               aria-controls="habits-archived"
-              className="flex w-full items-center justify-between gap-2 px-4 py-3.5 transition-colors hover:bg-white/[0.03]"
+              className="flex w-full items-center justify-between gap-2 px-4 py-3.5 transition-colors hover:bg-black/[0.02]"
             >
               <span className="flex items-center gap-2 text-[13px] font-semibold text-foreground/80">
                 <Archive className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
@@ -463,13 +463,13 @@ export function HabitsScreen() {
               />
             </button>
             {archivedOpen && (
-              <div id="habits-archived" className="sys-scroll max-h-72 space-y-2 overflow-y-auto border-t border-white/[0.06] p-3">
+              <div id="habits-archived" className="sys-scroll max-h-72 space-y-2 overflow-y-auto border-t border-black/[0.05] p-3">
                 {archived.map((h) => {
                   const Icon = iconByName(h.icon.toLowerCase());
                   return (
                     <div
                       key={h.id}
-                      className="flex items-center gap-2.5 rounded-xl glass-soft border border-white/[0.06] p-2.5"
+                      className="flex items-center gap-2.5 rounded-xl glass-soft border border-black/[0.05] p-2.5"
                     >
                       <span
                         className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl opacity-60"
@@ -497,7 +497,7 @@ export function HabitsScreen() {
                       <button
                         type="button"
                         onClick={() => setDeleting(h)}
-                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl glass-soft border border-white/[0.06] text-muted-foreground transition-colors hover:text-coral"
+                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl glass-soft border border-black/[0.05] text-muted-foreground transition-colors hover:text-coral"
                         aria-label={`حذف «${h.name}»`}
                       >
                         <Trash2 className="h-4 w-4" aria-hidden="true" />
@@ -528,7 +528,7 @@ export function HabitsScreen() {
       <Dialog open={deleting !== null} onOpenChange={(o) => !o && setDeleting(null)}>
         <DialogContent
           dir="rtl"
-          className="mx-auto max-w-sm rounded-3xl border-white/10 bg-[#0B0F1A]/95 p-5 backdrop-blur-2xl"
+          className="mx-auto max-w-sm rounded-3xl border-black/[0.08] bg-white/95 p-5 backdrop-blur-xl shadow-[0_24px_60px_-20px_rgba(23,33,43,0.35)]"
         >
           <DialogHeader className="text-right">
             <DialogTitle className="text-right text-[15px]">حذف العادة؟</DialogTitle>
@@ -682,12 +682,12 @@ function HabitCard({
                 type="button"
                 onClick={(e) => e.stopPropagation()}
                 aria-label={`خيارات ${h.name}`}
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl glass-soft border border-white/[0.06] text-muted-foreground transition-colors hover:text-foreground"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl glass-soft border border-black/[0.05] text-muted-foreground transition-colors hover:text-foreground"
               >
                 <MoreVertical className="h-4 w-4" aria-hidden="true" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="rounded-xl border-white/10 bg-[#10152a]">
+            <DropdownMenuContent align="end" className="rounded-xl border-black/[0.08] bg-white">
               <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onEdit(); }} className="text-[13px]">
                 <Pencil aria-hidden="true" /> تعديل
               </DropdownMenuItem>
@@ -742,7 +742,7 @@ function HabitCard({
             </span>
           </div>
           <div
-            className="h-1.5 overflow-hidden rounded-full bg-white/[0.06]"
+            className="h-1.5 overflow-hidden rounded-full bg-black/[0.04]"
             role="progressbar"
             aria-valuenow={countToday}
             aria-valuemin={0}
@@ -782,7 +782,7 @@ function HabitCard({
                   e.stopPropagation();
                   onStartTimer();
                 }}
-                className="flex h-11 flex-1 items-center justify-center gap-1.5 rounded-xl glass-soft border border-white/[0.08] text-[12px] font-bold text-foreground/90 transition-colors hover:bg-white/[0.06]"
+                className="flex h-11 flex-1 items-center justify-center gap-1.5 rounded-xl glass-soft border border-black/[0.07] text-[12px] font-bold text-foreground/90 transition-colors hover:bg-black/[0.04]"
                 aria-label={`بدء مؤقت «${h.name}»`}
               >
                 <Play className="h-4 w-4 shrink-0" style={{ color: h.color }} aria-hidden="true" />

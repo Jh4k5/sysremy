@@ -138,7 +138,7 @@ export function GoalsSection({ data }: { data: MoneyData }) {
                     </button>
                   </div>
 
-                  <div className="h-2 rounded-full bg-white/[0.06] mt-3 overflow-hidden">
+                  <div className="h-2 rounded-full bg-black/[0.04] mt-3 overflow-hidden">
                     <div
                       className="h-full rounded-full"
                       style={{ width: `${pct}%`, background: done ? "linear-gradient(90deg, #F5B95C, #6EE7A8)" : g.color }}
@@ -161,7 +161,7 @@ export function GoalsSection({ data }: { data: MoneyData }) {
                     {g.savedAmount > 0 && (
                       <button
                         onClick={() => setWithdrawing(g)}
-                        className="flex-1 h-11 rounded-xl glass-soft border border-white/[0.08] text-foreground/75 text-[12px] font-bold hover:bg-white/[0.07] transition-colors"
+                        className="flex-1 h-11 rounded-xl glass-soft border border-black/[0.07] text-foreground/75 text-[12px] font-bold hover:bg-black/[0.04] transition-colors"
                       >
                         اسحب
                       </button>
@@ -275,7 +275,7 @@ function GoalMoveSheet({
                 "h-11 px-3.5 rounded-xl border text-[12px] font-medium shrink-0 transition-all",
                 accountId === "none"
                   ? "bg-primary/20 border-primary/50 text-primary"
-                  : "glass-soft border-white/[0.08] text-foreground/75 hover:text-foreground"
+                  : "glass-soft border-black/[0.07] text-foreground/75 hover:text-foreground"
               )}
             >
               بدون ربط بحساب
@@ -291,7 +291,7 @@ function GoalMoveSheet({
                   "h-11 px-3.5 rounded-xl border text-[12px] font-medium flex items-center gap-1.5 shrink-0 transition-all",
                   accountId === a.id
                     ? "bg-primary/20 border-primary/50 text-primary"
-                    : "glass-soft border-white/[0.08] text-foreground/75 hover:text-foreground"
+                    : "glass-soft border-black/[0.07] text-foreground/75 hover:text-foreground"
                 )}
               >
                 <span className="w-2 h-2 rounded-full" style={{ background: a.color }} aria-hidden="true" />
@@ -411,7 +411,7 @@ function GoalSheet({ editing, data, onClose }: { editing: Goal | "new"; data: Mo
                 onClick={() => setEmoji(e)}
                 className={cn(
                   "aspect-square rounded-xl flex items-center justify-center text-[20px] transition-all",
-                  emoji === e ? "bg-primary/25 border border-primary/50 scale-105" : "glass-soft border border-white/[0.06] hover:bg-white/[0.07]"
+                  emoji === e ? "bg-primary/25 border border-primary/50 scale-105" : "glass-soft border border-black/[0.05] hover:bg-black/[0.04]"
                 )}
               >
                 {e}

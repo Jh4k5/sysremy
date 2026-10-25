@@ -11,7 +11,7 @@ const plexArabic = IBM_Plex_Sans_Arabic({
 });
 
 export const metadata: Metadata = {
-  title: "Systemy — ابنِ حياتك كنظام",
+  title: "Systemy 5.1 — ابنِ حياتك كنظام",
   description:
     "نظام تشغيل شخصي يجمع المال والملاحظات والعادات والأهداف في تدفق واحد. عربي أولاً، يبني ذكاؤه الاصطناعي أنظمتك ويحللها ويقترح تحسينها.",
   keywords: ["Systemy", "سيستمي", "إدارة حياة", "مصاريف", "عادات", "يوميات", "أهداف", "نظام شخصي"],
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0B0F1A",
+  themeColor: "#F8F7F2",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -46,7 +46,7 @@ export default function RootLayout({
         className={`${plexArabic.variable} font-sans antialiased bg-background text-foreground`}
       >
         {children}
-        <Toaster position="top-center" theme="dark" richColors closeButton dir="rtl" />
+        <Toaster position="top-center" theme="light" richColors closeButton dir="rtl" />
       </body>
     </html>
   );

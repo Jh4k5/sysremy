@@ -100,7 +100,7 @@ export function PaceBar({
   const pace = Math.min(100, Math.max(0, Math.round(pacePercent)));
   return (
     <div
-      className={cn("relative h-2 rounded-full bg-white/[0.08]", className)}
+      className={cn("relative h-2 rounded-full bg-black/[0.05]", className)}
       role={ariaLabel ? "progressbar" : undefined}
       aria-label={ariaLabel}
       aria-valuenow={ariaLabel ? Math.max(0, Math.min(100, Math.round(percent))) : undefined}
@@ -330,7 +330,7 @@ export function BudgetSection({ data, onGoToTab }: { data: MoneyData; onGoToTab:
                 onClick={() => setSheetOpen(true)}
                 aria-label="تعديل إعدادات الميزانية"
                 className={cn(
-                  "w-11 h-11 rounded-xl glass-soft border border-white/[0.08] flex items-center justify-center text-primary hover:bg-white/[0.07] shrink-0",
+                  "w-11 h-11 rounded-xl glass-soft border border-black/[0.07] flex items-center justify-center text-primary hover:bg-black/[0.04] shrink-0",
                   press,
                 )}
               >
@@ -442,7 +442,7 @@ export function BudgetSection({ data, onGoToTab }: { data: MoneyData; onGoToTab:
             </div>
 
             {/* المتبقي البارز جداً + الحد اليومي الحي */}
-            <div className="mt-3 rounded-2xl glass-soft p-3.5 border border-white/[0.05]">
+            <div className="mt-3 rounded-2xl glass-soft p-3.5 border border-black/[0.04]">
               {overWeek ? (
                 <>
                   <p className="text-[11px] font-bold text-coral flex items-center gap-1.5">
@@ -463,12 +463,12 @@ export function BudgetSection({ data, onGoToTab }: { data: MoneyData; onGoToTab:
               )}
 
               {/* الحد اليومي الحي — رقيقة الشريط: خلفية شريطية خافتة ورقم بلون سماوي الشريط */}
-              <div className="mt-3 ribbon-soft rounded-xl border border-white/[0.06] px-3 py-2.5 flex items-baseline justify-between gap-2 flex-wrap">
+              <div className="mt-3 ribbon-soft rounded-xl border border-black/[0.05] px-3 py-2.5 flex items-baseline justify-between gap-2 flex-wrap">
                 <p className="text-[11.5px] text-foreground/75">حدك اليومي المتبقي</p>
                 <PrivateAmount
                   className={cn(
                     "num-display text-[24px] font-bold leading-none",
-                    overWeek ? "text-coral" : "text-[color:var(--ribbon-cyan)]",
+                    overWeek ? "text-coral" : "text-cyan",
                   )}
                 >
                   {formatMoney(ws.dailyLimit, cur)}
@@ -492,7 +492,7 @@ export function BudgetSection({ data, onGoToTab }: { data: MoneyData; onGoToTab:
                         title={`${d.label} · ${formatMoney(d.spent, cur)}`}
                         className={cn(
                           "flex-1 min-w-0 flex flex-col items-center gap-1 rounded-lg pt-1",
-                          d.isToday && "bg-white/[0.04]",
+                          d.isToday && "bg-black/[0.03]",
                         )}
                       >
                         <span
@@ -541,7 +541,7 @@ export function BudgetSection({ data, onGoToTab }: { data: MoneyData; onGoToTab:
                     key={wk.index}
                     className={cn(
                       "shrink-0 rounded-full px-2.5 py-1 text-[10px] font-semibold tabular glass-soft border",
-                      active ? "border-primary/50 text-primary" : "border-white/[0.06] text-muted-foreground",
+                      active ? "border-primary/50 text-primary" : "border-black/[0.05] text-muted-foreground",
                       over && "text-coral border-coral/25",
                     )}
                   >
@@ -591,7 +591,7 @@ export function BudgetSection({ data, onGoToTab }: { data: MoneyData; onGoToTab:
               aria-valuemin={0}
               aria-valuemax={100}
             >
-              <div className="h-1.5 rounded-full bg-white/[0.07] overflow-hidden">
+              <div className="h-1.5 rounded-full bg-black/[0.04] overflow-hidden">
                 <div className="h-full rounded-full ribbon" style={{ width: `${savingsShare}%` }} />
               </div>
               <p className="mt-1 text-[9.5px] text-muted-foreground tabular">
@@ -610,7 +610,7 @@ export function BudgetSection({ data, onGoToTab }: { data: MoneyData; onGoToTab:
                 "min-h-11 px-3 rounded-xl border flex items-center justify-center gap-1.5 text-[12px] font-bold",
                 quickForm === "income"
                   ? "bg-mint/15 border-mint/40 text-mint"
-                  : "glass-soft border-white/[0.08] text-foreground/85 hover:bg-white/[0.07]",
+                  : "glass-soft border-black/[0.07] text-foreground/85 hover:bg-black/[0.04]",
                 press,
               )}
             >
@@ -703,7 +703,7 @@ export function BudgetSection({ data, onGoToTab }: { data: MoneyData; onGoToTab:
           ) : (
             <div className="mt-1">
               {outsideTxs.map((t) => (
-                <div key={t.id} className="py-2 flex items-center gap-2.5 border-t border-white/[0.05] first:border-t-0">
+                <div key={t.id} className="py-2 flex items-center gap-2.5 border-t border-black/[0.04] first:border-t-0">
                   <IconBubble
                     icon={t.recurringId ? "repeat" : "receipt"}
                     color={t.recurringId ? "#F5B95C" : "#94A3B8"}
@@ -782,7 +782,7 @@ export function BudgetSection({ data, onGoToTab }: { data: MoneyData; onGoToTab:
               <PrivateAmount className="font-semibold text-foreground/90">{formatMoney(uncategorized, cur)}</PrivateAmount> من إجمالي{" "}
               <PrivateAmount>{formatMoney(ws.month.spent, cur)}</PrivateAmount>
             </p>
-            <div className="h-1.5 rounded-full bg-white/[0.05] mt-2 overflow-hidden" aria-hidden="true">
+            <div className="h-1.5 rounded-full bg-black/[0.03] mt-2 overflow-hidden" aria-hidden="true">
               <div
                 className="h-full rounded-full bg-gold"
                 style={{ width: `${Math.min(100, ws.month.spent > 0 ? (uncategorized / ws.month.spent) * 100 : 0)}%` }}
@@ -816,7 +816,7 @@ export function BudgetSection({ data, onGoToTab }: { data: MoneyData; onGoToTab:
           ) : (
             <div className="max-h-96 overflow-y-auto sys-scroll">
               {envs.map((e) => (
-                <div key={e.category.id} className="py-2.5 border-t border-white/[0.05] first:border-t-0">
+                <div key={e.category.id} className="py-2.5 border-t border-black/[0.04] first:border-t-0">
                   <div className="flex items-center gap-2.5">
                     <IconBubble icon={e.category.icon} color={e.category.color} className="w-8 h-8" iconClassName="w-4 h-4" />
                     <span className="text-[12.5px] font-medium flex-1 truncate">{e.category.name}</span>
@@ -829,7 +829,7 @@ export function BudgetSection({ data, onGoToTab }: { data: MoneyData; onGoToTab:
                       {formatNumber(e.percent)}%
                     </span>
                   </div>
-                  <div className="h-1.5 rounded-full bg-white/[0.05] mt-2 overflow-hidden" aria-hidden="true">
+                  <div className="h-1.5 rounded-full bg-black/[0.03] mt-2 overflow-hidden" aria-hidden="true">
                     <div
                       className="h-full rounded-full"
                       style={{ width: `${Math.min(100, e.percent)}%`, background: ENV_COLOR[e.status] }}
@@ -894,7 +894,7 @@ function QuickAmountForm({
   };
 
   return (
-    <div className="mt-3 pt-3 border-t border-white/[0.07] space-y-2.5">
+    <div className="mt-3 pt-3 border-t border-black/[0.06] space-y-2.5">
       <div>
         <p className="text-[12.5px] font-semibold text-foreground/90">{title}</p>
         {hint && <p className="text-[10.5px] text-muted-foreground mt-0.5 leading-relaxed">{hint}</p>}
@@ -934,7 +934,7 @@ function QuickAmountForm({
           type="button"
           onClick={onCancel}
           className={cn(
-            "flex-1 min-h-11 rounded-xl glass-soft border border-white/[0.08] text-foreground/80 text-[13px] font-semibold hover:bg-white/[0.07]",
+            "flex-1 min-h-11 rounded-xl glass-soft border border-black/[0.07] text-foreground/80 text-[13px] font-semibold hover:bg-black/[0.04]",
             press,
           )}
         >
@@ -1030,7 +1030,7 @@ function BudgetSettingsSheet({
   };
 
   const chipCls = cn(
-    "min-h-11 px-3.5 rounded-xl glass-soft border border-white/[0.08] text-[11.5px] font-medium text-foreground/85 hover:bg-white/[0.07]",
+    "min-h-11 px-3.5 rounded-xl glass-soft border border-black/[0.07] text-[11.5px] font-medium text-foreground/85 hover:bg-black/[0.04]",
     press,
   );
 
@@ -1130,7 +1130,7 @@ function BudgetSettingsSheet({
                     "min-h-11 rounded-xl border px-2 py-2.5 text-[10.5px] font-semibold leading-snug text-center",
                     active
                       ? "bg-primary/20 border-primary/50 text-primary"
-                      : "glass-soft border-white/[0.08] text-foreground/75 hover:bg-white/[0.06]",
+                      : "glass-soft border-black/[0.07] text-foreground/75 hover:bg-black/[0.04]",
                     press,
                   )}
                 >

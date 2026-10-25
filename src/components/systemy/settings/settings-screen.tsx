@@ -8,15 +8,16 @@
  */
 
 import { useEffect, useRef, useState, type ChangeEvent, type ReactNode } from "react";
-import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  Activity, AlertTriangle, ArrowLeft, Bell, ChevronDown, Database, Download, Info,
-  KeyRound, Lock, Palette, RotateCcw, Save, ShieldCheck, Sparkles, Trash2, Upload,
+  Activity, AlertTriangle, ArrowLeft, Bell, ChevronDown, Database, Download, FileText, Info,
+  KeyRound, Loader2, Lock, Palette, RotateCcw, Save, ShieldCheck, Sparkles, Trash2, Upload,
   User, Wallet, X,
 } from "lucide-react";
 import { toast } from "sonner";
+import { downloadHTMLReport } from "@/lib/report";
 import { Switch } from "@/components/ui/switch";
+import { Logo } from "@/components/systemy/logo";
 import {
   db, getSettings, resetScope, RESET_SCOPES, RESET_SCOPE_LABELS, useLive, type ResetScope,
 } from "@/lib/db";
@@ -72,7 +73,7 @@ export function applyAccent(color: string): void {
   document.documentElement.style.setProperty("--ring", color);
 }
 
-const APP_VERSION = "5.0";
+const APP_VERSION = "5.1";
 
 /** عناوين عربية للجداول (للمعاينات والتشخيص) */
 const TABLE_AR: Record<string, string> = {
@@ -210,6 +211,9 @@ export function SettingsScreen() {
     <div className="relative h-full">
       <div className="h-full overflow-y-auto sys-scroll px-4 pt-3 pb-28">
         <motion.div {...widgetEnter()} className="space-y-3.5">
+          {/* عنوان الوجهة */}
+          <h1 className="text-[22px] font-bold leading-tight px-1">أنا</h1>
+
           {/* بطاقة الملخص */}
           <GlassCard className="p-4 flex items-center gap-3.5">
             <span className="w-14 h-14 rounded-2xl glass-soft flex items-center justify-center text-[30px] shrink-0" aria-hidden="true">
@@ -220,11 +224,11 @@ export function SettingsScreen() {
                 {settings.displayName || "صاحب النظام"}
               </p>
               <p className="text-[11px] text-muted-foreground mt-0.5 flex items-center gap-1.5">
-                <Image src="/brand/logo-128.png" alt="" width={18} height={18} className="rounded-md shrink-0" aria-hidden="true" />
+            <Logo size={"sm"} className="rounded-md shrink-0" />
                 Systemy — نظام تشغيلك الشخصي
               </p>
             </div>
-            <Chip className="text-primary border border-primary/25 shrink-0">v{APP_VERSION}</Chip>
+            <Chip className="text-gold border border-primary/25 shrink-0">v{APP_VERSION}</Chip>
           </GlassCard>
 
           <ProfileSection key={profileKey} settings={settings} />
@@ -233,6 +237,7 @@ export function SettingsScreen() {
           <LockSection settings={settings} onDialog={setPinDialog} />
           <FinanceSection key={settings.monthlyIncome} settings={settings} />
           <DataSection />
+          <ToolsSection />
           <AboutSection />
 
           <p className="text-center text-[10.5px] text-muted-foreground/70 pt-1">
@@ -318,7 +323,7 @@ function ProfileSection({ settings }: { settings: Settings }) {
                   "aspect-square min-h-11 rounded-xl flex items-center justify-center text-[20px] transition-all",
                   active
                     ? "bg-primary/25 border border-primary/50 scale-105"
-                    : "glass-soft border border-white/[0.06] hover:bg-white/[0.06]"
+                    : "glass-soft border border-black/[0.05] hover:bg-black/[0.04]"
                 )}
               >
                 <span aria-hidden="true">{emoji}</span>
@@ -333,7 +338,7 @@ function ProfileSection({ settings }: { settings: Settings }) {
           className={inputCls}
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="مثال: خالد"
+          placeholder="مثال: محمد"
           maxLength={30}
           autoComplete="off"
           aria-label="الاسم المعروض"
@@ -373,7 +378,7 @@ function ProfileSection({ settings }: { settings: Settings }) {
                   "h-11 min-h-11 px-4 rounded-xl border text-[13px] font-bold tabular-nums transition-colors",
                   active
                     ? "bg-primary/20 border-primary/50 text-primary"
-                    : "glass-soft border-white/[0.08] text-foreground/80 hover:bg-white/[0.06]"
+                    : "glass-soft border-black/[0.07] text-foreground/80 hover:bg-black/[0.04]"
                 )}
               >
                 يوم {d}
@@ -387,7 +392,7 @@ function ProfileSection({ settings }: { settings: Settings }) {
             value={monthDay}
             onChange={(e) => setMonthDay(e.target.value)}
             onBlur={() => setMonthDay(String(clampDay(monthDay)))}
-            className="w-24 h-11 min-h-11 rounded-xl glass-soft border border-white/[0.08] px-3 text-center text-[13px] tabular-nums focus:border-primary/40 focus:outline-none transition-colors"
+            className="w-24 h-11 min-h-11 rounded-xl glass-soft border border-black/[0.07] px-3 text-center text-[13px] tabular-nums focus:border-primary/40 focus:outline-none transition-colors"
             aria-label="يوم بداية الشهر المالي من 1 إلى 28"
           />
         </div>
@@ -462,8 +467,8 @@ function AppearanceSection({ settings }: { settings: Settings }) {
                 className={cn(
                   "flex-1 min-h-11 flex flex-col items-center gap-1.5 py-2.5 rounded-xl border transition-all active:scale-95",
                   active
-                    ? "border-white/25 bg-white/[0.07]"
-                    : "border-transparent hover:bg-white/[0.04]"
+                    ? "border-white/25 bg-black/[0.04]"
+                    : "border-transparent hover:bg-black/[0.03]"
                 )}
               >
                 <span
@@ -634,7 +639,7 @@ function LockSection({
         <button
           type="button"
           onClick={() => onDialog("change")}
-          className="w-full h-12 min-h-12 rounded-xl glass-soft border border-white/[0.08] text-[13px] font-semibold flex items-center justify-center gap-2 transition-colors hover:bg-white/[0.06]"
+          className="w-full h-12 min-h-12 rounded-xl glass-soft border border-black/[0.07] text-[13px] font-semibold flex items-center justify-center gap-2 transition-colors hover:bg-black/[0.04]"
         >
           <KeyRound className="w-4 h-4" aria-hidden="true" />
           تغيير الرمز
@@ -774,7 +779,7 @@ function PinDialog({
       aria-modal="true"
       aria-label={copy.title}
     >
-      <div className="absolute inset-0 bg-[#05070d]/70 backdrop-blur-[6px]" onClick={onClose} aria-hidden="true" />
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-[4px]" onClick={onClose} aria-hidden="true" />
       <motion.div
         key={shakeKey}
         animate={shakeKey > 0 ? { x: [0, -10, 10, -8, 8, -4, 4, 0] } : undefined}
@@ -809,7 +814,7 @@ function PinDialog({
             type="button"
             onClick={onClose}
             disabled={busy}
-            className="w-full h-11 min-h-11 rounded-xl glass-soft border border-white/[0.08] text-[12.5px] font-medium transition-colors hover:bg-white/[0.06] disabled:opacity-50"
+            className="w-full h-11 min-h-11 rounded-xl glass-soft border border-black/[0.07] text-[12.5px] font-medium transition-colors hover:bg-black/[0.04] disabled:opacity-50"
           >
             إلغاء
           </button>
@@ -1023,7 +1028,7 @@ function FinanceSection({ settings }: { settings: Settings }) {
       <button
         type="button"
         onClick={() => goToMoney()}
-        className="w-full min-h-11 flex items-center justify-between gap-2 rounded-xl glass-soft p-3.5 transition-colors hover:bg-white/[0.06]"
+        className="w-full min-h-11 flex items-center justify-between gap-2 rounded-xl glass-soft p-3.5 transition-colors hover:bg-black/[0.04]"
         aria-label="فتح شاشة المال"
       >
         <span className="text-[12.5px] font-semibold">فتح شاشة المال</span>
@@ -1149,7 +1154,7 @@ function DataSection() {
       <button
         type="button"
         onClick={() => void exportBackup()}
-        className="w-full min-h-11 flex items-center gap-3 rounded-xl glass-soft p-3.5 transition-colors hover:bg-white/[0.06]"
+        className="w-full min-h-11 flex items-center gap-3 rounded-xl glass-soft p-3.5 transition-colors hover:bg-black/[0.04]"
       >
         <Download className="w-[18px] h-[18px] text-primary shrink-0" aria-hidden="true" />
         <span className="flex-1 min-w-0 text-right">
@@ -1164,7 +1169,7 @@ function DataSection() {
       <button
         type="button"
         onClick={() => fileRef.current?.click()}
-        className="w-full min-h-11 flex items-center gap-3 rounded-xl glass-soft p-3.5 transition-colors hover:bg-white/[0.06]"
+        className="w-full min-h-11 flex items-center gap-3 rounded-xl glass-soft p-3.5 transition-colors hover:bg-black/[0.04]"
         aria-label="استيراد نسخة احتياطية"
       >
         <Upload className="w-[18px] h-[18px] text-primary shrink-0" aria-hidden="true" />
@@ -1209,7 +1214,7 @@ function DataSection() {
                   type="button"
                   onClick={() => setImportPreview(null)}
                   aria-label="إغلاق معاينة الاستيراد"
-                  className="w-11 h-11 min-h-11 rounded-xl glass-soft flex items-center justify-center shrink-0 transition-colors hover:bg-white/[0.06]"
+                  className="w-11 h-11 min-h-11 rounded-xl glass-soft flex items-center justify-center shrink-0 transition-colors hover:bg-black/[0.04]"
                 >
                   <X className="w-4 h-4" aria-hidden="true" />
                 </button>
@@ -1383,7 +1388,7 @@ function DataSection() {
                   setDelStep(false);
                   setDelText("");
                 }}
-                className="flex-1 h-11 min-h-11 rounded-xl glass-soft border border-white/[0.08] text-[12.5px] font-medium transition-colors hover:bg-white/[0.06]"
+                className="flex-1 h-11 min-h-11 rounded-xl glass-soft border border-black/[0.07] text-[12.5px] font-medium transition-colors hover:bg-black/[0.04]"
               >
                 رجوع
               </button>
@@ -1432,7 +1437,7 @@ function DataSection() {
               {diag === null ? (
                 <div className="pt-3 space-y-1.5">
                   {[0, 1, 2, 3, 4].map((i) => (
-                    <div key={i} className="h-5 rounded-md bg-white/[0.05] animate-pulse" />
+                    <div key={i} className="h-5 rounded-md bg-black/[0.03] animate-pulse" />
                   ))}
                 </div>
               ) : (
@@ -1455,6 +1460,68 @@ function DataSection() {
 
 // ═══════════════════════ 7) حول ═══════════════════════
 
+// ═══════════════════════ أدوات — مستخلص الشهر ومركز الثقة ═══════════════════════
+
+/** أدوات سريعة: تقرير HTML شهري + مركز الثقة والخصوصية (من شاشة المزيد القديمة) */
+function ToolsSection() {
+  const setView = useUIStore((s) => s.setView);
+  const [reportBusy, setReportBusy] = useState(false);
+
+  const makeReport = async () => {
+    if (reportBusy) return;
+    setReportBusy(true);
+    try {
+      const name = await downloadHTMLReport();
+      toast.success("نزّلنا مستخلص الشهر ✓", { description: `${name} — افتحه بأي متصفح أو شاركه` });
+    } catch {
+      toast.error("تعذّر توليد التقرير");
+    } finally {
+      setReportBusy(false);
+    }
+  };
+
+  return (
+    <Section
+      id="tools"
+      icon={<FileText className="w-5 h-5" aria-hidden="true" />}
+      title="أدوات"
+      subtitle="مستخلص الشهر وخصوصيتك"
+    >
+      <div className="grid grid-cols-2 gap-2.5">
+        <button
+          type="button"
+          onClick={() => void makeReport()}
+          disabled={reportBusy}
+          className="glass-soft rounded-2xl p-3.5 text-start min-h-[84px] flex flex-col justify-between border border-black/[0.05] hover:bg-black/[0.03] transition-colors disabled:opacity-60"
+          aria-label="تنزيل مستخلص الشهر بصيغة HTML"
+        >
+          <span className="w-9 h-9 rounded-xl bg-primary/10 text-gold flex items-center justify-center shrink-0">
+            {reportBusy ? <Loader2 className="w-[18px] h-[18px] animate-spin" aria-hidden="true" /> : <FileText className="w-[18px] h-[18px]" aria-hidden="true" />}
+          </span>
+          <span>
+            <span className="block text-[12.5px] font-bold">مستخلص الشهر</span>
+            <span className="block text-[10px] text-muted-foreground leading-snug mt-0.5">تقرير HTML يفتح بأي متصفح</span>
+          </span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setView("trust")}
+          className="glass-soft rounded-2xl p-3.5 text-start min-h-[84px] flex flex-col justify-between border border-black/[0.05] hover:bg-black/[0.03] transition-colors"
+          aria-label="فتح مركز الثقة والخصوصية"
+        >
+          <span className="w-9 h-9 rounded-xl bg-cyan/10 text-cyan flex items-center justify-center shrink-0">
+            <ShieldCheck className="w-[18px] h-[18px]" aria-hidden="true" />
+          </span>
+          <span>
+            <span className="block text-[12.5px] font-bold">مركز الثقة</span>
+            <span className="block text-[10px] text-muted-foreground leading-snug mt-0.5">بياناتك، تصديرك، وحذفك النهائي</span>
+          </span>
+        </button>
+      </div>
+    </Section>
+  );
+}
+
 function AboutSection() {
   return (
     <Section
@@ -1465,12 +1532,9 @@ function AboutSection() {
     >
       <div className="space-y-3 text-[11.5px] leading-relaxed text-muted-foreground">
         <p className="flex items-center gap-2.5 text-foreground/90">
-          <Image
-            src="/brand/logo-128.png"
-            alt="شعار Systemy — روبوت Sys"
-            width={36}
-            height={36}
-            className="rounded-xl border border-white/10 shrink-0"
+          <Logo
+            size="md"
+            className="rounded-xl shrink-0"
           />
           Systemy v{APP_VERSION} — نظام تشغيلك الشخصي
         </p>

@@ -140,7 +140,7 @@ export function HabitTemplatesSheet({
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent
         dir="rtl"
-        className="mx-auto max-w-md rounded-t-3xl border-white/10 bg-[#0B0F1A]/95 backdrop-blur-2xl"
+        className="mx-auto max-w-md rounded-t-3xl border-black/[0.08] bg-white/95 backdrop-blur-xl shadow-[0_-12px_40px_-16px_rgba(23,33,43,0.3)]"
       >
         {/* خيط الشريط أعلى اللوحة — عنصر div حقيقي (نمط V5 للوحات) */}
         <div className="mx-10 h-0.5 rounded-full" style={{ background: RIBBON_GRAD }} aria-hidden="true" />
@@ -182,7 +182,7 @@ export function HabitTemplatesSheet({
                         onClick={() => pick(t)}
                         aria-label={`اختيار قالب ${t.name}`}
                         className={cn(
-                          "glass-soft flex w-full items-center gap-3 rounded-2xl border border-white/[0.06] px-3 py-2.5 text-start",
+                          "glass-soft flex w-full items-center gap-3 rounded-2xl border border-black/[0.05] px-3 py-2.5 text-start",
                           "min-h-11 hover:border-primary/25",
                           RIBBON_PRESS
                         )}

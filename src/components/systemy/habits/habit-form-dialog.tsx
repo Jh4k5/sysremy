@@ -58,7 +58,7 @@ const DAYS_OPTIONS = [
 ];
 
 const selectTriggerCls =
-  "h-12 rounded-xl glass-soft border border-white/[0.08] px-4 text-[13.5px] text-foreground focus:ring-0";
+  "h-12 rounded-xl glass-soft border border-black/[0.07] px-4 text-[13.5px] text-foreground focus:ring-0";
 
 export interface HabitFormDialogProps {
   open: boolean;
@@ -237,7 +237,7 @@ export function HabitFormDialog({
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent
         dir="rtl"
-        className="mx-auto max-w-md rounded-t-3xl border-white/10 bg-[#0B0F1A]/95 backdrop-blur-2xl"
+        className="mx-auto max-w-md rounded-t-3xl border-black/[0.08] bg-white/95 backdrop-blur-xl shadow-[0_-12px_40px_-16px_rgba(23,33,43,0.3)]"
       >
         <DrawerHeader className="pb-1">
           <DrawerTitle className="text-right text-[15px] font-bold">
@@ -256,7 +256,7 @@ export function HabitFormDialog({
               onClick={() => setTemplatesOpen(true)}
               aria-label="تصفح القوالب الجاهزة — ٢١ فكرة عادة"
               className={cn(
-                "flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-white/[0.10] text-[12.5px] font-bold text-foreground/90 hover:border-primary/30",
+                "flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-black/[0.08] text-[12.5px] font-bold text-foreground/90 hover:border-primary/30",
                 RIBBON_PRESS
               )}
               style={{ background: RIBBON_SOFT }}
@@ -351,7 +351,7 @@ export function HabitFormDialog({
                         "h-10 rounded-xl border px-3.5 text-[12px] font-bold transition-colors",
                         Number(timerMinutes) === m
                           ? "border-primary/60 bg-primary/20 text-primary"
-                          : "glass-soft border-white/[0.08] text-foreground/80 hover:bg-white/[0.06]"
+                          : "glass-soft border-black/[0.07] text-foreground/80 hover:bg-black/[0.04]"
                       )}
                     >
                       <span className="tabular">{m}</span> د
@@ -395,7 +395,7 @@ export function HabitFormDialog({
                         "h-10 rounded-xl border px-3.5 text-[12px] font-bold transition-colors",
                         remindAt === p.time
                           ? "border-primary/60 bg-primary/20 text-primary"
-                          : "glass-soft border-white/[0.08] text-foreground/80 hover:bg-white/[0.06]"
+                          : "glass-soft border-black/[0.07] text-foreground/80 hover:bg-black/[0.04]"
                       )}
                     >
                       {p.label}
@@ -433,7 +433,7 @@ export function HabitFormDialog({
                         <SelectTrigger className={selectTriggerCls} aria-label="اختيار الهدف">
                           <SelectValue placeholder="اختر هدفاً" />
                         </SelectTrigger>
-                        <SelectContent className="rounded-xl border-white/10 bg-[#10152a]">
+                        <SelectContent className="rounded-xl border-black/[0.08] bg-white">
                           <SelectItem value="none">بدون</SelectItem>
                           {activeGoals.map((g) => (
                             <SelectItem key={g.id} value={g.id} className="text-[13px]">
@@ -474,7 +474,7 @@ export function HabitFormDialog({
                   type="button"
                   onClick={() => void toggleArchive()}
                   disabled={busy}
-                  className="h-12 flex-1 rounded-2xl glass-soft border border-white/[0.08] text-[12.5px] font-bold text-foreground/80 transition-colors hover:bg-white/[0.06] disabled:opacity-50"
+                  className="h-12 flex-1 rounded-2xl glass-soft border border-black/[0.07] text-[12.5px] font-bold text-foreground/80 transition-colors hover:bg-black/[0.04] disabled:opacity-50"
                 >
                   {habit.archived ? "استعادة من الأرشيف" : "أرشفة"}
                 </button>

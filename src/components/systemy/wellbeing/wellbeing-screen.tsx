@@ -300,7 +300,7 @@ export function WellbeingScreen() {
                             transition={{ duration: 0.5, delay: 0.06 + i * 0.04, ease: [0.22, 1, 0.36, 1] }}
                           />
                         </div>
-                        <div className="h-px w-full max-w-[26px] bg-white/[0.12]" aria-hidden="true" />
+                        <div className="h-px w-full max-w-[26px] bg-black/[0.08]" aria-hidden="true" />
                         <div className="flex h-[26px] w-full max-w-[26px] flex-col justify-start">
                           <motion.div
                             className="w-full rounded-b-[4px]"
@@ -434,7 +434,7 @@ export function WellbeingScreen() {
                     }
                   }}
                   aria-label={`تعديل القاعدة: ${r.text}`}
-                  className="flex min-h-11 cursor-pointer items-center gap-3 border-t border-white/[0.05] p-3 first:border-t-0 transition-colors hover:bg-white/[0.03]"
+                  className="flex min-h-11 cursor-pointer items-center gap-3 border-t border-black/[0.04] p-3 first:border-t-0 transition-colors hover:bg-black/[0.02]"
                 >
                   <span
                     className={cn(
@@ -503,7 +503,7 @@ function ActivityRow({
   const isHealthy = activity.kind === "healthy";
   const tint = isHealthy ? MINT : CORAL;
   return (
-    <div className="flex items-center gap-2.5 border-t border-white/[0.05] p-3 first:border-t-0">
+    <div className="flex items-center gap-2.5 border-t border-black/[0.04] p-3 first:border-t-0">
       <span
         className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
         style={{ background: `${tint}1c`, color: tint }}
@@ -521,7 +521,7 @@ function ActivityRow({
         onClick={onEdit}
         aria-label={`تعديل ${activity.name}`}
         className={cn(
-          "glass-soft flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/[0.06] text-muted-foreground transition-colors hover:text-foreground",
+          "glass-soft flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-black/[0.05] text-muted-foreground transition-colors hover:text-foreground",
           RIBBON_PRESS
         )}
       >
@@ -537,7 +537,7 @@ function ActivityRow({
           "flex h-11 w-11 shrink-0 items-center justify-center rounded-full border transition-colors",
           logged
             ? "border-mint bg-mint text-[#06281f]"
-            : "border-white/[0.12] text-muted-foreground/40 hover:border-mint/40 hover:text-mint/70"
+            : "border-black/[0.1] text-muted-foreground/40 hover:border-mint/40 hover:text-mint/70"
         )}
       >
         <Check className="h-5 w-5" strokeWidth={2.6} aria-hidden="true" />
@@ -605,7 +605,7 @@ function ActivityDialog({
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent
         dir="rtl"
-        className="mx-auto max-w-md rounded-t-3xl border-white/10 bg-[#0B0F1A]/95 backdrop-blur-2xl"
+        className="mx-auto max-w-md rounded-t-3xl border-black/[0.08] bg-white/95 backdrop-blur-xl shadow-[0_-12px_40px_-16px_rgba(23,33,43,0.3)]"
       >
         <div className="mx-10 h-0.5 rounded-full" style={{ background: RIBBON_GRAD }} aria-hidden="true" />
         <DrawerHeader className="pb-1">
@@ -741,7 +741,7 @@ function RuleDialog({
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent
         dir="rtl"
-        className="mx-auto max-w-md rounded-t-3xl border-white/10 bg-[#0B0F1A]/95 backdrop-blur-2xl"
+        className="mx-auto max-w-md rounded-t-3xl border-black/[0.08] bg-white/95 backdrop-blur-xl shadow-[0_-12px_40px_-16px_rgba(23,33,43,0.3)]"
       >
         <div className="mx-10 h-0.5 rounded-full" style={{ background: RIBBON_GRAD }} aria-hidden="true" />
         <DrawerHeader className="pb-1">
@@ -778,7 +778,7 @@ function RuleDialog({
                       "h-10 rounded-xl border px-3.5 text-[12px] font-bold transition-colors",
                       time === p.time
                         ? "border-primary/60 bg-primary/20 text-primary"
-                        : "glass-soft border-white/[0.08] text-foreground/80 hover:bg-white/[0.06]"
+                        : "glass-soft border-black/[0.07] text-foreground/80 hover:bg-black/[0.04]"
                     )}
                   >
                     {p.label}

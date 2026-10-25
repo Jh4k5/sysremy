@@ -22,7 +22,7 @@ import { useUIStore } from "@/store/ui-store";
 import { visibleTags } from "./notes-utils";
 
 const bigTextareaCls =
-  "w-full min-h-48 rounded-xl glass-soft border border-white/[0.08] p-3.5 text-[13.5px] leading-relaxed text-foreground placeholder:text-muted-foreground/50 focus:border-primary/40 focus:outline-none transition-colors resize-none";
+  "w-full min-h-48 rounded-xl glass-soft border border-black/[0.07] p-3.5 text-[13.5px] leading-relaxed text-foreground placeholder:text-muted-foreground/50 focus:border-primary/40 focus:outline-none transition-colors resize-none";
 
 interface EditorState {
   title: string;
@@ -209,7 +209,7 @@ export function NoteDialog({
                   "min-h-11 h-11 rounded-xl text-[12px] font-semibold flex items-center justify-center gap-1.5 transition-colors",
                   editor.pinned
                     ? "bg-primary/15 border border-primary/40 text-primary"
-                    : "glass-soft border border-white/[0.06] text-muted-foreground hover:text-foreground"
+                    : "glass-soft border border-black/[0.05] text-muted-foreground hover:text-foreground"
                 )}
               >
                 {editor.pinned ? <PinOff className="w-4 h-4" /> : <Pin className="w-4 h-4" />}
@@ -224,7 +224,7 @@ export function NoteDialog({
                   "min-h-11 h-11 rounded-xl text-[12px] font-semibold flex items-center justify-center gap-1.5 transition-colors",
                   editor.secret
                     ? "bg-lav/15 border border-lav/40 text-lav"
-                    : "glass-soft border border-white/[0.06] text-muted-foreground hover:text-foreground"
+                    : "glass-soft border border-black/[0.05] text-muted-foreground hover:text-foreground"
                 )}
               >
                 {editor.secret ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -269,7 +269,7 @@ export function NoteDialog({
                   onClick={() => void convertToTask()}
                   disabled={busy}
                   aria-label="تحويل الملاحظة إلى مهمة بتاريخ اليوم"
-                  className="min-h-11 rounded-xl glass-soft border border-white/[0.06] px-3 text-[11.5px] font-medium text-foreground/85 flex items-center justify-center gap-1.5 hover:bg-white/[0.06] disabled:opacity-50 transition-colors"
+                  className="min-h-11 rounded-xl glass-soft border border-black/[0.05] px-3 text-[11.5px] font-medium text-foreground/85 flex items-center justify-center gap-1.5 hover:bg-black/[0.04] disabled:opacity-50 transition-colors"
                 >
                   <CheckSquare className="w-4 h-4 text-gold" aria-hidden="true" />
                   حوّلها مهمة
@@ -281,7 +281,7 @@ export function NoteDialog({
                     setView("journal");
                   }}
                   aria-label="الانتقال إلى اليوميات"
-                  className="min-h-11 rounded-xl glass-soft border border-white/[0.06] px-3 text-[11.5px] font-medium text-foreground/85 flex items-center justify-center gap-1.5 hover:bg-white/[0.06] transition-colors"
+                  className="min-h-11 rounded-xl glass-soft border border-black/[0.05] px-3 text-[11.5px] font-medium text-foreground/85 flex items-center justify-center gap-1.5 hover:bg-black/[0.04] transition-colors"
                 >
                   <NotebookPen className="w-4 h-4 text-lav" aria-hidden="true" />
                   دوّن يومية

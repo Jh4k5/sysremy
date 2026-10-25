@@ -136,7 +136,7 @@ export function MetricDialog({
                   "h-11 px-4 rounded-xl text-[12px] font-semibold transition-colors",
                   num === meta.target
                     ? "bg-primary/20 border border-primary/45 text-primary"
-                    : "glass-soft border border-white/[0.08] text-foreground/85 hover:bg-white/[0.07]"
+                    : "glass-soft border border-black/[0.07] text-foreground/85 hover:bg-black/[0.04]"
                 )}
               >
                 الهدف — {formatNumber(meta.target)} {meta.unit}

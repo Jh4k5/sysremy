@@ -203,7 +203,7 @@ export function CommandBar({ open }: { open: boolean }) {
               aria-label="شريط الأوامر"
             >
               <CommandPrimitive label="شريط الأوامر" className="flex flex-col" shouldFilter={false}>
-                <div className="flex items-center gap-2.5 px-4 border-b border-white/[0.07]">
+                <div className="flex items-center gap-2.5 px-4 border-b border-black/[0.06]">
                   <Search className="w-4 h-4 text-muted-foreground shrink-0" />
                   <CommandPrimitive.Input
                     value={q}

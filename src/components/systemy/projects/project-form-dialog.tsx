@@ -122,7 +122,7 @@ export function ProjectFormDialog({ open, onOpenChange, project, currency }: Pro
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent
         dir="rtl"
-        className="mx-auto max-w-md rounded-t-3xl border-white/10 bg-[#0B0F1A]/95 backdrop-blur-2xl"
+        className="mx-auto max-w-md rounded-t-3xl border-black/[0.08] bg-white/95 backdrop-blur-xl shadow-[0_-12px_40px_-16px_rgba(23,33,43,0.3)]"
       >
         <DrawerHeader className="pb-1">
           <DrawerTitle className="text-right text-[15px] font-bold">

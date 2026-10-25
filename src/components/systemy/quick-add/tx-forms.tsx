@@ -271,7 +271,7 @@ export function TxForm({ tab, presetDate, editTxId, draft }: { tab: "expense" | 
                   aria-label={`تعبئة الوصف: ${d}`}
                   className={cn(
                     "h-11 shrink-0 px-4 rounded-full border text-[12px] font-medium whitespace-nowrap transition-colors",
-                    desc.trim() === d ? "bg-primary/20 border-primary/50 text-primary" : "glass-soft border-white/[0.08]"
+                    desc.trim() === d ? "bg-primary/20 border-primary/50 text-primary" : "glass-soft border-black/[0.07]"
                   )}
                 >
                   {d}
@@ -302,7 +302,7 @@ export function TxForm({ tab, presetDate, editTxId, draft }: { tab: "expense" | 
                 onClick={() => setAccountId(a.id)}
                 className={cn(
                   "h-11 px-4 rounded-xl border text-[12.5px] font-medium flex items-center gap-1.5 transition-colors",
-                  accountId === a.id ? "bg-primary/20 border-primary/50 text-primary" : "glass-soft border-white/[0.08]"
+                  accountId === a.id ? "bg-primary/20 border-primary/50 text-primary" : "glass-soft border-black/[0.07]"
                 )}
               >
                 {(() => {
@@ -332,7 +332,7 @@ export function TxForm({ tab, presetDate, editTxId, draft }: { tab: "expense" | 
                     onClick={() => setToAccountId(a.id)}
                     className={cn(
                       "h-11 px-4 rounded-xl border text-[12.5px] font-medium transition-colors",
-                      toAccountId === a.id ? "bg-primary/20 border-primary/50 text-primary" : "glass-soft border-white/[0.08]"
+                      toAccountId === a.id ? "bg-primary/20 border-primary/50 text-primary" : "glass-soft border-black/[0.07]"
                     )}
                   >
                     {a.name}
@@ -354,7 +354,7 @@ export function TxForm({ tab, presetDate, editTxId, draft }: { tab: "expense" | 
                   onClick={() => setCategoryId(categoryId === c.id ? "" : c.id)}
                   className={cn(
                     "h-9 px-3 rounded-full border text-[11.5px] font-medium flex items-center gap-1.5 transition-colors",
-                    categoryId === c.id ? "bg-primary/20 border-primary/50 text-primary" : "glass-soft border-white/[0.08]"
+                    categoryId === c.id ? "bg-primary/20 border-primary/50 text-primary" : "glass-soft border-black/[0.07]"
                   )}
                 >
                   {(() => {
@@ -393,7 +393,7 @@ export function TxForm({ tab, presetDate, editTxId, draft }: { tab: "expense" | 
             <input
               value={person}
               onChange={(e) => setPerson(e.target.value)}
-              placeholder="مثال: خالد، العائلة…"
+              placeholder="مثال: محمد، العائلة…"
               className={inputCls}
               dir="auto"
             />
@@ -455,7 +455,7 @@ export function TxForm({ tab, presetDate, editTxId, draft }: { tab: "expense" | 
                       onClick={() => setGoalId(goalId === g.id ? "" : g.id)}
                       className={cn(
                         "h-11 px-4 rounded-full border text-[12.5px] font-medium flex items-center gap-1.5 transition-colors",
-                        goalId === g.id ? "bg-primary/20 border-primary/50 text-primary" : "glass-soft border-white/[0.08]"
+                        goalId === g.id ? "bg-primary/20 border-primary/50 text-primary" : "glass-soft border-black/[0.07]"
                       )}
                     >
                       <span aria-hidden="true">{g.emoji}</span>

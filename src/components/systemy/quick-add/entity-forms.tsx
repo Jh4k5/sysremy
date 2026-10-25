@@ -424,7 +424,7 @@ function ToggleChip({ active, onClick, label }: { active: boolean; onClick: () =
       aria-pressed={active}
       className={cn(
         "h-11 px-4 rounded-xl border text-[12px] font-medium transition-colors",
-        active ? "bg-primary/20 border-primary/50 text-primary" : "glass-soft border-white/[0.08] text-muted-foreground"
+        active ? "bg-primary/20 border-primary/50 text-primary" : "glass-soft border-black/[0.07] text-muted-foreground"
       )}
     >
       {label}

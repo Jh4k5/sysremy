@@ -62,14 +62,14 @@ export type MoneyTabId =
   | "assets";
 
 const TABS: Array<{ id: MoneyTabId; label: string; icon: LucideIcon }> = [
-  { id: "overview", label: "نظرة عامة", icon: LayoutGrid },
+  { id: "overview", label: "نظرة", icon: LayoutGrid },
   { id: "budget", label: "الميزانية", icon: Gauge },
   { id: "transactions", label: "المعاملات", icon: Receipt },
   { id: "accounts", label: "الحسابات", icon: Wallet },
   { id: "categories", label: "الفئات", icon: Tags },
   { id: "recurring", label: "المتكررة", icon: Repeat },
   { id: "goals", label: "الأهداف", icon: Target },
-  { id: "assets", label: "الأصول والديون", icon: Gem },
+  { id: "assets", label: "الأصول", icon: Gem },
 ];
 
 /** حزمة بيانات المال الكاملة — تُقرأ مرة واحدة وتتدفق لكل الأقسام */
@@ -137,7 +137,7 @@ export function SheetShell({
           "max-w-[430px] mx-auto",
           "data-[vaul-drawer-direction=bottom]:max-h-[92vh]",
           "data-[vaul-drawer-direction=bottom]:rounded-t-3xl",
-          "border-white/10"
+          "border-black/[0.08]"
         )}
       >
         <DrawerHeader className="pb-0">
@@ -240,7 +240,7 @@ export function MoneyScreen({ onBack }: { onBack?: () => void }) {
             <h1 className="text-[20px] font-bold leading-6">المال</h1>
             <p className="text-[11px] text-muted-foreground mt-0.5 flex items-center gap-1.5 min-w-0">
               <span className="shrink-0">صافي الثروة</span>
-              <PrivateAmount className="text-primary font-semibold truncate">
+              <PrivateAmount className="text-gold font-semibold truncate">
                 {formatMoney(nw.total, cur)}
               </PrivateAmount>
             </p>
@@ -256,34 +256,32 @@ export function MoneyScreen({ onBack }: { onBack?: () => void }) {
         </button>
       </header>
 
-      {/* ═══ شريط التبويبات اللاصق ═══ */}
+      {/* ═══ شبكة التبويبات — 4×2 ثابتة: لا تمرير، لا اقتطاع، النشط مرئي دائماً ═══ */}
       <nav
         aria-label="أقسام المال"
-        className="sticky top-0 z-30 -mx-4 px-4 py-2.5 mb-3 bg-[#0B0F1A]/85 backdrop-blur-xl border-b border-white/[0.05]"
+        className="-mx-1 mb-3 grid grid-cols-4 gap-1.5 px-1"
       >
-        <div className="flex gap-2 overflow-x-auto no-scrollbar" role="tablist">
-          {TABS.map((t) => {
-            const active = tab === t.id;
-            const Icon = t.icon;
-            return (
-              <button
-                key={t.id}
-                role="tab"
-                aria-selected={active}
-                onClick={() => selectTab(t.id)}
-                className={cn(
-                  "h-11 px-4 rounded-full flex items-center gap-1.5 text-[12px] font-semibold shrink-0 transition-all border",
-                  active
-                    ? "bg-primary/20 border-primary/50 text-primary"
-                    : "glass-soft border-white/[0.06] text-foreground/70 hover:text-foreground"
-                )}
-              >
-                <Icon className="w-4 h-4" aria-hidden="true" />
-                {t.label}
-              </button>
-            );
-          })}
-        </div>
+        {TABS.map((t) => {
+          const active = tab === t.id;
+          const Icon = t.icon;
+          return (
+            <button
+              key={t.id}
+              role="tab"
+              aria-selected={active}
+              onClick={() => selectTab(t.id)}
+              className={cn(
+                "min-h-[52px] rounded-2xl flex flex-col items-center justify-center gap-1 border transition-[color,border-color,background-color,transform] duration-150 ease-out active:scale-[0.96]",
+                active
+                  ? "bg-primary/15 border-primary/40 text-gold"
+                  : "glass-soft border-black/[0.05] text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <Icon className="w-[17px] h-[17px]" strokeWidth={active ? 2.3 : 2} aria-hidden="true" />
+              <span className="text-[10px] font-semibold leading-none">{t.label}</span>
+            </button>
+          );
+        })}
       </nav>
 
       {/* ═══ القسم النشط ═══ */}

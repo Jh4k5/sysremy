@@ -248,7 +248,7 @@ export function ProjectDetailsDialog({
     <Drawer open onOpenChange={(o) => { if (!o) onClose(); }}>
       <DrawerContent
         dir="rtl"
-        className="mx-auto max-w-md rounded-t-3xl border-white/10 bg-[#0B0F1A]/95 backdrop-blur-2xl"
+        className="mx-auto max-w-md rounded-t-3xl border-black/[0.08] bg-white/95 backdrop-blur-xl shadow-[0_-12px_40px_-16px_rgba(23,33,43,0.3)]"
       >
         <DrawerHeader className="pb-1">
           <DrawerTitle className="flex items-center gap-2.5 text-right text-[15px] font-bold">
@@ -282,7 +282,7 @@ export function ProjectDetailsDialog({
             {allTasks.length > 0 && (
               <>
                 <div
-                  className="h-2.5 overflow-hidden rounded-full bg-white/[0.06]"
+                  className="h-2.5 overflow-hidden rounded-full bg-black/[0.04]"
                   role="progressbar"
                   aria-valuenow={taskPct}
                   aria-valuemin={0}
@@ -302,7 +302,7 @@ export function ProjectDetailsDialog({
                     <Chip
                       className={cn(
                         "border tabular",
-                        deadlineLate ? "border-coral/40 text-coral" : "border-white/[0.1] text-muted-foreground",
+                        deadlineLate ? "border-coral/40 text-coral" : "border-black/[0.08] text-muted-foreground",
                       )}
                     >
                       <CalendarDays className="h-3 w-3" aria-hidden="true" />
@@ -316,7 +316,7 @@ export function ProjectDetailsDialog({
               <Chip
                 className={cn(
                   "border tabular",
-                  deadlineLate ? "border-coral/40 text-coral" : "border-white/[0.1] text-muted-foreground",
+                  deadlineLate ? "border-coral/40 text-coral" : "border-black/[0.08] text-muted-foreground",
                 )}
               >
                 <CalendarDays className="h-3 w-3" aria-hidden="true" />
@@ -346,7 +346,7 @@ export function ProjectDetailsDialog({
                       "h-11 min-h-11 flex-1 rounded-xl border text-[12.5px] font-bold transition-colors disabled:opacity-50",
                       active
                         ? STATUS_META[o.k].btnCls
-                        : "glass-soft border-white/[0.08] text-foreground/70 hover:bg-white/[0.06]",
+                        : "glass-soft border-black/[0.07] text-foreground/70 hover:bg-black/[0.04]",
                     )}
                   >
                     {o.label}
@@ -378,7 +378,7 @@ export function ProjectDetailsDialog({
                         onClick={() => void toggleTask(t.id)}
                         aria-pressed={t.done}
                         aria-label={`مهمة ${t.title}${t.done ? " — منجزة" : " — لإتمامها"}`}
-                        className="flex min-h-11 w-full items-center gap-2.5 rounded-xl px-2 py-1.5 text-start transition-colors hover:bg-white/[0.05]"
+                        className="flex min-h-11 w-full items-center gap-2.5 rounded-xl px-2 py-1.5 text-start transition-colors hover:bg-black/[0.03]"
                       >
                         <span
                           className={cn(
@@ -408,7 +408,7 @@ export function ProjectDetailsDialog({
               )}
 
               {/* إضافة مهمة مرتبطة */}
-              <div className="space-y-2.5 border-t border-white/[0.06] pt-2.5">
+              <div className="space-y-2.5 border-t border-black/[0.05] pt-2.5">
                 <input
                   value={newTask}
                   onChange={(e) => setNewTask(e.target.value)}
@@ -443,7 +443,7 @@ export function ProjectDetailsDialog({
                             "h-11 min-h-11 rounded-xl border px-3 text-[11px] font-bold transition-colors",
                             active
                               ? "border-primary/60 bg-primary/20 text-primary"
-                              : "glass-soft border-white/[0.08] text-foreground/70 hover:bg-white/[0.06]",
+                              : "glass-soft border-black/[0.07] text-foreground/70 hover:bg-black/[0.04]",
                           )}
                         >
                           {p.label}
@@ -473,11 +473,11 @@ export function ProjectDetailsDialog({
             </SectionTitle>
             <div className="glass-soft space-y-3 rounded-2xl p-3.5">
               <div className="grid grid-cols-2 gap-2 text-center">
-                <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] px-1 py-2.5">
+                <div className="rounded-xl border border-black/[0.05] bg-black/[0.02] px-1 py-2.5">
                   <p className="text-[9.5px] text-muted-foreground">عدد الجلسات</p>
                   <p className="text-[15px] font-bold tabular">{formatNumber(projectBlocks.length)}</p>
                 </div>
-                <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] px-1 py-2.5">
+                <div className="rounded-xl border border-black/[0.05] bg-black/[0.02] px-1 py-2.5">
                   <p className="text-[9.5px] text-muted-foreground">المدة الكلية</p>
                   <p className="text-[13px] font-bold tabular">{formatDurationAr(totalMinutes)}</p>
                 </div>
@@ -531,7 +531,7 @@ export function ProjectDetailsDialog({
               </div>
 
               {lastTxs.length > 0 && (
-                <ul className="space-y-1 border-t border-white/[0.06] pt-2">
+                <ul className="space-y-1 border-t border-black/[0.05] pt-2">
                   {lastTxs.map((t) => (
                     <li key={t.id} className="flex items-center gap-2 rounded-lg px-1.5 py-1.5">
                       <span
@@ -599,13 +599,13 @@ export function ProjectDetailsDialog({
           </div>
 
           {/* ═══ تعديل / حذف ═══ */}
-          <div className="space-y-2 border-t border-white/[0.06] pt-3">
+          <div className="space-y-2 border-t border-black/[0.05] pt-3">
             {!confirmDelete ? (
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => onEdit(project)}
-                  className="h-11 min-h-11 flex-1 rounded-xl glass-soft border border-white/[0.08] text-[12.5px] font-bold text-foreground/80 transition-colors hover:bg-white/[0.06]"
+                  className="h-11 min-h-11 flex-1 rounded-xl glass-soft border border-black/[0.07] text-[12.5px] font-bold text-foreground/80 transition-colors hover:bg-black/[0.04]"
                   aria-label={`تعديل المشروع ${project.name}`}
                 >
                   تعديل البيانات

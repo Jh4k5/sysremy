@@ -200,7 +200,7 @@ function HabitTimerSession({ habit, onClose }: { habit: Habit; onClose: () => vo
         className="flex h-full flex-col"
       >
         {/* الرأس */}
-        <header className="flex items-center justify-between gap-3 border-b border-white/[0.07] p-4">
+        <header className="flex items-center justify-between gap-3 border-b border-black/[0.06] p-4">
           <div className="flex min-w-0 items-center gap-2.5">
             <span
               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl"
@@ -223,7 +223,7 @@ function HabitTimerSession({ habit, onClose }: { habit: Habit; onClose: () => vo
             type="button"
             onClick={askExit}
             aria-label="إغلاق المؤقت"
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl glass-soft border border-white/[0.08] text-muted-foreground transition-colors hover:text-foreground"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl glass-soft border border-black/[0.07] text-muted-foreground transition-colors hover:text-foreground"
           >
             <X className="h-5 w-5" aria-hidden="true" />
           </button>
@@ -315,7 +315,7 @@ function HabitTimerSession({ habit, onClose }: { habit: Habit; onClose: () => vo
                 <button
                   type="button"
                   onClick={pauseResume}
-                  className="flex h-14 items-center justify-center gap-2 rounded-2xl glass-soft border border-white/[0.08] text-[13.5px] font-bold transition-all hover:bg-white/[0.06] active:scale-[0.97]"
+                  className="flex h-14 items-center justify-center gap-2 rounded-2xl glass-soft border border-black/[0.07] text-[13.5px] font-bold transition-all hover:bg-black/[0.04] active:scale-[0.97]"
                 >
                   {running ? (
                     <Pause className="h-5 w-5" aria-hidden="true" />
@@ -327,7 +327,7 @@ function HabitTimerSession({ habit, onClose }: { habit: Habit; onClose: () => vo
                 <button
                   type="button"
                   onClick={addFive}
-                  className="flex h-14 items-center justify-center gap-2 rounded-2xl glass-soft border border-white/[0.08] text-[13.5px] font-bold transition-all hover:bg-white/[0.06] active:scale-[0.97]"
+                  className="flex h-14 items-center justify-center gap-2 rounded-2xl glass-soft border border-black/[0.07] text-[13.5px] font-bold transition-all hover:bg-black/[0.04] active:scale-[0.97]"
                 >
                   <Plus className="h-5 w-5" aria-hidden="true" />
                   <span className="tabular">5</span> دقائق

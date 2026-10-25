@@ -82,7 +82,7 @@ const PHASE_META: Record<Phase, { label: string; icon: LucideIcon; hint: string 
 const minutesFor = (p: Phase, cfg: PhaseCfg) => (p === "focus" ? cfg.focus : p === "long" ? cfg.long : cfg.short);
 
 const selectTriggerCls =
-  "h-12 rounded-xl glass-soft border border-white/[0.08] px-4 text-[13.5px] text-foreground focus:ring-0";
+  "h-12 rounded-xl glass-soft border border-black/[0.07] px-4 text-[13.5px] text-foreground focus:ring-0";
 
 type WeekStat = { technique: FocusTechnique; minutes: number; sessions: number };
 
@@ -403,7 +403,7 @@ export function FocusTimerCard({ openTasks }: { openTasks: Task[] }) {
     <motion.div {...widgetEnter(0.08)} className="mb-3">
       <GlassCard className="overflow-hidden">
         {/* ═══ رأس البطاقة ═══ */}
-        <div className="flex items-center justify-between gap-2 border-b border-white/[0.06] px-4 py-3">
+        <div className="flex items-center justify-between gap-2 border-b border-black/[0.05] px-4 py-3">
           <span className="flex items-center gap-2 text-[13px] font-semibold text-foreground/90">
             <Brain className="h-4 w-4 shrink-0 text-cyan" aria-hidden="true" />
             مؤقت التركيز
@@ -413,7 +413,7 @@ export function FocusTimerCard({ openTasks }: { openTasks: Task[] }) {
               <span
                 className={cn(
                   "tabular rounded-full px-2 py-0.5 font-bold",
-                  paused ? "bg-white/[0.06]" : "bg-cyan/15 text-cyan",
+                  paused ? "bg-black/[0.04]" : "bg-cyan/15 text-cyan",
                 )}
               >
                 {paused ? "متوقفة" : "جارية"}
@@ -449,7 +449,7 @@ export function FocusTimerCard({ openTasks }: { openTasks: Task[] }) {
                         press,
                         active
                           ? "border-white/25 text-foreground"
-                          : "glass-soft border-white/[0.08] text-foreground/75 hover:bg-white/[0.06]",
+                          : "glass-soft border-black/[0.07] text-foreground/75 hover:bg-black/[0.04]",
                       )}
                       style={active ? { background: RIBBON_SOFT } : undefined}
                     >
@@ -473,7 +473,7 @@ export function FocusTimerCard({ openTasks }: { openTasks: Task[] }) {
                       max={180}
                       value={customFocus}
                       onChange={(e) => setCustomFocus(clamp(parseInt(e.target.value || "0", 10) || 5, 5, 180))}
-                      className="tabular h-12 w-full rounded-xl glass-soft border border-white/[0.08] px-3 text-center text-[14px] font-bold text-foreground focus:border-primary/40 focus:outline-none"
+                      className="tabular h-12 w-full rounded-xl glass-soft border border-black/[0.07] px-3 text-center text-[14px] font-bold text-foreground focus:border-primary/40 focus:outline-none"
                       aria-label="دقائق التركيز للمخصص، من ٥ إلى ١٨٠"
                     />
                   </label>
@@ -487,7 +487,7 @@ export function FocusTimerCard({ openTasks }: { openTasks: Task[] }) {
                       max={60}
                       value={customBreak}
                       onChange={(e) => setCustomBreak(clamp(parseInt(e.target.value || "0", 10) || 1, 1, 60))}
-                      className="tabular h-12 w-full rounded-xl glass-soft border border-white/[0.08] px-3 text-center text-[14px] font-bold text-foreground focus:border-primary/40 focus:outline-none"
+                      className="tabular h-12 w-full rounded-xl glass-soft border border-black/[0.07] px-3 text-center text-[14px] font-bold text-foreground focus:border-primary/40 focus:outline-none"
                       aria-label="دقائق الاستراحة للمخصص"
                     />
                   </label>
@@ -503,7 +503,7 @@ export function FocusTimerCard({ openTasks }: { openTasks: Task[] }) {
                 <SelectTrigger className={selectTriggerCls} aria-label="اختيار مهمة للجلسة">
                   <SelectValue placeholder="تركيز عام (بدون مهمة)" />
                 </SelectTrigger>
-                <SelectContent className="max-h-64 rounded-xl border-white/10 bg-[#10152a]">
+                <SelectContent className="max-h-64 rounded-xl border-black/[0.08] bg-white">
                   <SelectItem value="none" className="text-[13px]">
                     تركيز عام (بدون مهمة)
                   </SelectItem>
@@ -537,7 +537,7 @@ export function FocusTimerCard({ openTasks }: { openTasks: Task[] }) {
                           press,
                           active
                             ? "border-white/25 text-foreground"
-                            : "glass-soft border-white/[0.08] text-foreground/70 hover:bg-white/[0.06]",
+                            : "glass-soft border-black/[0.07] text-foreground/70 hover:bg-black/[0.04]",
                         )}
                         style={active ? { background: RIBBON_SOFT } : undefined}
                       >
@@ -630,7 +630,7 @@ export function FocusTimerCard({ openTasks }: { openTasks: Task[] }) {
 
               {/* شريط التقدم — تعبئة الشريط (قاعدة V5: الشريط للتقدّم) */}
               <div
-                className="h-1.5 overflow-hidden rounded-full bg-white/[0.06]"
+                className="h-1.5 overflow-hidden rounded-full bg-black/[0.04]"
                 role="progressbar"
                 aria-valuenow={Math.round(progress * 100)}
                 aria-valuemin={0}
@@ -664,7 +664,7 @@ export function FocusTimerCard({ openTasks }: { openTasks: Task[] }) {
                 <button
                   type="button"
                   onClick={skipBreak}
-                  className={cn("flex h-14 items-center justify-center gap-1.5 rounded-2xl glass-soft border border-white/[0.08] text-[13px] font-bold text-foreground/80 hover:bg-white/[0.06]", press)}
+                  className={cn("flex h-14 items-center justify-center gap-1.5 rounded-2xl glass-soft border border-black/[0.07] text-[13px] font-bold text-foreground/80 hover:bg-black/[0.04]", press)}
                   aria-label="تخطي الاستراحة والعودة للتركيز"
                 >
                   <SkipForward className="h-5 w-5" aria-hidden="true" />
@@ -674,7 +674,7 @@ export function FocusTimerCard({ openTasks }: { openTasks: Task[] }) {
               <button
                 type="button"
                 onClick={pauseResume}
-                className={cn("flex h-14 items-center justify-center gap-2 rounded-2xl glass-soft border border-white/[0.08] text-[13.5px] font-bold hover:bg-white/[0.06]", press)}
+                className={cn("flex h-14 items-center justify-center gap-2 rounded-2xl glass-soft border border-black/[0.07] text-[13.5px] font-bold hover:bg-black/[0.04]", press)}
               >
                 {runStart !== null ? (
                   <>
@@ -713,7 +713,7 @@ export function FocusTimerCard({ openTasks }: { openTasks: Task[] }) {
           )}
 
           {/* ═══ تذييل الإحصاءات — هذا الأسبوع ═══ */}
-          <div className="border-t border-white/[0.06] pt-3">
+          <div className="border-t border-black/[0.05] pt-3">
             {weekStats === null ? (
               <p className="text-[11px] text-muted-foreground">…</p>
             ) : totalWeekMin === 0 ? (

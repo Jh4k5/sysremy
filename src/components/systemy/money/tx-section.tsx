@@ -172,7 +172,7 @@ export function TxSection({ data }: { data: MoneyData }) {
             onClick={() => void downloadTransactionsCSV()}
             aria-label="تصدير المعاملات كملف CSV"
             title="تصدير CSV — يفتح في Excel"
-            className="h-11 px-3 rounded-2xl glass-soft border border-white/[0.08] text-muted-foreground hover:text-primary hover:border-primary/30 text-[12px] font-medium flex items-center gap-1.5 hover:bg-primary/10 transition-colors"
+            className="h-11 px-3 rounded-2xl glass-soft border border-black/[0.07] text-muted-foreground hover:text-primary hover:border-primary/30 text-[12px] font-medium flex items-center gap-1.5 hover:bg-primary/10 transition-colors"
           >
             <FileDown className="w-4 h-4" aria-hidden="true" />
             <span className="hidden sm:inline">CSV</span>
@@ -225,7 +225,7 @@ export function TxSection({ data }: { data: MoneyData }) {
                 "h-11 px-3.5 rounded-full border text-[12px] font-semibold flex items-center gap-1.5 shrink-0 transition-all",
                 typeFilter === c.k
                   ? "bg-primary/20 border-primary/50 text-primary"
-                  : "glass-soft border-white/[0.06] text-foreground/70 hover:text-foreground"
+                  : "glass-soft border-black/[0.05] text-foreground/70 hover:text-foreground"
               )}
             >
               <span className="w-2 h-2 rounded-full" style={{ background: c.dot }} aria-hidden="true" />
@@ -252,7 +252,7 @@ export function TxSection({ data }: { data: MoneyData }) {
               </div>
             ) : (
               <Select value={accountFilter} onValueChange={setAccountFilter}>
-                <SelectTrigger className="h-11 rounded-xl glass-soft border-white/[0.08] text-[13px]" aria-label="فلترة حسب الحساب">
+                <SelectTrigger className="h-11 rounded-xl glass-soft border-black/[0.07] text-[13px]" aria-label="فلترة حسب الحساب">
                   <SelectValue placeholder="كل الحسابات" />
                 </SelectTrigger>
                 <SelectContent>
@@ -270,7 +270,7 @@ export function TxSection({ data }: { data: MoneyData }) {
         <div className="flex gap-2 mt-3 items-center">
           <div className="flex-1 min-w-0">
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="h-11 rounded-xl glass-soft border-white/[0.08] text-[13px] w-full" aria-label="فلترة حسب الفئة">
+              <SelectTrigger className="h-11 rounded-xl glass-soft border-black/[0.07] text-[13px] w-full" aria-label="فلترة حسب الفئة">
                 <SelectValue placeholder="كل الفئات" />
               </SelectTrigger>
               <SelectContent className="max-h-64">
@@ -299,7 +299,7 @@ export function TxSection({ data }: { data: MoneyData }) {
                 "h-11 px-3.5 rounded-full border text-[11.5px] font-semibold shrink-0 transition-all",
                 range === c.k
                   ? "bg-cyan/15 border-cyan/40 text-cyan"
-                  : "glass-soft border-white/[0.06] text-foreground/70 hover:text-foreground"
+                  : "glass-soft border-black/[0.05] text-foreground/70 hover:text-foreground"
               )}
             >
               {c.v}
@@ -314,7 +314,7 @@ export function TxSection({ data }: { data: MoneyData }) {
               "h-11 px-3.5 rounded-full border text-[11.5px] font-semibold transition-all",
               sort === "recent"
                 ? "bg-primary/20 border-primary/50 text-primary"
-                : "glass-soft border-white/[0.06] text-foreground/70 hover:text-foreground"
+                : "glass-soft border-black/[0.05] text-foreground/70 hover:text-foreground"
             )}
           >
             الأحدث
@@ -326,7 +326,7 @@ export function TxSection({ data }: { data: MoneyData }) {
               "h-11 px-3.5 rounded-full border text-[11.5px] font-semibold transition-all",
               sort === "amount"
                 ? "bg-primary/20 border-primary/50 text-primary"
-                : "glass-soft border-white/[0.06] text-foreground/70 hover:text-foreground"
+                : "glass-soft border-black/[0.05] text-foreground/70 hover:text-foreground"
             )}
           >
             الأكبر مبلغاً
@@ -360,13 +360,13 @@ export function TxSection({ data }: { data: MoneyData }) {
           {sort === "recent"
             ? groups.map((g) => (
                 <GlassCard key={g.date} className="overflow-visible">
-                  <div className="sticky top-[66px] z-10 px-4 py-2 flex items-center justify-between rounded-t-3xl bg-[#0E1220]/95 backdrop-blur-md border-b border-white/[0.05]">
+                  <div className="sticky top-[66px] z-10 px-4 py-2 flex items-center justify-between rounded-t-3xl bg-white/95 backdrop-blur-md border-b border-black/[0.04]">
                     <p className="text-[11.5px] font-bold text-muted-foreground">{g.label}</p>
                     {g.spent > 0 && (
                       <span className="text-[10.5px] text-muted-foreground tabular">صرف {formatMoney(g.spent, cur)}</span>
                     )}
                   </div>
-                  <div className="divide-y divide-white/[0.04]">
+                  <div className="divide-y divide-black/[0.04]">
                     {g.items.map((t) => (
                       <TxRow
                         key={t.id}
@@ -381,7 +381,7 @@ export function TxSection({ data }: { data: MoneyData }) {
                 </GlassCard>
               ))
             : (
-              <GlassCard className="divide-y divide-white/[0.04] overflow-hidden">
+              <GlassCard className="divide-y divide-black/[0.04] overflow-hidden">
                 {shown.map((t) => (
                   <TxRow
                     key={t.id}
@@ -408,7 +408,7 @@ export function TxSection({ data }: { data: MoneyData }) {
           {hasFilters && (
             <button
               onClick={resetFilters}
-              className="w-full h-12 rounded-2xl glass-soft border border-white/[0.06] text-[11.5px] font-medium text-muted-foreground hover:text-foreground transition-colors"
+              className="w-full h-12 rounded-2xl glass-soft border border-black/[0.05] text-[11.5px] font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               مسح كل الفلاتر ({formatNumber(filtered.length)} نتيجة)
             </button>
@@ -442,7 +442,7 @@ function TxRow({
     <button
       onClick={onEdit}
       aria-label={`تعديل المعاملة: ${t.description}`}
-      className="w-full flex items-center gap-3 px-4 py-2.5 min-h-[60px] text-right hover:bg-white/[0.03] transition-colors"
+      className="w-full flex items-center gap-3 px-4 py-2.5 min-h-[60px] text-right hover:bg-black/[0.02] transition-colors"
     >
       <IconBubble
         icon={cat?.icon ?? "shapes"}
@@ -461,12 +461,12 @@ function TxRow({
         {tags.length > 0 && (
           <span className="flex flex-wrap gap-1 mt-1">
             {tags.slice(0, 2).map((tag) => (
-              <span key={tag} className="text-[9.5px] rounded-full px-2 py-0.5 bg-white/[0.05] text-muted-foreground">
+              <span key={tag} className="text-[9.5px] rounded-full px-2 py-0.5 bg-black/[0.03] text-muted-foreground">
                 #{tag}
               </span>
             ))}
             {tags.length > 2 && (
-              <span className="text-[9.5px] rounded-full px-2 py-0.5 bg-white/[0.05] text-muted-foreground">
+              <span className="text-[9.5px] rounded-full px-2 py-0.5 bg-black/[0.03] text-muted-foreground">
                 +{formatNumber(tags.length - 2)}
               </span>
             )}
@@ -512,7 +512,7 @@ function FilterChip({
         "h-11 px-3.5 rounded-full border text-[11.5px] font-semibold flex items-center gap-1.5 shrink-0 transition-all",
         active
           ? "bg-primary/20 border-primary/50 text-primary"
-          : "glass-soft border-white/[0.06] text-foreground/70 hover:text-foreground"
+          : "glass-soft border-black/[0.05] text-foreground/70 hover:text-foreground"
       )}
     >
       {color && <span className="w-2 h-2 rounded-full" style={{ background: color }} aria-hidden="true" />}
@@ -670,7 +670,7 @@ function TxEditSheet({ tx, data, onClose }: { tx: Transaction; data: MoneyData; 
             <input
               value={person}
               onChange={(e) => setPerson(e.target.value)}
-              placeholder="خالد…"
+              placeholder="محمد…"
               className={inputCls}
             />
           </Field>
@@ -789,7 +789,7 @@ function AccountChips({
             "h-11 px-3.5 rounded-xl border text-[12px] font-medium flex items-center gap-1.5 shrink-0 transition-all",
             value === a.id
               ? "bg-primary/20 border-primary/50 text-primary"
-              : "glass-soft border-white/[0.08] text-foreground/75 hover:text-foreground"
+              : "glass-soft border-black/[0.07] text-foreground/75 hover:text-foreground"
           )}
         >
           <span className="w-2 h-2 rounded-full" style={{ background: a.color }} aria-hidden="true" />

@@ -57,8 +57,8 @@ export function PinPad({
             aria-label={isBack ? "مسح رقم" : `الرقم ${k}`}
             className={cn(
               "h-14 min-h-14 rounded-2xl border text-[22px] font-bold tabular-nums select-none",
-              "glass-soft border-white/[0.08] text-foreground transition-all",
-              "hover:bg-white/[0.08] active:scale-95 active:border-primary/40",
+              "glass-soft border-black/[0.07] text-foreground transition-all",
+              "hover:bg-black/[0.05] active:scale-95 active:border-primary/40",
               "disabled:opacity-40 disabled:active:scale-100",
               isBack && "text-muted-foreground"
             )}

@@ -182,7 +182,7 @@ export function TasksScreen() {
               type="button"
               onClick={() => setFilter("today")}
               aria-label={`مهام اليوم المفتوحة: ${todayOpen.length} — عرض قائمة اليوم`}
-              className="rounded-2xl glass-soft border border-white/[0.06] p-3 text-right transition-colors hover:bg-white/[0.06] active:scale-[0.98]"
+              className="rounded-2xl glass-soft border border-black/[0.05] p-3 text-right transition-colors hover:bg-black/[0.04] active:scale-[0.98]"
             >
               <p className="text-[11px] text-muted-foreground">مفتوحة اليوم</p>
               <p className="num-display tabular mt-0.5 text-[34px] leading-none text-cyan">{todayOpen.length}</p>
@@ -191,7 +191,7 @@ export function TasksScreen() {
               type="button"
               onClick={() => setFilter("done")}
               aria-label={`مهام منجزة اليوم: ${doneToday.length} — عرض المنجزة`}
-              className="rounded-2xl glass-soft border border-white/[0.06] p-3 text-right transition-colors hover:bg-white/[0.06] active:scale-[0.98]"
+              className="rounded-2xl glass-soft border border-black/[0.05] p-3 text-right transition-colors hover:bg-black/[0.04] active:scale-[0.98]"
             >
               <p className="text-[11px] text-muted-foreground">منجزة اليوم</p>
               <p className="num-display tabular mt-0.5 text-[34px] leading-none text-mint">{doneToday.length}</p>
@@ -256,7 +256,7 @@ export function TasksScreen() {
                 "h-11 min-h-11 shrink-0 rounded-full border px-4 text-[12.5px] font-bold transition-colors",
                 active
                   ? "border-primary/50 bg-primary/20 text-primary"
-                  : "glass-soft border-white/[0.08] text-foreground/75 hover:bg-white/[0.06]"
+                  : "glass-soft border-black/[0.07] text-foreground/75 hover:bg-black/[0.04]"
               )}
             >
               {f.v}
@@ -320,7 +320,7 @@ export function TasksScreen() {
               <button
                 type="button"
                 onClick={() => goToCalendar()}
-                className="flex h-11 min-h-11 items-center gap-1.5 rounded-xl glass-soft border border-white/[0.08] px-3.5 text-[12px] font-bold text-foreground/80 transition-colors hover:bg-white/[0.06]"
+                className="flex h-11 min-h-11 items-center gap-1.5 rounded-xl glass-soft border border-black/[0.07] px-3.5 text-[12px] font-bold text-foreground/80 transition-colors hover:bg-black/[0.04]"
                 aria-label="فتح التقويم"
               >
                 <CalendarDays className="h-4 w-4 shrink-0" aria-hidden="true" />
@@ -329,7 +329,7 @@ export function TasksScreen() {
               <button
                 type="button"
                 onClick={() => setView("projects")}
-                className="flex h-11 min-h-11 items-center gap-1.5 rounded-xl glass-soft border border-white/[0.08] px-3.5 text-[12px] font-bold text-foreground/80 transition-colors hover:bg-white/[0.06]"
+                className="flex h-11 min-h-11 items-center gap-1.5 rounded-xl glass-soft border border-black/[0.07] px-3.5 text-[12px] font-bold text-foreground/80 transition-colors hover:bg-black/[0.04]"
                 aria-label="فتح شاشة المشاريع"
               >
                 المشاريع
@@ -399,7 +399,7 @@ function TaskRow({
             type="button"
             onClick={onOpen}
             aria-label={`تفاصيل «${task.title}»`}
-            className="min-h-11 flex-1 rounded-xl px-1.5 py-0.5 text-right transition-colors hover:bg-white/[0.03]"
+            className="min-h-11 flex-1 rounded-xl px-1.5 py-0.5 text-right transition-colors hover:bg-black/[0.02]"
           >
             <p
               className={cn(
@@ -438,8 +438,8 @@ function MetaChip({ icon: Icon, children }: { icon: LucideIcon; children: ReactN
 function PriorityChip({ priority }: { priority: Task["priority"] }) {
   const meta: Record<Task["priority"], { label: string; cls: string }> = {
     high: { label: "عاجلة", cls: "border-coral/40 bg-coral/10 text-coral" },
-    normal: { label: "عادية", cls: "border-white/[0.08] bg-white/[0.04] text-foreground/65" },
-    low: { label: "هادئة", cls: "border-white/[0.08] bg-white/[0.03] text-muted-foreground/80" },
+    normal: { label: "عادية", cls: "border-black/[0.07] bg-black/[0.03] text-foreground/65" },
+    low: { label: "هادئة", cls: "border-black/[0.07] bg-black/[0.02] text-muted-foreground/80" },
   };
   const m = meta[priority] ?? meta.normal;
   return (

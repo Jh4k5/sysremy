@@ -134,7 +134,7 @@ export function GoalFormDialog({
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent
         dir="rtl"
-        className="mx-auto max-w-md rounded-t-3xl border-white/10 bg-[#0B0F1A]/95 backdrop-blur-2xl"
+        className="mx-auto max-w-md rounded-t-3xl border-black/[0.08] bg-white/95 backdrop-blur-xl shadow-[0_-12px_40px_-16px_rgba(23,33,43,0.3)]"
       >
         <DrawerHeader className="pb-1">
           <DrawerTitle className="text-right text-[15px] font-bold">
@@ -173,7 +173,7 @@ export function GoalFormDialog({
                       "h-11 min-h-11 rounded-xl flex items-center justify-center text-[20px] transition-all",
                       active
                         ? "bg-primary/25 border border-primary/50 scale-105"
-                        : "glass-soft border border-white/[0.06] hover:bg-white/[0.07]",
+                        : "glass-soft border border-black/[0.05] hover:bg-black/[0.04]",
                     )}
                   >
                     {e}

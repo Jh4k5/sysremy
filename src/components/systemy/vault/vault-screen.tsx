@@ -71,7 +71,7 @@ function TintChip({
         "inline-flex shrink-0 items-center gap-1 rounded-full border px-2.5 py-0.5 text-[10.5px] font-semibold",
         tone === "gold" && "bg-gold/10 text-gold border-gold/25",
         tone === "coral" && "bg-coral/10 text-coral border-coral/25",
-        tone === "neutral" && "bg-white/[0.04] text-muted-foreground border-white/[0.08]"
+        tone === "neutral" && "bg-black/[0.03] text-muted-foreground border-black/[0.07]"
       )}
     >
       {children}
@@ -136,7 +136,7 @@ function DocumentCard({
       role="button"
       tabIndex={0}
       aria-label={`فتح مستند: ${doc.title}`}
-      className="glass rounded-2xl p-3.5 cursor-pointer outline-none transition-all duration-200 hover:bg-white/[0.07] hover:scale-[1.01] active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-primary/40"
+      className="glass rounded-2xl p-3.5 cursor-pointer outline-none transition-all duration-200 hover:bg-black/[0.04] hover:scale-[1.01] active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-primary/40"
     >
       <div className="flex items-start gap-3">
         <span
@@ -172,15 +172,15 @@ function VaultSkeleton() {
   return (
     <div className="h-full overflow-y-auto sys-scroll px-4 pt-3 pb-28">
       <div className="mb-4 space-y-2">
-        <Skeleton className="h-7 w-48 rounded-lg bg-white/[0.06]" />
-        <Skeleton className="h-3.5 w-56 rounded-md bg-white/[0.06]" />
+        <Skeleton className="h-7 w-48 rounded-lg bg-black/[0.04]" />
+        <Skeleton className="h-3.5 w-56 rounded-md bg-black/[0.04]" />
       </div>
-      <Skeleton className="mb-3 h-[96px] rounded-3xl bg-white/[0.05]" />
-      <Skeleton className="mb-3 h-11 rounded-full bg-white/[0.05]" />
+      <Skeleton className="mb-3 h-[96px] rounded-3xl bg-black/[0.03]" />
+      <Skeleton className="mb-3 h-11 rounded-full bg-black/[0.03]" />
       <div className="space-y-3">
-        <Skeleton className="h-[104px] rounded-2xl bg-white/[0.06]" />
-        <Skeleton className="h-[104px] rounded-2xl bg-white/[0.06]" />
-        <Skeleton className="h-[104px] rounded-2xl bg-white/[0.06]" />
+        <Skeleton className="h-[104px] rounded-2xl bg-black/[0.04]" />
+        <Skeleton className="h-[104px] rounded-2xl bg-black/[0.04]" />
+        <Skeleton className="h-[104px] rounded-2xl bg-black/[0.04]" />
       </div>
     </div>
   );

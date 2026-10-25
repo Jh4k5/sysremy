@@ -20,8 +20,8 @@ import { TaskFields, formToTaskInput, taskLinkChips, taskToForm, type TaskFormVa
 
 const PRIORITY_META: Record<Task["priority"], { label: string; cls: string }> = {
   high: { label: "عاجلة", cls: "border-coral/40 bg-coral/10 text-coral" },
-  normal: { label: "عادية", cls: "border-white/10 bg-white/[0.05] text-foreground/70" },
-  low: { label: "هادئة", cls: "border-white/10 bg-white/[0.05] text-muted-foreground" },
+  normal: { label: "عادية", cls: "border-white/10 bg-black/[0.03] text-foreground/70" },
+  low: { label: "هادئة", cls: "border-white/10 bg-black/[0.03] text-muted-foreground" },
 };
 
 export interface TaskDetailDialogProps {
@@ -137,7 +137,7 @@ export function TaskDetailDialog({ task, onOpenChange, links }: TaskDetailDialog
     >
       <DialogContent
         dir="rtl"
-        className="mx-auto max-w-sm rounded-3xl border-white/10 bg-[#0B0F1A]/95 p-5 backdrop-blur-2xl"
+        className="mx-auto max-w-sm rounded-3xl border-black/[0.08] bg-white/95 p-5 backdrop-blur-xl shadow-[0_24px_60px_-20px_rgba(23,33,43,0.35)]"
       >
         {editing && form ? (
           <>
@@ -155,7 +155,7 @@ export function TaskDetailDialog({ task, onOpenChange, links }: TaskDetailDialog
                     setForm(null);
                   }}
                   disabled={busy}
-                  className="h-11 flex-1 rounded-2xl glass-soft border border-white/[0.08] text-[12.5px] font-medium text-foreground/80 transition-colors hover:bg-white/[0.06] disabled:opacity-50"
+                  className="h-11 flex-1 rounded-2xl glass-soft border border-black/[0.07] text-[12.5px] font-medium text-foreground/80 transition-colors hover:bg-black/[0.04] disabled:opacity-50"
                 >
                   رجوع للتفاصيل
                 </button>
@@ -222,7 +222,7 @@ export function TaskDetailDialog({ task, onOpenChange, links }: TaskDetailDialog
                 );
               })}
               {task.description && (
-                <div className="space-y-1.5 rounded-2xl glass-soft border border-white/[0.06] p-3.5">
+                <div className="space-y-1.5 rounded-2xl glass-soft border border-black/[0.05] p-3.5">
                   <p className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
                     <NotebookPen className="h-3.5 w-3.5" aria-hidden="true" />
                     التفاصيل
@@ -272,7 +272,7 @@ export function TaskDetailDialog({ task, onOpenChange, links }: TaskDetailDialog
                       type="button"
                       onClick={startEdit}
                       disabled={busy}
-                      className="flex h-12 flex-1 items-center justify-center gap-2 rounded-2xl glass-soft border border-white/[0.08] text-[12.5px] font-bold text-foreground/85 transition-colors hover:bg-white/[0.06] disabled:opacity-50"
+                      className="flex h-12 flex-1 items-center justify-center gap-2 rounded-2xl glass-soft border border-black/[0.07] text-[12.5px] font-bold text-foreground/85 transition-colors hover:bg-black/[0.04] disabled:opacity-50"
                     >
                       <Pencil className="h-4 w-4" aria-hidden="true" />
                       تعديل
@@ -308,7 +308,7 @@ export function TaskDetailDialog({ task, onOpenChange, links }: TaskDetailDialog
 
 function DetailRow({ icon, label, value }: { icon: ReactNode; label: string; value: ReactNode }) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-2xl glass-soft border border-white/[0.06] px-3.5 py-2.5">
+    <div className="flex items-center justify-between gap-3 rounded-2xl glass-soft border border-black/[0.05] px-3.5 py-2.5">
       <span className="flex shrink-0 items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
         {icon}
         {label}

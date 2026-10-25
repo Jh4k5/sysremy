@@ -242,7 +242,7 @@ export function CalendarScreen() {
           <button
             type="button"
             onClick={() => shiftWeek(-1)}
-            className="flex h-11 w-11 items-center justify-center rounded-2xl glass-soft border border-white/[0.08] transition-all hover:bg-white/[0.06] active:scale-95"
+            className="flex h-11 w-11 items-center justify-center rounded-2xl glass-soft border border-black/[0.07] transition-all hover:bg-black/[0.04] active:scale-95"
             aria-label="الأسبوع السابق"
           >
             <ChevronRight className="h-5 w-5" aria-hidden="true" />
@@ -251,7 +251,7 @@ export function CalendarScreen() {
             type="button"
             onClick={goToday}
             disabled={isCurrentWeek && selected === today}
-            className="h-11 rounded-2xl glass-soft border border-white/[0.08] px-3.5 text-[12px] font-bold text-foreground/90 transition-all hover:bg-white/[0.06] active:scale-95 disabled:opacity-40"
+            className="h-11 rounded-2xl glass-soft border border-black/[0.07] px-3.5 text-[12px] font-bold text-foreground/90 transition-all hover:bg-black/[0.04] active:scale-95 disabled:opacity-40"
             aria-label="الانتقال إلى اليوم"
           >
             اليوم
@@ -259,7 +259,7 @@ export function CalendarScreen() {
           <button
             type="button"
             onClick={() => shiftWeek(1)}
-            className="flex h-11 w-11 items-center justify-center rounded-2xl glass-soft border border-white/[0.08] transition-all hover:bg-white/[0.06] active:scale-95"
+            className="flex h-11 w-11 items-center justify-center rounded-2xl glass-soft border border-black/[0.07] transition-all hover:bg-black/[0.04] active:scale-95"
             aria-label="الأسبوع التالي"
           >
             <ChevronLeft className="h-5 w-5" aria-hidden="true" />
@@ -280,9 +280,9 @@ export function CalendarScreen() {
       <motion.div {...widgetEnter(0.06)}>
         <GlassCard className="overflow-hidden">
           {/* صف الأيام — محاذٍ لأعمدة الشبكة */}
-          <div className="flex border-b border-white/[0.06]">
+          <div className="flex border-b border-black/[0.05]">
             <div
-              className="flex w-11 shrink-0 items-center justify-center border-e border-white/[0.06]"
+              className="flex w-11 shrink-0 items-center justify-center border-e border-black/[0.05]"
               aria-hidden="true"
             >
               <Clock3 className="h-3.5 w-3.5 text-muted-foreground/50" />
@@ -299,7 +299,7 @@ export function CalendarScreen() {
                     onClick={() => setSelected(day)}
                     aria-label={`تحديد ${day}${dayCount > 0 ? `، ${dayCount} أحداث` : ""}`}
                     aria-pressed={isSelected}
-                    className="flex min-h-[56px] flex-col items-center justify-center gap-1 py-1.5 transition-colors hover:bg-white/[0.04] active:bg-white/[0.07]"
+                    className="flex min-h-[56px] flex-col items-center justify-center gap-1 py-1.5 transition-colors hover:bg-black/[0.03] active:bg-black/[0.04]"
                   >
                     <span className="text-[10px] text-muted-foreground">{dayNameShort(day)}</span>
                     <span
@@ -330,7 +330,7 @@ export function CalendarScreen() {
 
           {/* شريط «طول اليوم»: التزامات مستحقة + مهام بلا وقت لليوم المحدد */}
           {allDay.length > 0 && (
-            <div className="no-scrollbar flex gap-2 overflow-x-auto border-b border-white/[0.06] px-3 py-2.5">
+            <div className="no-scrollbar flex gap-2 overflow-x-auto border-b border-black/[0.05] px-3 py-2.5">
               {allDay.map((ev) => {
                 if (ev.source === "task") {
                   const done = ev.taskDone === true;
@@ -384,7 +384,7 @@ export function CalendarScreen() {
 
           {/* تلميح اليوم الفارغ */}
           {selectedEvents.length === 0 && (
-            <div className="border-b border-white/[0.06] px-4 py-5 text-center">
+            <div className="border-b border-black/[0.05] px-4 py-5 text-center">
               <p className="text-[12px] text-muted-foreground">
                 يومك فارغ — <span className="font-medium text-primary/90">المس الشبكة لإضافة حدث</span>
               </p>
@@ -401,7 +401,7 @@ export function CalendarScreen() {
             nowLineRef={nowLineRef}
           />
 
-          <p className="border-t border-white/[0.06] px-3 py-2 text-[10px] leading-relaxed text-muted-foreground/70">
+          <p className="border-t border-black/[0.05] px-3 py-2 text-[10px] leading-relaxed text-muted-foreground/70">
             المس أي فراغ لإضافة حدث · الأحداث المتداخلة تظهر بإطار مرجاني · الشبكة من 7 صباحاً حتى 11 مساءً
           </p>
         </GlassCard>

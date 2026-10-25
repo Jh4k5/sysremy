@@ -121,7 +121,7 @@ export function PeopleScreen() {
           {/* ═══ البطل ═══ */}
           <motion.div {...widgetEnter(0.05)} className="mb-3">
             <GlassCard className="p-4">
-              <div className="grid grid-cols-3 divide-x divide-x-reverse divide-white/[0.06]">
+              <div className="grid grid-cols-3 divide-x divide-x-reverse divide-black/[0.05]">
                 <HeroStat label="شخص" value={formatNumber(people.length)} className="text-foreground" />
                 <HeroStat label="لم تواصلهم منذ 30+ يوماً" value={formatNumber(staleCount)} className="text-gold" />
                 <HeroStat label="مفضلة" value={formatNumber(favCount)} className="text-primary" />
@@ -157,7 +157,7 @@ export function PeopleScreen() {
                       }}
                       aria-label={p.favorite ? `إزالة ${p.name} من المفضلة` : `تمييز ${p.name} بالمفضلة`}
                       aria-pressed={p.favorite}
-                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-colors hover:bg-white/[0.06]"
+                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-colors hover:bg-black/[0.04]"
                     >
                       <Star
                         className={cn(

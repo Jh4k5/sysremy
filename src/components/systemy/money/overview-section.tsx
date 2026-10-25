@@ -168,7 +168,7 @@ export function OverviewSection({ data, onGoToTab }: { data: MoneyData; onGoToTa
             type="button"
             onClick={() => onGoToTab("budget")}
             aria-label="فتح تبويب الميزانية"
-            className="w-full text-start glass rounded-3xl p-5 relative overflow-hidden hover:bg-white/[0.06] active:scale-[0.96] transition-[background-color,transform] duration-150 ease-out"
+            className="w-full text-start glass rounded-3xl p-5 relative overflow-hidden hover:bg-black/[0.04] active:scale-[0.96] transition-[background-color,transform] duration-150 ease-out"
           >
             <div className="flex items-center justify-between gap-2">
               <span className="text-[12px] text-muted-foreground">الميزانية — {view.ws.monthLabel}</span>
@@ -232,7 +232,7 @@ export function OverviewSection({ data, onGoToTab }: { data: MoneyData; onGoToTa
           <p className="mt-2 text-[11px] text-muted-foreground">
             حتى نهاية الشهر المالي · <span className="tabular">{formatNumber(view.sts.daysLeft)}</span> يوماً متبقياً
           </p>
-          <div className="mt-3.5 pt-3 border-t border-white/[0.07] flex items-center justify-between text-[10px] text-muted-foreground/90 tabular">
+          <div className="mt-3.5 pt-3 border-t border-black/[0.06] flex items-center justify-between text-[10px] text-muted-foreground/90 tabular">
             <span>دخل {formatCompact(view.sts.expectedIncome)}</span>
             <span className="opacity-50">−</span>
             <span>التزامات {formatCompact(view.sts.commitments)}</span>
@@ -272,13 +272,13 @@ export function OverviewSection({ data, onGoToTab }: { data: MoneyData; onGoToTa
               <div className="space-y-1.5">
                 <div className="flex items-center gap-2">
                   <span className="w-9 shrink-0 text-[9.5px] text-mint">دخل</span>
-                  <div className="flex-1 h-1.5 rounded-full bg-white/[0.05] overflow-hidden">
+                  <div className="flex-1 h-1.5 rounded-full bg-black/[0.03] overflow-hidden">
                     <div className="h-full rounded-full bg-mint" style={{ width: `${incomePct}%` }} />
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="w-9 shrink-0 text-[9.5px] text-coral">مصروف</span>
-                  <div className="flex-1 h-1.5 rounded-full bg-white/[0.05] overflow-hidden">
+                  <div className="flex-1 h-1.5 rounded-full bg-black/[0.03] overflow-hidden">
                     <div className="h-full rounded-full bg-coral" style={{ width: `${expensePct}%` }} />
                   </div>
                 </div>
@@ -356,14 +356,14 @@ export function OverviewSection({ data, onGoToTab }: { data: MoneyData; onGoToTa
             <p className="text-[11.5px] text-muted-foreground py-4 text-center">لا مصروفات مصنّفة هذا الشهر بعد</p>
           ) : (
             view.cats.map((c) => (
-              <div key={c.name} className="flex items-center gap-2.5 py-2 border-t border-white/[0.05] first:border-t-0">
+              <div key={c.name} className="flex items-center gap-2.5 py-2 border-t border-black/[0.04] first:border-t-0">
                 <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: c.color }} aria-hidden="true" />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2 text-[12px]">
                     <span className="truncate">{c.name}</span>
                     <PrivateAmount className="tabular font-semibold shrink-0">{formatMoney(c.value, cur)}</PrivateAmount>
                   </div>
-                  <div className="h-1.5 rounded-full bg-white/[0.05] mt-1.5 overflow-hidden">
+                  <div className="h-1.5 rounded-full bg-black/[0.03] mt-1.5 overflow-hidden">
                     <div
                       className="h-full rounded-full"
                       style={{ width: `${Math.max(4, (c.value / topCatValue) * 100)}%`, background: c.color }}
@@ -390,7 +390,7 @@ export function OverviewSection({ data, onGoToTab }: { data: MoneyData; onGoToTa
               </button>
             </div>
             {view.envs.map((e) => (
-              <div key={e.category.id} className="py-2.5 border-t border-white/[0.05] first:border-t-0">
+              <div key={e.category.id} className="py-2.5 border-t border-black/[0.04] first:border-t-0">
                 <div className="flex items-center gap-2.5">
                   <IconBubble icon={e.category.icon} color={e.category.color} className="w-8 h-8" iconClassName="w-4 h-4" />
                   <span className="text-[12.5px] font-medium flex-1 truncate">{e.category.name}</span>
@@ -403,7 +403,7 @@ export function OverviewSection({ data, onGoToTab }: { data: MoneyData; onGoToTa
                     {formatNumber(e.percent)}%
                   </span>
                 </div>
-                <div className="h-1.5 rounded-full bg-white/[0.05] mt-2 overflow-hidden">
+                <div className="h-1.5 rounded-full bg-black/[0.03] mt-2 overflow-hidden">
                   <div
                     className="h-full rounded-full"
                     style={{ width: `${Math.min(100, e.percent)}%`, background: ENV_COLOR[e.status] }}
@@ -433,9 +433,9 @@ export function OverviewSection({ data, onGoToTab }: { data: MoneyData; onGoToTa
                   ? { t: "اليوم", cls: "bg-[#FF8E7A]/15 text-coral" }
                   : item.daysLeft === 1
                     ? { t: "غداً", cls: "bg-[#F5B95C]/15 text-gold" }
-                    : { t: `بعد ${formatNumber(item.daysLeft)} أيام`, cls: "bg-white/[0.06] text-muted-foreground" };
+                    : { t: `بعد ${formatNumber(item.daysLeft)} أيام`, cls: "bg-black/[0.04] text-muted-foreground" };
               return (
-                <div key={`${item.kind}:${item.id}`} className="py-2.5 border-t border-white/[0.05] first:border-t-0">
+                <div key={`${item.kind}:${item.id}`} className="py-2.5 border-t border-black/[0.04] first:border-t-0">
                   <div className="flex items-center gap-3">
                     <IconBubble
                       icon={item.icon}
@@ -476,7 +476,7 @@ export function OverviewSection({ data, onGoToTab }: { data: MoneyData; onGoToTa
                               key={a.id}
                               onClick={() => payWith(item, a.id)}
                               className={cn(
-                                "h-11 px-3 rounded-xl glass-soft border border-white/[0.08] flex items-center gap-1.5 shrink-0 hover:bg-white/[0.07]",
+                                "h-11 px-3 rounded-xl glass-soft border border-black/[0.07] flex items-center gap-1.5 shrink-0 hover:bg-black/[0.04]",
                                 press,
                               )}
                             >
@@ -537,7 +537,7 @@ function QuickLink({
     <button
       onClick={onClick}
       className={cn(
-        "glass rounded-2xl p-2.5 flex flex-col items-center gap-1 min-h-[70px] justify-center hover:bg-white/[0.06]",
+        "glass rounded-2xl p-2.5 flex flex-col items-center gap-1 min-h-[70px] justify-center hover:bg-black/[0.04]",
         press,
       )}
       aria-label={`الانتقال إلى ${label}`}

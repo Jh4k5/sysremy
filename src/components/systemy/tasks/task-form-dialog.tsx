@@ -64,7 +64,7 @@ export function TaskFormDialog({ open, onOpenChange, links, presetDate }: TaskFo
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         dir="rtl"
-        className="mx-auto max-w-sm rounded-3xl border-white/10 bg-[#0B0F1A]/95 p-5 backdrop-blur-2xl"
+        className="mx-auto max-w-sm rounded-3xl border-black/[0.08] bg-white/95 p-5 backdrop-blur-xl shadow-[0_24px_60px_-20px_rgba(23,33,43,0.35)]"
       >
         <DialogHeader className="space-y-1 text-right">
           <DialogTitle className="text-right text-[15px] font-bold">مهمة جديدة</DialogTitle>

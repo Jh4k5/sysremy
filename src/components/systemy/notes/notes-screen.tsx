@@ -30,15 +30,15 @@ function NotesSkeleton() {
       aria-label="جارٍ تحميل الملاحظات"
     >
       <div className="h-14 mb-4 space-y-2">
-        <Skeleton className="h-7 w-40 rounded-lg bg-white/[0.06]" />
-        <Skeleton className="h-3.5 w-56 rounded-md bg-white/[0.06]" />
+        <Skeleton className="h-7 w-40 rounded-lg bg-black/[0.04]" />
+        <Skeleton className="h-3.5 w-56 rounded-md bg-black/[0.04]" />
       </div>
-      <Skeleton className="h-11 rounded-2xl bg-white/[0.05] mb-3" />
-      <Skeleton className="h-11 rounded-full bg-white/[0.05] mb-3" />
+      <Skeleton className="h-11 rounded-2xl bg-black/[0.03] mb-3" />
+      <Skeleton className="h-11 rounded-full bg-black/[0.03] mb-3" />
       <div className="space-y-2.5">
-        <Skeleton className="h-[96px] rounded-2xl bg-white/[0.06]" />
-        <Skeleton className="h-[96px] rounded-2xl bg-white/[0.06]" />
-        <Skeleton className="h-[96px] rounded-2xl bg-white/[0.06]" />
+        <Skeleton className="h-[96px] rounded-2xl bg-black/[0.04]" />
+        <Skeleton className="h-[96px] rounded-2xl bg-black/[0.04]" />
+        <Skeleton className="h-[96px] rounded-2xl bg-black/[0.04]" />
       </div>
     </div>
   );
@@ -84,7 +84,7 @@ function KnowledgeCard({
       role="button"
       tabIndex={0}
       aria-label={hidden ? `كشف الملاحظة السرية: ${note.title}` : `فتح الملاحظة: ${note.title}`}
-      className="glass rounded-2xl p-3.5 cursor-pointer outline-none transition-all duration-200 hover:bg-white/[0.07] hover:scale-[1.01] active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-primary/40"
+      className="glass rounded-2xl p-3.5 cursor-pointer outline-none transition-all duration-200 hover:bg-black/[0.04] hover:scale-[1.01] active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-primary/40"
     >
       <div className="flex items-start gap-1">
         {note.pinned && (
@@ -113,7 +113,7 @@ function KnowledgeCard({
           }}
           aria-label={note.pinned ? `إلغاء تثبيت: ${note.title}` : `تثبيت: ${note.title}`}
           aria-pressed={note.pinned}
-          className="w-11 h-11 -me-2 -mt-2 shrink-0 rounded-xl flex items-center justify-center transition-colors hover:bg-white/[0.06]"
+          className="w-11 h-11 -me-2 -mt-2 shrink-0 rounded-xl flex items-center justify-center transition-colors hover:bg-black/[0.04]"
         >
           {note.pinned ? (
             <Pin className="w-4 h-4 text-primary fill-primary/25" aria-hidden="true" />
@@ -130,7 +130,7 @@ function KnowledgeCard({
           }}
           aria-label={fav ? `إزالة ${note.title} من المفضلة` : `إضافة ${note.title} إلى المفضلة`}
           aria-pressed={fav}
-          className="w-11 h-11 -me-3 -mt-2 shrink-0 rounded-xl flex items-center justify-center transition-colors hover:bg-white/[0.06]"
+          className="w-11 h-11 -me-3 -mt-2 shrink-0 rounded-xl flex items-center justify-center transition-colors hover:bg-black/[0.04]"
         >
           <Star
             className={cn("w-4 h-4", fav ? "text-gold fill-gold/40" : "text-muted-foreground/60")}

@@ -134,8 +134,8 @@ export function ProjectsScreen() {
         aria-label="جارٍ تحميل المشاريع"
       >
         <header className="mb-4">
-          <div className="h-7 w-40 animate-pulse rounded-lg bg-white/[0.05]" />
-          <div className="mt-2 h-3.5 w-56 animate-pulse rounded bg-white/[0.04]" />
+          <div className="h-7 w-40 animate-pulse rounded-lg bg-black/[0.03]" />
+          <div className="mt-2 h-3.5 w-56 animate-pulse rounded bg-black/[0.03]" />
         </header>
         <div className="glass-soft mb-3 h-24 animate-pulse rounded-3xl" />
         <div className="glass-soft mb-3 h-11 animate-pulse rounded-full" />
@@ -197,7 +197,7 @@ export function ProjectsScreen() {
                 {formatMoney(monthIncome, cur)}
               </PrivateAmount>
             </div>
-            <div className="flex flex-wrap items-center gap-2 border-t border-white/[0.06] pt-3">
+            <div className="flex flex-wrap items-center gap-2 border-t border-black/[0.05] pt-3">
               <Chip className="tabular text-foreground/85">
                 <Briefcase className="h-3 w-3 text-mint" aria-hidden="true" />
                 {formatNumber(activeCount)} مشروع نشط
@@ -233,7 +233,7 @@ export function ProjectsScreen() {
                     "h-11 min-h-11 flex-1 rounded-2xl border text-[12px] font-bold transition-colors",
                     active
                       ? "border-primary/50 bg-primary/15 text-primary"
-                      : "glass-soft border-white/[0.08] text-foreground/70 hover:bg-white/[0.06]",
+                      : "glass-soft border-black/[0.07] text-foreground/70 hover:bg-black/[0.04]",
                   )}
                 >
                   <span className="tabular">
@@ -364,7 +364,7 @@ function ProjectCard({
 
         {hasTasks && (
           <div
-            className="mt-3 h-2 overflow-hidden rounded-full bg-white/[0.06]"
+            className="mt-3 h-2 overflow-hidden rounded-full bg-black/[0.04]"
             role="progressbar"
             aria-valuenow={pct}
             aria-valuemin={0}
@@ -383,7 +383,7 @@ function ProjectCard({
             <Chip
               className={cn(
                 "border tabular",
-                late ? "border-coral/40 text-coral" : "border-white/[0.1] text-muted-foreground",
+                late ? "border-coral/40 text-coral" : "border-black/[0.08] text-muted-foreground",
               )}
             >
               <CalendarDays className="h-3 w-3" aria-hidden="true" />

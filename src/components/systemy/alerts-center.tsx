@@ -149,7 +149,7 @@ export function AlertsCenter() {
                               dismissAlert(a.dismissKey as string);
                               useUIStore.setState({ tick: Date.now() });
                             }}
-                            className="h-8 px-3 rounded-xl glass-soft border border-white/[0.08] text-muted-foreground text-[11px]"
+                            className="h-8 px-3 rounded-xl glass-soft border border-black/[0.07] text-muted-foreground text-[11px]"
                           >
                             تجاهل اليوم
                           </button>
@@ -164,7 +164,7 @@ export function AlertsCenter() {
                 <div className="pt-2">
                   <p className="text-[11px] font-semibold text-muted-foreground px-1 mb-2">تذكيرات قادمة</p>
                   {upcoming.map((r: Reminder) => (
-                    <div key={r.id} className="glass-soft rounded-2xl border border-white/[0.06] p-3 flex items-center gap-3 mb-2">
+                    <div key={r.id} className="glass-soft rounded-2xl border border-black/[0.05] p-3 flex items-center gap-3 mb-2">
                       <Clock className="w-4 h-4 text-cyan shrink-0" />
                       <div className="min-w-0 flex-1">
                         <p className="text-[12.5px] font-medium truncate">{r.title}</p>

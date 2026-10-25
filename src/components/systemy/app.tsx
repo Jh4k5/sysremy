@@ -7,7 +7,6 @@
  * المجدول: تذكيرات وعادات تطلق إشعارات في وقتها.
  */
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
 import { useUIStore } from "@/store/ui-store";
@@ -19,6 +18,7 @@ import { isStandalone, standaloneServerSnapshot, subscribeNever } from "@/lib/st
 import { StatusBar } from "./phone-frame";
 import { BottomNav } from "./bottom-nav";
 import { Header } from "./header";
+import { Logo } from "./logo";
 import { TodayScreen } from "./today/today-screen";
 import { MoneyScreen } from "./money/money-screen";
 import { CalendarScreen } from "./calendar/calendar-screen";
@@ -100,15 +100,8 @@ export function SystemyApp() {
     return (
       <div className="h-full flex items-center justify-center app-mesh">
         <div className="flex flex-col items-center gap-4">
-          {/* شعار Systemy الرسمي — روبوت Sys */}
-          <Image
-            src="/brand/logo-128.png"
-            alt="شعار Systemy — روبوت Sys"
-            width={56}
-            height={56}
-            className="rounded-2xl border border-white/10"
-            priority
-          />
+          {/* شعار Systemy الرسمي — روبوت Sys (أصل مستورد لا ينكسر) */}
+          <Logo priority className="w-14 h-14 rounded-2xl" />
           <div className="flex gap-1.5">
             {[0, 1, 2].map((i) => (
               <motion.span
@@ -241,9 +234,9 @@ function JustOnboarded({ name }: { name: string }) {
       animate={{ opacity: [0, 1, 1, 1, 0], y: [-12, 0, 0, 0, -12] }}
       transition={{ duration: 4.5, times: [0, 0.1, 0.5, 0.85, 1], ease: "easeInOut" }}
       onAnimationComplete={() => setGone(true)}
-      className="absolute top-16 inset-x-4 z-50 glass rounded-2xl p-3.5 text-center border-primary/25 pointer-events-none"
+      className="absolute top-16 inset-x-4 z-50 glass rounded-2xl p-3.5 text-center border-primary/30 pointer-events-none"
     >
-      <p className="text-[12.5px] font-semibold text-primary">أهلاً بك يا {name} 🌙</p>
+      <p className="text-[12.5px] font-semibold text-gold">أهلاً بك يا {name} 🌙</p>
       <p className="text-[10.5px] text-muted-foreground mt-0.5">ابدأ بزر + — كل شيء مترابط من هنا</p>
     </motion.div>
   );

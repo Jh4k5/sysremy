@@ -108,7 +108,7 @@ export function CategoriesSection({ data }: { data: MoneyData }) {
             setEditing(c);
           }
         }}
-        className="px-4 py-2.5 cursor-pointer hover:bg-white/[0.03] transition-colors border-t border-white/[0.04] first:border-t-0"
+        className="px-4 py-2.5 cursor-pointer hover:bg-black/[0.02] transition-colors border-t border-black/[0.04] first:border-t-0"
       >
         <div className="flex items-center gap-3 min-h-11">
           <IconBubble icon={c.icon} color={c.color} className="w-10 h-10" iconClassName="w-[18px] h-[18px]" />
@@ -159,7 +159,7 @@ export function CategoriesSection({ data }: { data: MoneyData }) {
                         void updateCategory(c.id, { budget: 0 });
                         setBudgetOpenId(null);
                       }}
-                      className="flex-1 h-10 rounded-xl glass-soft border border-white/[0.08] text-[11px] font-medium hover:bg-white/[0.06] transition-colors"
+                      className="flex-1 h-10 rounded-xl glass-soft border border-black/[0.07] text-[11px] font-medium hover:bg-black/[0.04] transition-colors"
                     >
                       إزالة
                     </button>
@@ -178,7 +178,7 @@ export function CategoriesSection({ data }: { data: MoneyData }) {
 
         {hasBudget && (
           <div className="mt-1.5">
-            <div className="h-1.5 rounded-full bg-white/[0.05] overflow-hidden">
+            <div className="h-1.5 rounded-full bg-black/[0.03] overflow-hidden">
               <div
                 className="h-full rounded-full"
                 style={{ width: `${Math.min(100, percent)}%`, background: ENV_COLOR[status] }}
@@ -227,7 +227,7 @@ export function CategoriesSection({ data }: { data: MoneyData }) {
         <div className="space-y-3">
           {expenseCats.length > 0 && (
             <GlassCard className="overflow-hidden">
-              <div className="px-4 py-2.5 border-b border-white/[0.05] flex items-center justify-between">
+              <div className="px-4 py-2.5 border-b border-black/[0.04] flex items-center justify-between">
                 <span className="text-[12px] font-bold text-foreground/90">مصروف — أظرف الميزانية</span>
                 <span className="text-[10px] text-muted-foreground">اضغط الميزانية لتعديلها</span>
               </div>
@@ -237,7 +237,7 @@ export function CategoriesSection({ data }: { data: MoneyData }) {
 
           {incomeCats.length > 0 && (
             <GlassCard className="overflow-hidden">
-              <div className="px-4 py-2.5 border-b border-white/[0.05]">
+              <div className="px-4 py-2.5 border-b border-black/[0.04]">
                 <span className="text-[12px] font-bold text-foreground/90">دخل</span>
               </div>
               {incomeCats.map(renderRow)}

@@ -336,7 +336,7 @@ export function SysChat() {
               {messages.length === 1 && !busy && (
                 <div className="flex flex-wrap gap-2 justify-end pt-2">
                   {SUGGESTIONS.map((s) => (
-                    <Chip key={s} className="cursor-pointer hover:bg-white/[0.08] border-cyan/20" >
+                    <Chip key={s} className="cursor-pointer hover:bg-black/[0.05] border-cyan/20" >
                       <button onClick={() => void send(s)} className="text-[11px]">
                         {s}
                       </button>
@@ -359,7 +359,7 @@ export function SysChat() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="اسأل عن أي شيء في نظامك…"
-                className="flex-1 h-12 rounded-xl glass-soft border border-white/[0.08] px-4 text-[13.5px] focus:border-cyan/40 focus:outline-none"
+                className="flex-1 h-12 rounded-xl glass-soft border border-black/[0.07] px-4 text-[13.5px] focus:border-cyan/40 focus:outline-none"
                 dir="auto"
                 aria-label="رسالة إلى Sys"
               />

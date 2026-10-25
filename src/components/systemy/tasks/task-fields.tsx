@@ -135,8 +135,8 @@ export function taskLinkChips(task: Task, links: TaskLinkOptions): TaskLinkChip[
 // ═══════════════════════ الحقول المشتركة ═══════════════════════
 
 const selectTriggerCls =
-  "h-12 rounded-xl glass-soft border border-white/[0.08] px-4 text-[13.5px] text-foreground focus:ring-0";
-const selectContentCls = "rounded-xl border-white/10 bg-[#10152a] max-h-64";
+  "h-12 rounded-xl glass-soft border border-black/[0.07] px-4 text-[13.5px] text-foreground focus:ring-0";
+const selectContentCls = "rounded-xl border-black/[0.08] bg-white max-h-64";
 
 export function TaskFields({
   value,
@@ -244,7 +244,7 @@ export function TaskFields({
             onClick={() => setLinksOpen((o) => !o)}
             aria-expanded={linksOpen}
             aria-controls="task-link-selects"
-            className="flex h-11 w-full items-center justify-between gap-2 rounded-xl glass-soft border border-white/[0.08] px-4 text-[12.5px] font-medium text-foreground/85 transition-colors hover:bg-white/[0.06]"
+            className="flex h-11 w-full items-center justify-between gap-2 rounded-xl glass-soft border border-black/[0.07] px-4 text-[12.5px] font-medium text-foreground/85 transition-colors hover:bg-black/[0.04]"
           >
             <span className="flex items-center gap-2">
               <Link2 className="h-4 w-4 shrink-0 text-primary/80" aria-hidden="true" />
@@ -262,7 +262,7 @@ export function TaskFields({
           </button>
 
           {linksOpen && (
-            <div id="task-link-selects" className="space-y-3 rounded-2xl glass-soft border border-white/[0.06] p-3.5">
+            <div id="task-link-selects" className="space-y-3 rounded-2xl glass-soft border border-black/[0.05] p-3.5">
               <LinkSelect
                 label="المشروع"
                 icon={<Briefcase className="h-3.5 w-3.5" aria-hidden="true" />}

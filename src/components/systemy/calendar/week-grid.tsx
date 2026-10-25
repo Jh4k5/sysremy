@@ -65,7 +65,7 @@ export function WeekGrid({
   return (
     <div className="flex select-none" aria-label="شبكة الأسبوع الزمنية">
       {/* عمود الساعات — على اليمين في RTL */}
-      <div className="w-11 shrink-0 relative border-e border-white/[0.06]" style={{ height: GRID_H }} aria-hidden="true">
+      <div className="w-11 shrink-0 relative border-e border-black/[0.05]" style={{ height: GRID_H }} aria-hidden="true">
         {HOURS.map((h) => (
           <div
             key={h}
@@ -79,7 +79,7 @@ export function WeekGrid({
         ))}
         {nowVisible && (
           <div className="absolute inset-x-1 z-10 flex justify-center -translate-y-1/2" style={{ top: nowTop }}>
-            <span className="tabular rounded bg-[#0B0F1A]/90 px-1 text-[8.5px] font-bold text-primary">
+            <span className="tabular rounded bg-white/90 px-1 text-[8.5px] font-bold text-gold shadow-[0_0_0_1px_rgba(23,33,43,0.08)]">
               {formatTimeAr(minutesToHHMM(nowMin))}
             </span>
           </div>
@@ -151,7 +151,7 @@ function DayColumn({
     >
       {/* طبقة اللمس (الفراغ) */}
       <div
-        className="absolute inset-0 z-0 cursor-pointer transition-colors active:bg-white/[0.05]"
+        className="absolute inset-0 z-0 cursor-pointer transition-colors active:bg-black/[0.03]"
         role="button"
         tabIndex={0}
         aria-label={`عمود يوم ${day} — المس لإضافة حدث`}
@@ -168,7 +168,7 @@ function DayColumn({
       {HOURS.map((h) => (
         <div
           key={h}
-          className="pointer-events-none absolute inset-x-0 border-t border-white/[0.05]"
+          className="pointer-events-none absolute inset-x-0 border-t border-black/[0.04]"
           style={{ top: (h - DAY_START_HOUR) * HOUR_H, height: HOUR_H }}
           aria-hidden="true"
         />

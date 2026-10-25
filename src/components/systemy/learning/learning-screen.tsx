@@ -42,15 +42,15 @@ function LearningSkeleton() {
   return (
     <div className="h-full overflow-y-auto sys-scroll px-4 pt-3 pb-28" aria-busy="true" aria-label="جارٍ تحميل شاشة التعلم">
       <div className="h-14 mb-4 space-y-2">
-        <Skeleton className="h-7 w-36 rounded-lg bg-white/[0.06]" />
-        <Skeleton className="h-3.5 w-52 rounded-md bg-white/[0.06]" />
+        <Skeleton className="h-7 w-36 rounded-lg bg-black/[0.04]" />
+        <Skeleton className="h-3.5 w-52 rounded-md bg-black/[0.04]" />
       </div>
-      <Skeleton className="h-[168px] rounded-3xl bg-white/[0.05] mb-3" />
-      <Skeleton className="h-11 rounded-2xl bg-white/[0.05] mb-3" />
+      <Skeleton className="h-[168px] rounded-3xl bg-black/[0.03] mb-3" />
+      <Skeleton className="h-11 rounded-2xl bg-black/[0.03] mb-3" />
       <div className="space-y-2.5">
-        <Skeleton className="h-[88px] rounded-2xl bg-white/[0.06]" />
-        <Skeleton className="h-[88px] rounded-2xl bg-white/[0.06]" />
-        <Skeleton className="h-[88px] rounded-2xl bg-white/[0.06]" />
+        <Skeleton className="h-[88px] rounded-2xl bg-black/[0.04]" />
+        <Skeleton className="h-[88px] rounded-2xl bg-black/[0.04]" />
+        <Skeleton className="h-[88px] rounded-2xl bg-black/[0.04]" />
       </div>
     </div>
   );
@@ -92,7 +92,7 @@ function CourseCard({
       tabIndex={0}
       aria-label={`فتح مقرر ${course.name}`}
     >
-      <GlassCard interactive className="p-3.5 border-white/[0.06]">
+      <GlassCard interactive className="p-3.5 border-black/[0.05]">
         <div className="flex items-center gap-3">
           <div
             className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0"
@@ -222,7 +222,7 @@ export function LearningScreen() {
               onClick={() => setAddCardOpen(true)}
               aria-label="بطاقة مراجعة جديدة"
               title="بطاقة جديدة"
-              className="glass w-11 h-11 rounded-2xl flex items-center justify-center text-muted-foreground transition-all duration-200 hover:bg-white/[0.09] hover:text-foreground active:scale-95"
+              className="glass w-11 h-11 rounded-2xl flex items-center justify-center text-muted-foreground transition-all duration-200 hover:bg-black/[0.05] hover:text-foreground active:scale-95"
             >
               <Layers className="w-5 h-5" />
             </button>
@@ -258,7 +258,7 @@ export function LearningScreen() {
               aria-label={
                 avgGrade != null ? "متوسط الدرجات المرجّحة" : "أضف بنود درجات لمقرراتك"
               }
-              className="glass-soft rounded-2xl p-3 text-start hover:bg-white/[0.07] transition-colors"
+              className="glass-soft rounded-2xl p-3 text-start hover:bg-black/[0.04] transition-colors"
             >
               <p className="text-[10.5px] text-muted-foreground">متوسط الدرجات المرجّحة</p>
               {avgGrade != null ? (
@@ -318,7 +318,7 @@ export function LearningScreen() {
             type="button"
             onClick={() => openQuickAdd("expense")}
             aria-label="تسجيل رسوم ومستلزمات دراسية"
-            className="glass rounded-2xl min-h-11 px-3.5 py-2.5 flex items-center justify-center gap-2 text-[12px] font-medium text-foreground/85 hover:bg-white/[0.07] transition-colors active:scale-[0.98]"
+            className="glass rounded-2xl min-h-11 px-3.5 py-2.5 flex items-center justify-center gap-2 text-[12px] font-medium text-foreground/85 hover:bg-black/[0.04] transition-colors active:scale-[0.98]"
           >
             <Wallet className="w-4 h-4 text-cyan" aria-hidden="true" />
             رسوم ومستلزمات
@@ -327,7 +327,7 @@ export function LearningScreen() {
             type="button"
             onClick={() => goToCalendar()}
             aria-label="الانتقال إلى التقويم"
-            className="glass rounded-2xl min-h-11 px-3.5 py-2.5 flex items-center justify-center gap-2 text-[12px] font-medium text-foreground/85 hover:bg-white/[0.07] transition-colors active:scale-[0.98]"
+            className="glass rounded-2xl min-h-11 px-3.5 py-2.5 flex items-center justify-center gap-2 text-[12px] font-medium text-foreground/85 hover:bg-black/[0.04] transition-colors active:scale-[0.98]"
           >
             <CalendarDays className="w-4 h-4 text-gold" aria-hidden="true" />
             التقويم

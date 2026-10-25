@@ -91,7 +91,7 @@ export function HomeBillFormDialog({ accounts, currency, digits, onClose }: Home
     <Dialog open onOpenChange={(o) => { if (!o) onClose(); }}>
       <DialogContent
         dir="rtl"
-        className="mx-auto max-w-sm rounded-3xl border-white/10 bg-[#0B0F1A]/95 p-5 backdrop-blur-2xl max-h-[85dvh] overflow-y-auto sys-scroll"
+        className="mx-auto max-w-sm rounded-3xl border-black/[0.08] bg-white/95 p-5 backdrop-blur-xl shadow-[0_24px_60px_-20px_rgba(23,33,43,0.35)] max-h-[85dvh] overflow-y-auto sys-scroll"
       >
         <DialogHeader className="space-y-1 text-right">
           <DialogTitle className="text-lg leading-snug">فاتورة منزلية</DialogTitle>

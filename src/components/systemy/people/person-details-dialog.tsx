@@ -144,7 +144,7 @@ export function PersonDetailsDialog({
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent
         dir="rtl"
-        className="mx-auto max-w-sm rounded-3xl border-white/10 bg-[#0B0F1A]/95 p-5 backdrop-blur-2xl max-h-[85dvh] overflow-y-auto sys-scroll"
+        className="mx-auto max-w-sm rounded-3xl border-black/[0.08] bg-white/95 p-5 backdrop-blur-xl shadow-[0_24px_60px_-20px_rgba(23,33,43,0.35)] max-h-[85dvh] overflow-y-auto sys-scroll"
       >
         <DialogHeader className="space-y-2 text-right">
           <div className="flex items-center gap-3">
@@ -476,7 +476,7 @@ function DebtRow({ debt, accounts, currency }: { debt: Debt; accounts: Account[]
           type="button"
           onClick={partialTap}
           aria-label="تسديد مبلغ جزئي"
-          className="h-11 px-3.5 rounded-xl glass-soft border border-white/[0.08] text-[11.5px] font-medium text-foreground/80 transition-colors hover:bg-white/[0.07]"
+          className="h-11 px-3.5 rounded-xl glass-soft border border-black/[0.07] text-[11.5px] font-medium text-foreground/80 transition-colors hover:bg-black/[0.04]"
         >
           جزئي…
         </button>
@@ -503,7 +503,7 @@ function DebtRow({ debt, accounts, currency }: { debt: Debt; accounts: Account[]
             <button
               type="button"
               onClick={() => run(remaining)}
-              className="h-11 px-3.5 rounded-xl glass-soft border border-white/[0.08] text-[12px] font-medium text-muted-foreground transition-colors hover:bg-white/[0.07]"
+              className="h-11 px-3.5 rounded-xl glass-soft border border-black/[0.07] text-[12px] font-medium text-muted-foreground transition-colors hover:bg-black/[0.04]"
             >
               بلا معاملة
             </button>
@@ -539,7 +539,7 @@ function DebtRow({ debt, accounts, currency }: { debt: Debt; accounts: Account[]
               type="button"
               onClick={() => applyPartial()}
               disabled={!(Number(amount) > 0)}
-              className="h-11 px-3.5 rounded-xl glass-soft border border-white/[0.08] text-[12px] font-medium text-muted-foreground transition-colors hover:bg-white/[0.07] disabled:opacity-40"
+              className="h-11 px-3.5 rounded-xl glass-soft border border-black/[0.07] text-[12px] font-medium text-muted-foreground transition-colors hover:bg-black/[0.04] disabled:opacity-40"
             >
               بلا معاملة
             </button>
@@ -603,7 +603,7 @@ function TaskCheck({ task }: { task: Task }) {
       onClick={() => void toggle()}
       aria-pressed={done}
       aria-label={`${done ? "إرجاع" : "إنجاز"} مهمة ${task.title}`}
-      className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-start transition-colors hover:bg-white/[0.05] min-h-[44px]"
+      className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-start transition-colors hover:bg-black/[0.03] min-h-[44px]"
     >
       <span
         className={cn(

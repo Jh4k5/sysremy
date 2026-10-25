@@ -14,7 +14,7 @@
 
 import { createElement, useMemo, useState } from "react";
 import { Reorder, motion, useDragControls } from "framer-motion";
-import { Check, ChevronDown, ChevronUp, GripVertical, HeartHandshake, SlidersHorizontal } from "lucide-react";
+import { Check, ChevronDown, ChevronUp, GripVertical, HeartHandshake, Search, SlidersHorizontal, X } from "lucide-react";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
@@ -238,20 +238,30 @@ function SystemsSkeleton() {
       aria-label="جارٍ تحميل الأنظمة"
     >
       <div className="h-16 mb-4 space-y-2">
-        <Skeleton className="h-7 w-24 rounded-lg bg-white/[0.06]" />
-        <Skeleton className="h-3.5 w-60 rounded-md bg-white/[0.06]" />
-        <Skeleton className="h-3 w-44 rounded-md bg-white/[0.06]" />
+        <Skeleton className="h-7 w-24 rounded-lg bg-black/[0.04]" />
+        <Skeleton className="h-3.5 w-60 rounded-md bg-black/[0.04]" />
+        <Skeleton className="h-3 w-44 rounded-md bg-black/[0.04]" />
       </div>
       <div className="grid grid-cols-2 gap-3">
         {Array.from({ length: 6 }).map((_, i) => (
-          <Skeleton key={i} className="h-[214px] rounded-3xl bg-white/[0.05]" />
+          <Skeleton key={i} className="h-[214px] rounded-3xl bg-black/[0.03]" />
         ))}
       </div>
     </div>
   );
 }
 
-/* ═══════════════════════ بطاقة النظام (وضع العرض) ═══════════════════════ */
+/* ═══════════════════════ المجموعات والبحث ═══════════════════════ */
+
+/** الأنظمة الأساسية — تدفق الحياة اليومي */
+const CORE_KEYS = new Set(["money", "tasks", "habits", "calendar", "goals", "health", "journal", "sys"]);
+
+/** تصنيف نظام: أساسي أو مساحة إضافية */
+function groupOf(sys: SystemModel): "core" | "extra" {
+  return CORE_KEYS.has(sys.key) ? "core" : "extra";
+}
+
+/* ═══════════════════════ بطاقة النظام (وضع العرض) — 5.1 ═══════════════════════ */
 
 function SystemCard({
   sys,
@@ -265,7 +275,6 @@ function SystemCard({
   onOpen: () => void;
 }) {
   const live = liveIndicator(sys.key, data);
-  const features = SYSTEM_FEATURES[sys.key] ?? [];
   return (
     <motion.div role="listitem" className="h-full" {...widgetEnter(delay)}>
       {/* غلاف تفاعلي: النقر ولوحة المفاتيح معاً — البطاقة كلها زر واحد كبير */}
@@ -290,58 +299,35 @@ function SystemCard({
           )}
         >
           <div className="flex items-start justify-between gap-1">
+            {/* 5.1: بطاقة محايدة هادئة — اللون الوحيد لمسة الأيقونة فقط */}
             <IconBubble
               icon={sys.icon}
               color={sys.color}
-              alpha="26"
-              className="w-12 h-12 rounded-3xl"
-              iconClassName="w-7 h-7"
+              alpha="1A"
+              className="w-11 h-11 rounded-2xl"
+              iconClassName="w-[22px] h-[22px]"
             />
             {!sys.enabled && <Chip className="text-coral">معطّل</Chip>}
           </div>
-          <div className="mt-2.5 text-[13.5px] font-bold leading-5">{sys.name}</div>
+          <div className="mt-2.5 text-[13.5px] font-bold leading-5 text-foreground">{sys.name}</div>
           <p className="mt-1 text-[10.5px] text-muted-foreground leading-4 line-clamp-2 min-h-8 flex-1">
             {sys.description}
           </p>
-          {/* المؤشر الحي — نقطة بلون النظام الدلالي داخل كبسولة زجاجية خافتة،
-              وشريط تقدم بتدرج الشريط للأنظمة ذات النشاط الفعلي */}
+          {/* المؤشر الحي — نقطة بلون النظام فقط، والنص محايد مقروء */}
           <div className="mt-2 min-h-[22px] flex items-center">
-            <span className="relative inline-flex max-w-full items-center gap-1.5 overflow-hidden rounded-full glass-soft px-2 pt-0.5 pb-1 text-[10px]">
+            <span className="inline-flex max-w-full items-center gap-1.5 overflow-hidden rounded-full glass-soft px-2 py-0.5 text-[10px]">
               <span
-                className="w-1.5 h-1.5 rounded-full shrink-0 animate-pulse"
+                className="w-1.5 h-1.5 rounded-full shrink-0"
                 style={{ backgroundColor: sys.color }}
                 aria-hidden="true"
               />
               {live.text ? (
-                <span className="tabular truncate" style={{ color: sys.color }}>
-                  {live.text}
-                </span>
+                <span className="tabular truncate text-muted-foreground">{live.text}</span>
               ) : (
-                <span className="font-medium truncate" style={{ color: sys.color, opacity: 0.85 }}>
-                  {live.action}
-                </span>
-              )}
-              {/* V5: عنصر شبيه بالتقدم داخل المؤشر الحي — تعبئة بتدرج الشريط للأنظمة الحية فقط */}
-              {live.text && (
-                <span
-                  className="ribbon absolute inset-x-1 bottom-0 h-[2px] rounded-full opacity-80"
-                  aria-hidden="true"
-                />
+                <span className="font-medium truncate text-muted-foreground/85">{live.action}</span>
               )}
             </span>
           </div>
-          {features.length > 0 && (
-            <div className="mt-2 flex flex-wrap gap-1">
-              {features.map((f) => (
-                <span
-                  key={f}
-                  className="text-[9px] leading-[15px] px-1.5 rounded-md ribbon-soft text-white/70"
-                >
-                  {f}
-                </span>
-              ))}
-            </div>
-          )}
         </GlassCard>
       </div>
     </motion.div>
@@ -402,7 +388,7 @@ function EditRow({
           onClick={onExpand}
           aria-expanded={expanded}
           aria-label={`تخصيص ${sys.name}: اللون والأيقونة`}
-          className="flex-1 min-w-0 h-11 px-1 flex items-center gap-2.5 text-start rounded-xl hover:bg-white/[0.04] transition-[color,background-color,transform,scale] duration-[150ms] ease-out active:scale-[0.96]"
+          className="flex-1 min-w-0 h-11 px-1 flex items-center gap-2.5 text-start rounded-xl hover:bg-black/[0.03] transition-[color,background-color,transform,scale] duration-[150ms] ease-out active:scale-[0.96]"
         >
           <IconBubble icon={sys.icon} color={sys.color} className="w-9 h-9 rounded-xl" iconClassName="w-5 h-5" />
           <span className="min-w-0 flex-1">
@@ -452,7 +438,7 @@ function EditRow({
       </div>
 
       {expanded && (
-        <div className="mt-3 pt-3 border-t border-white/[0.07] space-y-3.5">
+        <div className="mt-3 pt-3 border-t border-black/[0.06] space-y-3.5">
           <p className="text-[10.5px] text-muted-foreground leading-relaxed">{sys.description}</p>
           <div className="space-y-2">
             <p className="text-[11px] font-medium text-muted-foreground">لون النظام</p>
@@ -477,6 +463,8 @@ export function SystemsScreen() {
 
   /** وضع التخصيص: سحب وترتيب وتفعيل وألوان وأيقونات */
   const [editMode, setEditMode] = useState(false);
+  /** بحث سريع — يصفّي بالاسم والوصف */
+  const [query, setQuery] = useState("");
   /** مسودة ترتيب السحب (معرّفات الأنظمة) — تُحفظ عند «تم» */
   const [orderIds, setOrderIds] = useState<string[] | null>(null);
   /** الصف الموسّع في وضع التخصيص (اللون والأيقونة) */
@@ -570,7 +558,14 @@ export function SystemsScreen() {
 
   const enabledSystems = systems.filter((s) => s.enabled);
   const disabledSystems = systems.filter((s) => !s.enabled);
-  const liveCount = enabledSystems.filter((s) => liveIndicator(s.key, data).text !== "").length;
+
+  /* البحث السريع — يصفّي بالاسم والوصف */
+  const q = query.trim();
+  const matches = (s: SystemModel) =>
+    !q || s.name.includes(q) || s.description.includes(q) || (SYSTEM_FEATURES[s.key] ?? []).some((f) => f.includes(q));
+  const coreSystems = enabledSystems.filter((s) => groupOf(s) === "core" && matches(s));
+  const extraSystems = enabledSystems.filter((s) => groupOf(s) === "extra" && matches(s));
+  const disabledShown = disabledSystems.filter(matches);
 
   /* ─── الانتقال للشاشة المرتبطة — التقويم وSys بمسارهما الخاص ─── */
   const navigate = (s: SystemModel) => {
@@ -642,38 +637,17 @@ export function SystemsScreen() {
   return (
     <div className="h-full overflow-y-auto sys-scroll px-4 pt-3 pb-28">
       {/* ═══ الرأس ═══ */}
-      <header className="mb-4 flex items-start justify-between gap-3">
+      <header className="mb-3 flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h1 className="text-[22px] font-bold leading-tight">{editMode ? "رتّب أنظمتك" : "الأنظمة"}</h1>
+          <h1 className="text-[22px] font-bold leading-tight">{editMode ? "رتّب أنظمتك" : "مكتبة الأنظمة"}</h1>
           {editMode ? (
             <p className="mt-1 text-[12px] text-muted-foreground leading-5">
               اسحب من المقبض أو استخدم الأسهم — يُحفظ الترتيب عند الضغط على «تم»
             </p>
           ) : (
-            <>
-              <p className="mt-0.5 text-[12px] text-muted-foreground flex flex-wrap items-center gap-1.5">
-                {/* V5-س: العدد داخل شريحة الشريط الخافتة — بلا تدرج نص */}
-                <span className="ribbon-soft rounded-full px-2 py-0.5 font-semibold text-foreground">
-                  {arabicCount(systems.length, "نظام واحد", "نظامان", "أنظمة", "نظاماً")}
-                </span>
-                <span>— كل نظام شاشة كاملة</span>
-              </p>
-              <p className="mt-1 text-[10.5px] text-muted-foreground flex items-center flex-wrap gap-1">
-                <span className="font-semibold text-foreground/85">
-                  {arabicCount(
-                    enabledSystems.length,
-                    "نظام نشط واحد",
-                    "نظامان نشطان",
-                    "أنظمة نشطة",
-                    "نظاماً نشطاً"
-                  )}
-                </span>
-                <span aria-hidden="true">·</span>
-                <span className="font-semibold text-[var(--ribbon-cyan)]">
-                  {arabicCount(liveCount, "مؤشر حي واحد", "مؤشران حيان", "مؤشرات حية", "مؤشراً حياً")}
-                </span>
-              </p>
-            </>
+            <p className="mt-1 text-[11.5px] text-muted-foreground leading-5">
+              {arabicCount(systems.length, "نظام واحد", "نظامان", "أنظمة", "نظاماً")} يعمل معاً — كل واحد شاشة كاملة وبياناته مترابطة
+            </p>
           )}
         </div>
         {editMode ? (
@@ -681,7 +655,8 @@ export function SystemsScreen() {
             type="button"
             onClick={() => void finishEdit()}
             aria-label="إنهاء وضع التخصيص وحفظ الترتيب"
-            className="h-11 px-4 shrink-0 rounded-2xl bg-primary text-primary-foreground text-[12.5px] font-bold flex items-center gap-1.5 glow-gold press"
+            className="h-11 px-4 shrink-0 rounded-2xl text-[12.5px] font-bold flex items-center gap-1.5 glow-gold press"
+            style={{ background: "linear-gradient(180deg, #F2B347, #D99026)", color: "#2a1a03" }}
           >
             <Check className="w-4 h-4" aria-hidden="true" />
             تم
@@ -691,7 +666,7 @@ export function SystemsScreen() {
             type="button"
             onClick={enterEdit}
             aria-label="تخصيص الأنظمة: الترتيب والتفعيل والألوان والأيقونات"
-            className="h-11 px-3.5 shrink-0 rounded-2xl glass-soft border border-white/[0.08] text-[12px] font-semibold flex items-center gap-1.5 text-foreground/85 hover:bg-white/[0.07] hover:border-primary/30 transition-[color,background-color,border-color,transform,scale] duration-[150ms] ease-out active:scale-[0.96]"
+            className="h-11 px-3.5 shrink-0 rounded-2xl glass-soft border border-black/[0.07] text-[12px] font-semibold flex items-center gap-1.5 text-foreground/85 hover:bg-black/[0.04] hover:border-primary/30 transition-[color,background-color,border-color,transform,scale] duration-[150ms] ease-out active:scale-[0.96]"
           >
             <SlidersHorizontal className="w-4 h-4" aria-hidden="true" />
             تخصيص
@@ -699,11 +674,41 @@ export function SystemsScreen() {
         )}
       </header>
 
+      {/* ═══ بحث سريع ═══ */}
+      {!editMode && (
+        <div className="relative mb-4">
+          <Search
+            className="absolute top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70 pointer-events-none"
+            style={{ insetInlineStart: "0.9rem" }}
+            aria-hidden="true"
+          />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="ابحث في أنظمتك…"
+            aria-label="بحث سريع في الأنظمة"
+            className="w-full h-12 rounded-2xl glass border border-black/[0.06] ps-10 pe-11 text-[13.5px] text-foreground placeholder:text-muted-foreground/60 focus:border-primary/40 focus:outline-none transition-colors"
+            dir="auto"
+          />
+          {query && (
+            <button
+              type="button"
+              onClick={() => setQuery("")}
+              aria-label="مسح البحث"
+              className="absolute top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center text-muted-foreground/70 hover:text-foreground transition-colors"
+              style={{ insetInlineEnd: "0.35rem" }}
+            >
+              <X className="w-4 h-4" aria-hidden="true" />
+            </button>
+          )}
+        </div>
+      )}
+
       {systems.length === 0 ? (
         <GlassCard className="p-4">
           <EmptyState
             title="الأنظمة تنتظر الإعداد الأولي"
-            hint="أكمل إعدادك مرة واحدة وستُبذر أنظمتك الخمسة عشر جاهزة للتخصيص الكامل"
+            hint="أكمل إعدادك مرة واحدة وستُبذر أنظمتك الـ16 جاهزة للتخصيص الكامل"
             actionLabel="اذهب للإعدادات"
             onAction={() => setView("settings")}
           />
@@ -735,30 +740,76 @@ export function SystemsScreen() {
         </Reorder.Group>
       ) : (
         <>
-          {/* ═══ شبكة الأنظمة المفعّلة — عمودان · stagger 20ms (15 بطاقة = 280ms حداً أقصى) ═══ */}
-          <div role="list" aria-label="أنظمتك المفعّلة" className="grid grid-cols-2 gap-3">
-            {enabledSystems.map((s, i) => (
-              <SystemCard
-                key={s.id}
-                sys={s}
-                data={data}
-                delay={i * 0.02}
-                onOpen={() => navigate(s)}
-              />
-            ))}
-          </div>
+          {/* ═══ الأساسيات — تدفق حياتك اليومي ═══ */}
+          {coreSystems.length > 0 && (
+            <section aria-label="أنظمتك الأساسية" className="mb-5">
+              <div className="flex items-center gap-2.5 mb-2.5 px-1">
+                <span className="text-[11px] font-bold text-foreground/80 shrink-0">أساسياتك</span>
+                <span className="h-px flex-1 bg-black/[0.05]" aria-hidden="true" />
+                <span className="text-[9.5px] text-muted-foreground/70 tabular shrink-0">{formatNumber(coreSystems.length)}</span>
+              </div>
+              <div role="list" className="grid grid-cols-2 gap-3">
+                {coreSystems.map((s, i) => (
+                  <SystemCard
+                    key={s.id}
+                    sys={s}
+                    data={data}
+                    delay={i * 0.02}
+                    onOpen={() => navigate(s)}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* ═══ مساحات إضافية — توسّع حين تحتاج ═══ */}
+          {extraSystems.length > 0 && (
+            <section aria-label="مساحات إضافية" className="mb-5">
+              <div className="flex items-center gap-2.5 mb-2.5 px-1">
+                <span className="text-[11px] font-bold text-muted-foreground shrink-0">مساحات إضافية</span>
+                <span className="h-px flex-1 bg-black/[0.05]" aria-hidden="true" />
+                <span className="text-[9.5px] text-muted-foreground/70 tabular shrink-0">{formatNumber(extraSystems.length)}</span>
+              </div>
+              <div role="list" className="grid grid-cols-2 gap-3">
+                {extraSystems.map((s, i) => (
+                  <SystemCard
+                    key={s.id}
+                    sys={s}
+                    data={data}
+                    delay={0.04 + i * 0.02}
+                    onOpen={() => navigate(s)}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* ═══ لا نتائج بحث ═══ */}
+          {q && coreSystems.length === 0 && extraSystems.length === 0 && disabledShown.length === 0 && (
+            <GlassCard className="p-6 text-center">
+              <p className="text-[13px] font-semibold">لا نتائج لـ«{q}»</p>
+              <p className="mt-1 text-[11px] text-muted-foreground">جرّب كلمة أخرى — أو استعرض كل الأنظمة</p>
+              <button
+                type="button"
+                onClick={() => setQuery("")}
+                className="mt-3 min-h-11 px-4 rounded-xl bg-primary/12 border border-primary/25 text-gold text-[12px] font-bold"
+              >
+                مسح البحث
+              </button>
+            </GlassCard>
+          )}
 
           {/* ═══ الموقوفة أسفل الشبكة — بياناتها محفوظة ═══ */}
-          {disabledSystems.length > 0 && (
-            <section className="mt-6" aria-label="الأنظمة الموقوفة">
+          {disabledShown.length > 0 && (
+            <section aria-label="الأنظمة الموقوفة">
               <div className="flex items-center gap-2.5 mb-2.5 px-1">
                 <span className="text-[11px] font-semibold text-muted-foreground shrink-0">
                   موقوفة مؤقتاً — بياناتها محفوظة
                 </span>
-                <span className="h-px flex-1 bg-white/[0.07]" aria-hidden="true" />
+                <span className="h-px flex-1 bg-black/[0.04]" aria-hidden="true" />
               </div>
               <div role="list" className="grid grid-cols-2 gap-3">
-                {disabledSystems.map((s, i) => (
+                {disabledShown.map((s, i) => (
                   <SystemCard
                     key={s.id}
                     sys={s}

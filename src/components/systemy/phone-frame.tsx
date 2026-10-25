@@ -34,10 +34,10 @@ function StatusBar() {
   );
 }
 
-/** إطار الهاتف — كامل الشاشة على الجوال، جهاز حقيقي على سطح المكتب */
+/** إطار الهاتف — كامل الشاشة على الجوال (معاينة نقية بلا ذيل)، جهاز حقيقي على سطح المكتب */
 export function PhoneFrame({ children }: { children: ReactNode }) {
   return (
-    <div className="relative w-full h-[calc(100dvh-3.1rem)] sm:w-[400px] sm:h-[min(870px,92vh)] sm:rounded-[46px] sm:border-[10px] sm:border-[#151a29] sm:shadow-[0_40px_120px_-20px_rgba(0,0,0,0.85),0_0_0_1px_rgba(255,255,255,0.08)] overflow-hidden bg-[#0B0F1A]">
+    <div className="relative w-full h-dvh sm:w-[400px] sm:h-[min(870px,92vh)] sm:rounded-[46px] sm:border-[10px] sm:border-[#151a29] sm:shadow-[0_40px_120px_-20px_rgba(23,33,43,0.5),0_0_0_1px_rgba(23,33,43,0.08)] overflow-hidden bg-[#F8F7F2]">
       <div className="absolute inset-0 pointer-events-none z-40 sm:rounded-[36px] sm:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]" />
       {children}
     </div>

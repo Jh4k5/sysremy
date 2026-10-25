@@ -111,7 +111,7 @@ export function AmountPad({
             aria-label={KEY_ARIA[k] ?? k}
             className={cn(
               "h-14 min-h-14 sm:h-16 sm:min-h-16 rounded-2xl select-none",
-              "glass-soft border-white/[0.06] text-foreground",
+              "glass-soft border-black/[0.05] text-foreground",
               "text-2xl font-bold tabular-nums",
               // V5: ضغط لمسي — القياس 0.96 خلال 150ms (`.press`) وخلفية فورية ≤150ms
               "press active:bg-white/10 active:border-white/20",

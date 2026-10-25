@@ -78,8 +78,8 @@ export function GoalsScreen() {
         aria-label="جارٍ تحميل الأهداف"
       >
         <header className="mb-4">
-          <div className="h-7 w-40 animate-pulse rounded-lg bg-white/[0.05]" />
-          <div className="mt-2 h-3.5 w-56 animate-pulse rounded bg-white/[0.04]" />
+          <div className="h-7 w-40 animate-pulse rounded-lg bg-black/[0.03]" />
+          <div className="mt-2 h-3.5 w-56 animate-pulse rounded bg-black/[0.03]" />
         </header>
         <div className="glass-soft mb-3 h-24 animate-pulse rounded-3xl" />
         <div className="glass-soft mb-3 h-36 animate-pulse rounded-3xl" />
@@ -141,7 +141,7 @@ export function GoalsScreen() {
               </PrivateAmount>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2 border-t border-white/[0.06] pt-3">
+            <div className="flex flex-wrap items-center gap-2 border-t border-black/[0.05] pt-3">
               <Chip className="tabular text-foreground/85">
                 <Target className="h-3 w-3 text-primary" aria-hidden="true" />
                 {formatNumber(live.length)} هدف نشط
@@ -269,7 +269,7 @@ function GoalCard({
         </div>
 
         <div
-          className="mt-3 h-2 overflow-hidden rounded-full bg-white/[0.06]"
+          className="mt-3 h-2 overflow-hidden rounded-full bg-black/[0.04]"
           role="progressbar"
           aria-valuenow={pct}
           aria-valuemin={0}

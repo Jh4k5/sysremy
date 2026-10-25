@@ -54,7 +54,7 @@ import { cn } from "@/lib/utils";
 export const TRIP_STATUS_META: Record<TripStatus, { label: string; chipCls: string }> = {
   planned: { label: "مخططة", chipCls: "border-gold/25 bg-gold/10 text-gold" },
   active: { label: "جارية", chipCls: "border-mint/25 bg-mint/10 text-mint" },
-  done: { label: "منتهية", chipCls: "border-white/[0.08] bg-white/[0.04] text-muted-foreground" },
+  done: { label: "منتهية", chipCls: "border-black/[0.07] bg-black/[0.03] text-muted-foreground" },
 };
 
 export function TripStatusChip({ status, className }: { status: TripStatus; className?: string }) {
@@ -119,7 +119,7 @@ function CheckRow({
           type="button"
           onClick={onDelete}
           aria-label={deleteAria}
-          className="flex h-11 w-10 shrink-0 items-center justify-center rounded-lg text-muted-foreground/70 transition-colors hover:bg-white/[0.05] hover:text-coral"
+          className="flex h-11 w-10 shrink-0 items-center justify-center rounded-lg text-muted-foreground/70 transition-colors hover:bg-black/[0.03] hover:text-coral"
         >
           <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
         </button>
@@ -351,7 +351,7 @@ export function TripDetailsDialog({
                     disabled={busy}
                     className={cn(
                       "h-11 rounded-xl border text-[12px] font-semibold transition-colors disabled:opacity-50",
-                      active ? meta.chipCls : "glass-soft border-white/[0.08] text-foreground/70 hover:bg-white/[0.06]"
+                      active ? meta.chipCls : "glass-soft border-black/[0.07] text-foreground/70 hover:bg-black/[0.04]"
                     )}
                   >
                     {meta.label}
@@ -383,7 +383,7 @@ export function TripDetailsDialog({
             {budget > 0 && (
               <>
                 <div
-                  className="mt-2.5 h-2 overflow-hidden rounded-full bg-white/[0.06]"
+                  className="mt-2.5 h-2 overflow-hidden rounded-full bg-black/[0.04]"
                   role="progressbar"
                   aria-valuenow={pct}
                   aria-valuemin={0}
@@ -493,7 +493,7 @@ export function TripDetailsDialog({
             )}
 
             {blockFormOpen ? (
-              <div className="space-y-2.5 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-3">
+              <div className="space-y-2.5 rounded-2xl border border-black/[0.07] bg-black/[0.02] p-3">
                 <Field label="عنوان الحدث">
                   <input
                     value={blockTitle}
@@ -542,7 +542,7 @@ export function TripDetailsDialog({
                   <button
                     type="button"
                     onClick={() => setBlockFormOpen(false)}
-                    className="h-11 rounded-xl glass-soft border border-white/[0.08] px-4 text-[12px] font-medium transition-colors hover:bg-white/[0.06]"
+                    className="h-11 rounded-xl glass-soft border border-black/[0.07] px-4 text-[12px] font-medium transition-colors hover:bg-black/[0.04]"
                   >
                     إلغاء
                   </button>
@@ -561,7 +561,7 @@ export function TripDetailsDialog({
                 type="button"
                 onClick={openBlockForm}
                 aria-label="أضف حدثاً للبرنامج"
-                className="flex h-11 w-full items-center justify-center gap-2 rounded-xl glass-soft border border-white/[0.08] text-[12px] font-semibold text-foreground/80 transition-colors hover:bg-white/[0.06]"
+                className="flex h-11 w-full items-center justify-center gap-2 rounded-xl glass-soft border border-black/[0.07] text-[12px] font-semibold text-foreground/80 transition-colors hover:bg-black/[0.04]"
               >
                 <CalendarPlus className="h-4 w-4" aria-hidden="true" />
                 أضف حدثاً للبرنامج
@@ -675,7 +675,7 @@ export function TripDetailsDialog({
               <button
                 type="button"
                 onClick={() => onEdit(trip)}
-                className="flex h-12 flex-1 items-center justify-center gap-2 rounded-2xl glass-soft border border-white/[0.08] text-[12.5px] font-bold text-foreground/80 transition-colors hover:bg-white/[0.06]"
+                className="flex h-12 flex-1 items-center justify-center gap-2 rounded-2xl glass-soft border border-black/[0.07] text-[12.5px] font-bold text-foreground/80 transition-colors hover:bg-black/[0.04]"
               >
                 <Pencil className="h-4 w-4" aria-hidden="true" />
                 تعديل البيانات

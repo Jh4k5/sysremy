@@ -99,7 +99,7 @@ function MetricCard({
           }
         }}
         aria-label={`إدخال ${meta.label} بدقة — المسجّل اليوم ${value != null ? `${fmtVal(value)} ${meta.unit}` : "لا شيء"}`}
-        className="outline-none rounded-2xl cursor-pointer transition-colors hover:bg-white/[0.02] focus-visible:ring-2 focus-visible:ring-primary/40"
+        className="outline-none rounded-2xl cursor-pointer transition-colors hover:bg-black/[0.02] focus-visible:ring-2 focus-visible:ring-primary/40"
       >
         <div className="flex items-center justify-between gap-1.5">
           <span className="flex items-center gap-1.5 min-w-0">
@@ -128,7 +128,7 @@ function MetricCard({
           <span className="text-[10.5px] text-muted-foreground">{meta.unit}</span>
         </div>
 
-        <div className="mt-2.5 h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
+        <div className="mt-2.5 h-1.5 rounded-full bg-black/[0.04] overflow-hidden">
           <div
             className="h-full rounded-full transition-all duration-500"
             style={{ width: `${pct}%`, backgroundColor: meta.color }}
@@ -150,7 +150,7 @@ function MetricCard({
           disabled={minusDisabled}
           onClick={() => onBump(-1)}
           aria-label={`إنقاص ${meta.label} بمقدار ${fmtVal(meta.step)}`}
-          className="flex-1 h-11 min-h-11 rounded-xl glass-soft border border-white/[0.08] flex items-center justify-center text-muted-foreground transition-all hover:bg-white/[0.08] hover:text-foreground active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
+          className="flex-1 h-11 min-h-11 rounded-xl glass-soft border border-black/[0.07] flex items-center justify-center text-muted-foreground transition-all hover:bg-black/[0.05] hover:text-foreground active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
         >
           <Minus className="w-4 h-4" aria-hidden="true" />
         </button>
@@ -174,17 +174,17 @@ function HealthSkeleton() {
   return (
     <div className="h-full overflow-y-auto sys-scroll px-4 pt-3 pb-28" aria-busy="true" aria-label="جارٍ تحميل الصحة">
       <div className="h-14 mb-4 space-y-2">
-        <Skeleton className="h-7 w-36 rounded-lg bg-white/[0.06]" />
-        <Skeleton className="h-3.5 w-60 rounded-md bg-white/[0.06]" />
+        <Skeleton className="h-7 w-36 rounded-lg bg-black/[0.04]" />
+        <Skeleton className="h-3.5 w-60 rounded-md bg-black/[0.04]" />
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
         {Array.from({ length: 6 }, (_, i) => (
-          <Skeleton key={i} className="h-[136px] rounded-3xl bg-white/[0.05]" />
+          <Skeleton key={i} className="h-[136px] rounded-3xl bg-black/[0.03]" />
         ))}
       </div>
-      <Skeleton className="h-11 rounded-full bg-white/[0.05] mb-3" />
-      <Skeleton className="h-[152px] rounded-3xl bg-white/[0.05] mb-3" />
-      <Skeleton className="h-20 rounded-3xl bg-white/[0.05]" />
+      <Skeleton className="h-11 rounded-full bg-black/[0.03] mb-3" />
+      <Skeleton className="h-[152px] rounded-3xl bg-black/[0.03] mb-3" />
+      <Skeleton className="h-20 rounded-3xl bg-black/[0.03]" />
     </div>
   );
 }
@@ -403,7 +403,7 @@ export function HealthScreen() {
                   key={row.kind}
                   className={cn(
                     "flex items-center gap-2.5 py-2.5 px-1.5",
-                    i > 0 && "border-t border-white/[0.05]"
+                    i > 0 && "border-t border-black/[0.04]"
                   )}
                 >
                   <button
@@ -476,7 +476,7 @@ export function HealthScreen() {
                   aria-label={`مزاج اليوم: ${MOOD_LABELS[i]}`}
                   title={MOOD_LABELS[i]}
                   className={cn(
-                    "flex-1 h-12 min-h-12 rounded-2xl text-[22px] flex items-center justify-center glass-soft transition-colors duration-200 hover:bg-white/10 disabled:cursor-wait",
+                    "flex-1 h-12 min-h-12 rounded-2xl text-[22px] flex items-center justify-center glass-soft transition-colors duration-200 hover:bg-black/[0.05] disabled:cursor-wait",
                     selected && "ring-2 ring-primary shadow-[0_0_20px_-4px_rgba(245,185,92,0.55)]"
                   )}
                 >
@@ -499,7 +499,7 @@ export function HealthScreen() {
                     title={`${dayNameShort(iso)}${score != null ? ` · ${MOOD_LABELS[score - 1]}` : ""}`}
                     className={cn(
                       "w-7 h-7 rounded-full transition-colors",
-                      score == null && "bg-white/[0.06]",
+                      score == null && "bg-black/[0.04]",
                       iso === today && "ring-1 ring-primary/70 ring-offset-0"
                     )}
                     style={
@@ -522,7 +522,7 @@ export function HealthScreen() {
             type="button"
             onClick={() => setView("journal")}
             aria-label="افتح الدفتر — العقل واليوميات"
-            className="mt-3 w-full h-11 min-h-11 rounded-2xl glass-soft border border-white/[0.06] flex items-center justify-center gap-2 text-[12px] text-foreground/85 hover:bg-white/[0.06] transition-colors"
+            className="mt-3 w-full h-11 min-h-11 rounded-2xl glass-soft border border-black/[0.05] flex items-center justify-center gap-2 text-[12px] text-foreground/85 hover:bg-black/[0.04] transition-colors"
           >
             <NotebookPen className="w-4 h-4 text-lav" aria-hidden="true" />
             اكتب في الدفتر — العقل واليوميات

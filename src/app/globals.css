@@ -4,9 +4,10 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ═══════════════════════════════════════════════════════════════
-   Systemy — Design Tokens
-   Personal Life OS · Arabic-first · Glassmorphism
-   خلفية #0B0F1A · ذهبي #F5B95C · سماوي #5CE1E6
+   Systemy 5.1 — Design Tokens «النهار» (Daylight)
+   Personal Life OS · Arabic-first · Light, warm, premium
+   خلفية #F8F7F2 · أبيض أسطح · ذهبي #F2B347 · تركوازي #16B8B0
+   الذهبي للإجراء والهوية · التركوازي للمعلومات · أخضر/أحمر دلالي
    ═══════════════════════════════════════════════════════════════ */
 
 @theme inline {
@@ -45,6 +46,7 @@
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
   --color-gold: var(--gold);
+  --color-gold-deep: var(--gold-deep);
   --color-cyan: var(--cyanx);
   --color-mint: var(--mint);
   --color-coral: var(--coral);
@@ -56,19 +58,19 @@
 }
 
 :root {
-  --radius: 1.1rem;
+  /* مدرج الزوايا: بطاقة 16px · أزرار 12px · عناصر صغيرة 8px · حبوب 999px */
+  --radius: 1rem;
 
-  /* ═══ V5 — شريط Systemy (الشعار الجديد) ═══ */
-  --ribbon-cyan: #00cdfe;
-  --ribbon-blue: #3e9bf6;
-  --ribbon-gold: #febb18;
-  --ribbon-orange: #fd4c10;
-  --ribbon-aqua: #52f7fe;
-  --grad-ribbon: linear-gradient(90deg, #00cdfe, #3e9bf6 32%, #febb18 66%, #fd4c10);
-  --grad-ribbon-rtl: linear-gradient(270deg, #00cdfe, #3e9bf6 32%, #febb18 66%, #fd4c10);
-  --grad-ribbon-soft: linear-gradient(90deg, rgba(0, 205, 254, 0.14), rgba(62, 155, 246, 0.14) 32%, rgba(254, 187, 24, 0.16) 66%, rgba(253, 76, 16, 0.14));
+  /* ═══ 5.1 — شريط الهوية (تركوازي → سماوي → ذهبي → عنبري) ═══ */
+  --ribbon-teal: #16b8b0;
+  --ribbon-cyan: #42c8e6;
+  --ribbon-gold: #f2b347;
+  --ribbon-amber: #d99026;
+  --grad-ribbon: linear-gradient(90deg, #16b8b0, #42c8e6 30%, #f2b347 62%, #d99026);
+  --grad-ribbon-rtl: linear-gradient(270deg, #16b8b0, #42c8e6 30%, #f2b347 62%, #d99026);
+  --grad-ribbon-soft: linear-gradient(90deg, rgba(22, 184, 176, 0.1), rgba(66, 200, 230, 0.1) 30%, rgba(242, 179, 71, 0.12) 62%, rgba(217, 144, 38, 0.1));
 
-  /* ═══ V5 — رموز الحركة (مقياس transitions.dev) ═══ */
+  /* ═══ رموز الحركة (مقياس transitions.dev) — 150–250ms للتفاعل ═══ */
   --duration-stagger: 40ms;
   --duration-micro: 80ms;
   --duration-quick: 150ms;
@@ -80,66 +82,69 @@
   --ease-bounce: cubic-bezier(0.34, 1.36, 0.64, 1);
   --ease-bounce-strong: cubic-bezier(0.34, 3.85, 0.64, 1);
 
-  /* ═══ V5 — ظلال مركّبة (إزاحة + نعومة) ═══ */
-  --shadow-lift: 0 1px 2px rgba(2, 4, 10, 0.35), 0 10px 28px -14px rgba(2, 4, 10, 0.55);
-  --shadow-border: 0 0 0 1px rgba(255, 255, 255, 0.075), 0 1px 2px rgba(2, 4, 10, 0.22);
-  --shadow-border-hover: 0 0 0 1px rgba(255, 255, 255, 0.12), 0 2px 6px rgba(2, 4, 10, 0.28);
+  /* ═══ ظلال النهار — إزاحة + نعومة، بلا هالات صفرية الإزاحة ═══ */
+  --shadow-card: 0 0 0 1px rgba(23, 33, 43, 0.055), 0 1px 2px rgba(23, 33, 43, 0.04), 0 10px 26px -14px rgba(23, 33, 43, 0.14);
+  --shadow-lift: 0 1px 2px rgba(23, 33, 43, 0.05), 0 12px 30px -14px rgba(23, 33, 43, 0.2);
+  --shadow-border: 0 0 0 1px rgba(23, 33, 43, 0.055), 0 1px 2px rgba(23, 33, 43, 0.04);
+  --shadow-border-hover: 0 0 0 1px rgba(23, 33, 43, 0.1), 0 3px 10px rgba(23, 33, 43, 0.08);
 
-  /* الأساس — ليل Systemy */
-  --background: #070a12;
-  --foreground: #e9edf5;
-  --card: rgba(255, 255, 255, 0.045);
-  --card-foreground: #e9edf5;
-  --popover: #10152a;
-  --popover-foreground: #e9edf5;
+  /* الأساس — نهار Systemy الدافئ */
+  --background: #f8f7f2;
+  --foreground: #17212b;
+  --card: #ffffff;
+  --card-foreground: #17212b;
+  --popover: #ffffff;
+  --popover-foreground: #17212b;
 
-  /* الذهب الدافئ أساسي */
-  --primary: #f5b95c;
-  --primary-foreground: #1c1204;
+  /* العنبر أساسي — الإجراء والهوية */
+  --primary: #d99026;
+  --primary-foreground: #2a1a03;
 
-  /* السماوي ثانوي */
-  --secondary: #5ce1e6;
-  --secondary-foreground: #06282a;
+  /* سطح ثانوي مائل للتركوازي */
+  --secondary: #e8f1f0;
+  --secondary-foreground: #0f5f5a;
 
-  --muted: rgba(255, 255, 255, 0.055);
-  --muted-foreground: #8a93a8;
-  --accent: rgba(92, 225, 230, 0.1);
-  --accent-foreground: #5ce1e6;
+  --muted: #f0f3f2;
+  --muted-foreground: #687586;
+  --accent: rgba(22, 184, 176, 0.1);
+  --accent-foreground: #0e7c76;
 
-  /* مرجاني هادئ للسلبي — لا أحمر حاد أبداً */
-  --destructive: #ff8e7a;
-  --destructive-foreground: #2b0c05;
+  /* أحمر هادئ للسلبي — دلالي لا زخرفي */
+  --destructive: #d95e65;
+  --destructive-foreground: #ffffff;
 
-  --border: rgba(255, 255, 255, 0.09);
-  --input: rgba(255, 255, 255, 0.08);
-  --ring: #f5b95c;
+  --border: rgba(23, 33, 43, 0.085);
+  --input: rgba(23, 33, 43, 0.1);
+  --ring: #d99026;
 
-  /* لوحة الرسوم */
-  --chart-1: #f5b95c;
-  --chart-2: #5ce1e6;
-  --chart-3: #6ee7a8;
-  --chart-4: #c4b5fd;
-  --chart-5: #ff8e7a;
+  /* لوحة الرسوم — عائلية دافئة باردة متوازنة */
+  --chart-1: #f2b347;
+  --chart-2: #16b8b0;
+  --chart-3: #42c8e6;
+  --chart-4: #198768;
+  --chart-5: #d95e65;
 
-  /* ألوان العلامة */
-  --gold: #f5b95c;
-  --cyanx: #5ce1e6;
-  --mint: #6ee7a8;
-  --coral: #ff8e7a;
-  --lav: #c4b5fd;
+  /* ألوان العلامة — أفتاح نصية آمنة التباين على الفاتح */
+  --gold: #b45309;
+  --gold-deep: #d99026;
+  --cyanx: #0e7c84;
+  --mint: #17795b;
+  --coral: #c2444c;
+  --lav: #0e7c84;
 
-  --sidebar: #0b0f1a;
-  --sidebar-foreground: #e9edf5;
-  --sidebar-primary: #f5b95c;
-  --sidebar-primary-foreground: #1c1204;
-  --sidebar-accent: rgba(255, 255, 255, 0.06);
-  --sidebar-accent-foreground: #e9edf5;
-  --sidebar-border: rgba(255, 255, 255, 0.09);
-  --sidebar-ring: #f5b95c;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #17212b;
+  --sidebar-primary: #d99026;
+  --sidebar-primary-foreground: #2a1a03;
+  --sidebar-accent: #f0f3f2;
+  --sidebar-accent-foreground: #17212b;
+  --sidebar-border: rgba(23, 33, 43, 0.085);
+  --sidebar-ring: #d99026;
 }
 
+/* الوضع الليلي — محفوظ كخيار مستقبلي (غير مفعّل افتراضياً) */
 .dark {
-  --background: #070a12;
+  --background: #10141b;
   --foreground: #e9edf5;
 }
 
@@ -156,16 +161,16 @@
     @apply bg-background text-foreground;
     font-feature-settings: "ss01";
   }
-  /* أسطح المتصفح — تُطالِق هوية V5 */
+  /* أسطح المتصفح — تُطالِق هوية 5.1 */
   ::selection {
-    background: rgba(0, 205, 254, 0.3);
-    color: #ffffff;
+    background: rgba(22, 184, 176, 0.22);
+    color: #17212b;
   }
   input, textarea, select {
     caret-color: var(--primary);
   }
   :focus-visible {
-    outline: 2px solid rgba(0, 205, 254, 0.55);
+    outline: 2px solid rgba(217, 144, 38, 0.6);
     outline-offset: 2px;
   }
   /* التفاف النص — توازن للعناوين وجمال للفقرات */
@@ -177,58 +182,57 @@
   }
 }
 
-/* ═══════════════════════ أدوات Systemy ═══════════════════════ */
+/* ═══════════════════════ أدوات Systemy — النهار ═══════════════════════ */
 
-/* زجاج هادئ — V5: لمعة حافة خافتة من ألوان الشريط */
+/* سطح أبيض صلب بظل ناعم — البطاقة الأساسية (بلا زجاج زخرفي) */
 .glass {
-  background: linear-gradient(150deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.028));
-  border: 1px solid rgba(255, 255, 255, 0.085);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  box-shadow: var(--shadow-border);
+  background: #ffffff;
+  border: 1px solid rgba(23, 33, 43, 0.065);
+  box-shadow: var(--shadow-card);
 }
+/* سطح عائم للتنقل واللوحات السفلية — تعتيم خفيف فوق المحتوى المتحرك */
 .glass-deep {
-  background: rgba(14, 18, 31, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(24px) saturate(1.4);
-  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(18px) saturate(1.25);
+  -webkit-backdrop-filter: blur(18px) saturate(1.25);
+  border: 1px solid rgba(23, 33, 43, 0.07);
+  box-shadow: 0 -1px 0 rgba(23, 33, 43, 0.04), 0 -12px 32px -16px rgba(23, 33, 43, 0.18);
 }
+/* سطح ثانوي هادئ */
 .glass-soft {
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: #f0f3f2;
+  border: 1px solid rgba(23, 33, 43, 0.05);
 }
 
-/* توهجات العلامة */
+/* توهجات العلامة — رفع ناعم بدرجة العنبر/التركوازي */
 .glow-gold {
-  box-shadow: 0 0 24px -6px rgba(245, 185, 92, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  box-shadow: 0 1px 2px rgba(23, 33, 43, 0.08), 0 10px 26px -10px rgba(217, 144, 38, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.65);
 }
 .glow-cyan {
-  box-shadow: 0 0 24px -6px rgba(92, 225, 230, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  box-shadow: 0 1px 2px rgba(23, 33, 43, 0.08), 0 10px 26px -10px rgba(22, 184, 176, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.65);
 }
 .text-glow-gold {
-  text-shadow: 0 0 22px rgba(245, 185, 92, 0.5);
+  text-shadow: none;
 }
 .text-glow-cyan {
-  text-shadow: 0 0 22px rgba(92, 225, 230, 0.45);
+  text-shadow: none;
 }
 
-/* شبكة Mesh متحركة ببطء — خلفية App (V5: وهج الشريط) */
+/* خلفية App النهارية — دفء صافٍ بلمسة خفيفة جداً في موضعين */
 .app-mesh {
   background:
-    radial-gradient(58% 44% at 82% 4%, rgba(0, 205, 254, 0.11), transparent 60%),
-    radial-gradient(50% 38% at 12% 30%, rgba(62, 155, 246, 0.1), transparent 62%),
-    radial-gradient(46% 40% at 55% 96%, rgba(254, 187, 24, 0.085), transparent 65%),
-    #0b0f1a;
+    radial-gradient(52% 38% at 88% 0%, rgba(66, 200, 230, 0.07), transparent 58%),
+    radial-gradient(46% 34% at 8% 100%, rgba(242, 179, 71, 0.075), transparent 60%),
+    #f8f7f2;
 }
 .page-mesh {
   background:
-    radial-gradient(60% 50% at 78% 8%, rgba(245, 185, 92, 0.1), transparent 60%),
-    radial-gradient(55% 45% at 15% 85%, rgba(92, 225, 230, 0.08), transparent 62%),
-    radial-gradient(40% 35% at 50% 50%, rgba(196, 181, 253, 0.05), transparent 70%),
-    #05070d;
+    radial-gradient(60% 50% at 78% 8%, rgba(242, 179, 71, 0.09), transparent 60%),
+    radial-gradient(55% 45% at 15% 85%, rgba(22, 184, 176, 0.07), transparent 62%),
+    #f4f2ea;
 }
 
-/* بقع ضوئية عائمة */
+/* بقع ضوئية عائمة — خافتة في النهار */
 .blob {
   position: absolute;
   border-radius: 9999px;
@@ -257,10 +261,10 @@
   letter-spacing: -0.03em;
 }
 
-/* شريط تمرير رقيق أنيق */
+/* شريط تمرير رقيق أنيق — داكن على فاتح */
 .sys-scroll {
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+  scrollbar-color: rgba(23, 33, 43, 0.18) transparent;
 }
 .sys-scroll::-webkit-scrollbar {
   width: 4px;
@@ -270,7 +274,7 @@
   background: transparent;
 }
 .sys-scroll::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.14);
+  background: rgba(23, 33, 43, 0.16);
   border-radius: 999px;
 }
 .no-scrollbar::-webkit-scrollbar {
@@ -281,18 +285,18 @@
   scrollbar-width: none;
 }
 
-/* شعار S — مساران متصلان */
+/* شعار S — عنبر متدرج نحو التركوازي */
 .sys-logo-s {
-  background: linear-gradient(120deg, #f5b95c 20%, #5ce1e6 90%);
+  background: linear-gradient(120deg, #b45309 20%, #0e7c84 90%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
-/* نبض خفيف للأزرار الرئيسية */
+/* نبض خفيف للزر الرئيسي — عنبري */
 @keyframes soft-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(245, 185, 92, 0.35); }
-  60% { box-shadow: 0 0 0 12px rgba(245, 185, 92, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(217, 144, 38, 0.3); }
+  60% { box-shadow: 0 0 0 12px rgba(217, 144, 38, 0); }
 }
 .fab-pulse {
   animation: soft-pulse 3.2s ease-out infinite;
@@ -308,7 +312,7 @@
   }
 }
 
-/* ═══════════════════ V5 — أدوات الشريط ═══════════════════ */
+/* ═══════════════════ 5.1 — أدوات الشريط ═══════════════════ */
 
 /* خلفية الشريط الكاملة */
 .ribbon {
@@ -330,25 +334,25 @@
   height: 2px;
   border-radius: 999px;
   background: var(--grad-ribbon);
-  opacity: 0.9;
+  opacity: 0.85;
   pointer-events: none;
 }
 /* حاوية شريط متوهجة — للبطاقات البطولية */
 .ribbon-frame {
   position: relative;
   background:
-    linear-gradient(160deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02)) padding-box,
+    linear-gradient(#ffffff, #ffffff) padding-box,
     var(--grad-ribbon) border-box;
   border: 1px solid transparent;
 }
 
-/* لمعة الشريط — حركة بطيئة للمテيز البطولي */
+/* لمعة الشريط — حركة بطيئة للمميز البطولي */
 @keyframes ribbon-slide {
   0% { background-position: 0% 50%; }
   100% { background-position: 200% 50%; }
 }
 .ribbon-shimmer {
-  background: linear-gradient(90deg, #00cdfe, #3e9bf6, #febb18, #fd4c10, #00cdfe);
+  background: linear-gradient(90deg, #16b8b0, #42c8e6, #f2b347, #d99026, #16b8b0);
   background-size: 200% 100%;
   animation: ribbon-slide 6s linear infinite;
 }
@@ -376,4 +380,14 @@
 }
 .ribbon-enter {
   animation: ribbon-enter var(--duration-slow) var(--ease-smooth-out) both;
+}
+
+/* لوحة مفاتيح — حماية زر الحفظ داخل اللوحات السفلية (Android WebView) */
+.kb-safe {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
+}
+@supports (height: 100dvh) {
+  .dvh-sheet {
+    max-height: min(88dvh, 720px);
+  }
 }

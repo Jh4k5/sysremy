@@ -85,8 +85,8 @@ export function NumberPad({
             aria-label={aria}
             className={cn(
               "h-11 min-h-11 rounded-xl border text-xl font-bold tabular-nums select-none",
-              "glass-soft border-white/[0.08] text-foreground transition-all",
-              "hover:bg-white/[0.08] active:scale-95 active:border-primary/40",
+              "glass-soft border-black/[0.08] text-foreground transition-all",
+              "hover:bg-black/[0.04] active:scale-95 active:border-primary/40",
               isBack && "text-muted-foreground text-lg"
             )}
           >
@@ -167,7 +167,7 @@ export function ChipRow({
                 small ? "h-9 px-3 text-[11.5px]" : "h-11 px-4 text-[13px]",
                 active
                   ? "bg-primary/20 border-primary/50 text-primary"
-                  : "glass-soft border-white/[0.08] text-foreground/80 hover:bg-white/[0.06]"
+                  : "glass-soft border-black/[0.08] text-foreground/80 hover:bg-black/[0.03]"
               )}
             >
               {o.v}
@@ -229,7 +229,7 @@ export function StickySave({
   secondary?: ReactNode;
 }) {
   return (
-    <div className="shrink-0 px-4 pt-2 pb-2.5 border-t border-white/[0.07] bg-[#0B0F1A]/95 backdrop-blur-md">
+    <div className="shrink-0 px-4 pt-2 pb-2.5 border-t border-black/[0.06] bg-white/95 backdrop-blur-md">
       <button
         onClick={onSave}
         disabled={busy}
@@ -263,10 +263,10 @@ export function Field({
 }
 
 export const inputCls =
-  "w-full h-12 rounded-xl glass-soft border border-white/[0.08] px-4 text-[14px] text-foreground placeholder:text-muted-foreground/50 focus:border-primary/40 focus:outline-none transition-colors";
+  "w-full h-12 rounded-xl glass-soft border border-black/[0.08] px-4 text-[14px] text-foreground placeholder:text-muted-foreground/50 focus:border-primary/40 focus:outline-none transition-colors";
 
 export const textareaCls =
-  "w-full min-h-[96px] rounded-xl glass-soft border border-white/[0.08] p-3.5 text-[13.5px] leading-relaxed text-foreground placeholder:text-muted-foreground/50 focus:border-primary/40 focus:outline-none transition-colors resize-none";
+  "w-full min-h-[96px] rounded-xl glass-soft border border-black/[0.08] p-3.5 text-[13.5px] leading-relaxed text-foreground placeholder:text-muted-foreground/50 focus:border-primary/40 focus:outline-none transition-colors resize-none";
 
 // ═══════════════════════ منتقي الأيقونات (تخصيص عالي) ═══════════════════════
 
@@ -303,7 +303,7 @@ export function IconGrid({
             onClick={() => onChange(name)}
             className={cn(
               "aspect-square rounded-xl flex items-center justify-center transition-all",
-              active ? "bg-primary/25 border border-primary/50 text-primary scale-105" : "glass-soft border border-white/[0.06] text-foreground/60 hover:text-foreground"
+              active ? "bg-primary/25 border border-primary/50 text-primary scale-105" : "glass-soft border border-black/[0.06] text-foreground/60 hover:text-foreground"
             )}
           >
             <Icon className="w-[18px] h-[18px]" />
@@ -411,15 +411,15 @@ export function ConfirmBar({
       <div className="flex gap-2">
         <button
           onClick={onCancel}
-          className="flex-1 h-11 rounded-xl glass-soft border border-white/[0.08] text-[12.5px] font-medium hover:bg-white/[0.06] transition-colors"
+          className="flex-1 h-11 rounded-xl glass-soft border border-black/[0.08] text-[12.5px] font-medium hover:bg-black/[0.03] transition-colors"
         >
           إلغاء
         </button>
         <button
           onClick={onConfirm}
           className={cn(
-            "flex-1 h-11 rounded-xl text-[12.5px] font-bold text-white transition-transform active:scale-95",
-            danger ? "bg-destructive/80 hover:bg-destructive" : "bg-primary hover:bg-primary/90"
+            "flex-1 h-11 rounded-xl text-[12.5px] font-bold transition-transform active:scale-95",
+            danger ? "bg-destructive/90 hover:bg-destructive text-white" : "bg-primary hover:bg-primary/90 text-[#2a1a03]"
           )}
         >
           {confirmLabel}

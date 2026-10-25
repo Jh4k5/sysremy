@@ -214,7 +214,7 @@ export function GoalDetailsDialog({
     <Drawer open onOpenChange={(o) => { if (!o) onClose(); }}>
       <DrawerContent
         dir="rtl"
-        className="mx-auto max-w-md rounded-t-3xl border-white/10 bg-[#0B0F1A]/95 backdrop-blur-2xl"
+        className="mx-auto max-w-md rounded-t-3xl border-black/[0.08] bg-white/95 backdrop-blur-xl shadow-[0_-12px_40px_-16px_rgba(23,33,43,0.3)]"
       >
         <DrawerHeader className="pb-1">
           <DrawerTitle className="flex items-center gap-2.5 text-right text-[15px] font-bold">
@@ -236,7 +236,7 @@ export function GoalDetailsDialog({
           {/* ═══ التقدم ═══ */}
           <div className="space-y-2.5">
             <div
-              className="h-2.5 overflow-hidden rounded-full bg-white/[0.06]"
+              className="h-2.5 overflow-hidden rounded-full bg-black/[0.04]"
               role="progressbar"
               aria-valuenow={pct}
               aria-valuemin={0}
@@ -308,7 +308,7 @@ export function GoalDetailsDialog({
                       "h-11 min-h-11 flex-1 rounded-xl border text-[12.5px] font-bold tabular transition-colors",
                       Number(amount) === q
                         ? "border-primary/60 bg-primary/20 text-primary"
-                        : "glass-soft border-white/[0.08] text-foreground/80 hover:bg-white/[0.06]",
+                        : "glass-soft border-black/[0.07] text-foreground/80 hover:bg-black/[0.04]",
                     )}
                   >
                     +{formatNumber(q)}
@@ -340,7 +340,7 @@ export function GoalDetailsDialog({
                       "h-11 min-h-11 shrink-0 rounded-xl border px-3.5 text-[12px] font-medium transition-all",
                       accountId === "none"
                         ? "bg-primary/20 border-primary/50 text-primary"
-                        : "glass-soft border-white/[0.08] text-foreground/75 hover:text-foreground",
+                        : "glass-soft border-black/[0.07] text-foreground/75 hover:text-foreground",
                     )}
                   >
                     بدون ربط بحساب
@@ -357,7 +357,7 @@ export function GoalDetailsDialog({
                         "h-11 min-h-11 flex shrink-0 items-center gap-1.5 rounded-xl border px-3.5 text-[12px] font-medium transition-all",
                         accountId === a.id
                           ? "bg-primary/20 border-primary/50 text-primary"
-                          : "glass-soft border-white/[0.08] text-foreground/75 hover:text-foreground",
+                          : "glass-soft border-black/[0.07] text-foreground/75 hover:text-foreground",
                       )}
                     >
                       <span className="h-2 w-2 rounded-full" style={{ background: a.color }} aria-hidden="true" />
@@ -403,7 +403,7 @@ export function GoalDetailsDialog({
                   type="button"
                   onClick={() => void doWithdraw()}
                   disabled={busy}
-                  className="h-11 min-h-11 w-full rounded-xl glass-soft border border-white/[0.08] text-[12.5px] font-bold text-foreground/80 transition-colors hover:bg-white/[0.07] disabled:opacity-50"
+                  className="h-11 min-h-11 w-full rounded-xl glass-soft border border-black/[0.07] text-[12.5px] font-bold text-foreground/80 transition-colors hover:bg-black/[0.04] disabled:opacity-50"
                   aria-label="سحب المبلغ من الهدف"
                 >
                   اسحب المبلغ
@@ -434,7 +434,7 @@ export function GoalDetailsDialog({
                       "h-11 min-h-11 rounded-xl border px-4 text-[12.5px] font-bold tabular transition-colors",
                       simMonthly === m
                         ? "border-primary/60 bg-primary/20 text-primary"
-                        : "glass-soft border-white/[0.08] text-foreground/80 hover:bg-white/[0.06]",
+                        : "glass-soft border-black/[0.07] text-foreground/80 hover:bg-black/[0.04]",
                     )}
                   >
                     {formatNumber(m)}
@@ -471,7 +471,7 @@ export function GoalDetailsDialog({
                         onClick={() => void toggleTask(t.id)}
                         aria-pressed={t.done}
                         aria-label={`مهمة ${t.title}${t.done ? " — منجزة" : " — لإتمامها"}`}
-                        className="flex min-h-11 w-full items-center gap-2.5 rounded-xl px-2 py-1.5 text-start transition-colors hover:bg-white/[0.05]"
+                        className="flex min-h-11 w-full items-center gap-2.5 rounded-xl px-2 py-1.5 text-start transition-colors hover:bg-black/[0.03]"
                       >
                         <span
                           className={cn(
@@ -496,7 +496,7 @@ export function GoalDetailsDialog({
                   ))}
                 </ul>
               )}
-              <div className="flex gap-2 border-t border-white/[0.06] pt-2.5">
+              <div className="flex gap-2 border-t border-black/[0.05] pt-2.5">
                 <input
                   value={newTask}
                   onChange={(e) => setNewTask(e.target.value)}
@@ -565,7 +565,7 @@ export function GoalDetailsDialog({
                   onClose();
                   setView("habits");
                 }}
-                className="flex h-11 min-h-11 w-full items-center justify-center gap-1.5 rounded-xl glass-soft border border-white/[0.08] text-[12px] font-bold text-foreground/75 transition-colors hover:bg-white/[0.07]"
+                className="flex h-11 min-h-11 w-full items-center justify-center gap-1.5 rounded-xl glass-soft border border-black/[0.07] text-[12px] font-bold text-foreground/75 transition-colors hover:bg-black/[0.04]"
                 aria-label="فتح شاشة العادات"
               >
                 <ArrowLeft className="h-4 w-4" aria-hidden="true" />
@@ -595,13 +595,13 @@ export function GoalDetailsDialog({
           </button>
 
           {/* ═══ تعديل / حذف ═══ */}
-          <div className="space-y-2 border-t border-white/[0.06] pt-3">
+          <div className="space-y-2 border-t border-black/[0.05] pt-3">
             {!confirmDelete ? (
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => onEdit(goal)}
-                  className="h-11 min-h-11 flex-1 rounded-xl glass-soft border border-white/[0.08] text-[12.5px] font-bold text-foreground/80 transition-colors hover:bg-white/[0.06]"
+                  className="h-11 min-h-11 flex-1 rounded-xl glass-soft border border-black/[0.07] text-[12.5px] font-bold text-foreground/80 transition-colors hover:bg-black/[0.04]"
                   aria-label={`تعديل الهدف ${goal.name}`}
                 >
                   تعديل البيانات

@@ -62,7 +62,7 @@ export function TrustCenter() {
           whileTap={{ scale: 0.92 }}
           onClick={() => setView("more")}
           className={cn(
-            "glass-soft flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-white/[0.08] text-muted-foreground transition-colors hover:text-foreground",
+            "glass-soft flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-black/[0.07] text-muted-foreground transition-colors hover:text-foreground",
             RIBBON_PRESS
           )}
           aria-label="الرجوع إلى شاشة المزيد"

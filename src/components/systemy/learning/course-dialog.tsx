@@ -473,7 +473,7 @@ export function CourseDialog({
                         onClick={() => void toggleTask(t.id)}
                         aria-label={t.done ? "إلغاء إنجاز المهمة" : `إنجاز المهمة: ${t.title}`}
                         aria-pressed={t.done}
-                        className="w-11 h-11 shrink-0 flex items-center justify-center rounded-xl transition-colors hover:bg-white/[0.06]"
+                        className="w-11 h-11 shrink-0 flex items-center justify-center rounded-xl transition-colors hover:bg-black/[0.04]"
                       >
                         {t.done ? (
                           <Check className="w-5 h-5 text-mint" aria-hidden="true" />
@@ -572,7 +572,7 @@ export function CourseDialog({
                   type="button"
                   onClick={enterEdit}
                   aria-label="تعديل بيانات المقرر"
-                  className="w-full min-h-11 glass-soft rounded-2xl px-4 py-2.5 flex items-center justify-center gap-2 text-[12.5px] font-medium text-foreground/85 hover:bg-white/[0.06] transition-colors"
+                  className="w-full min-h-11 glass-soft rounded-2xl px-4 py-2.5 flex items-center justify-center gap-2 text-[12.5px] font-medium text-foreground/85 hover:bg-black/[0.04] transition-colors"
                 >
                   <Pencil className="w-4 h-4" aria-hidden="true" />
                   تعديل بيانات المقرر

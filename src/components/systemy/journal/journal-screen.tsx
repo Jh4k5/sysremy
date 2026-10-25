@@ -173,7 +173,7 @@ function NoteCard({
       role="button"
       tabIndex={0}
       aria-label={hidden ? `كشف اليومية الخاصة: ${note.title}` : `فتح اليومية: ${note.title}`}
-      className="glass rounded-2xl p-3.5 cursor-pointer outline-none transition-all duration-200 hover:bg-white/[0.07] hover:scale-[1.01] active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-primary/40"
+      className="glass rounded-2xl p-3.5 cursor-pointer outline-none transition-all duration-200 hover:bg-black/[0.04] hover:scale-[1.01] active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-primary/40"
     >
       <div className="flex items-start gap-2">
         {note.pinned && <Pin className="w-3.5 h-3.5 mt-1 shrink-0 text-primary fill-primary/25" aria-label="مثبتة" />}
@@ -223,17 +223,17 @@ function JournalSkeleton() {
   return (
     <div className="h-full overflow-y-auto sys-scroll px-4 pt-3 pb-28" aria-busy="true" aria-label="جارٍ تحميل اليوميات">
       <div className="h-14 mb-4 space-y-2">
-        <Skeleton className="h-7 w-44 rounded-lg bg-white/[0.06]" />
-        <Skeleton className="h-3.5 w-56 rounded-md bg-white/[0.06]" />
+        <Skeleton className="h-7 w-44 rounded-lg bg-black/[0.04]" />
+        <Skeleton className="h-3.5 w-56 rounded-md bg-black/[0.04]" />
       </div>
-      <Skeleton className="h-11 rounded-2xl bg-white/[0.05] mb-3" />
-      <Skeleton className="h-[132px] rounded-3xl bg-white/[0.05] mb-3" />
-      <Skeleton className="h-[168px] rounded-3xl bg-white/[0.05] mb-3" />
-      <Skeleton className="h-11 rounded-full bg-white/[0.05] mb-3" />
+      <Skeleton className="h-11 rounded-2xl bg-black/[0.03] mb-3" />
+      <Skeleton className="h-[132px] rounded-3xl bg-black/[0.03] mb-3" />
+      <Skeleton className="h-[168px] rounded-3xl bg-black/[0.03] mb-3" />
+      <Skeleton className="h-11 rounded-full bg-black/[0.03] mb-3" />
       <div className="space-y-2.5">
-        <Skeleton className="h-[76px] rounded-2xl bg-white/[0.06]" />
-        <Skeleton className="h-[76px] rounded-2xl bg-white/[0.06]" />
-        <Skeleton className="h-[76px] rounded-2xl bg-white/[0.06]" />
+        <Skeleton className="h-[76px] rounded-2xl bg-black/[0.04]" />
+        <Skeleton className="h-[76px] rounded-2xl bg-black/[0.04]" />
+        <Skeleton className="h-[76px] rounded-2xl bg-black/[0.04]" />
       </div>
     </div>
   );
@@ -536,7 +536,7 @@ export function JournalScreen() {
                 <span
                   key={iso}
                   title={`${formatDate(iso)}${score != null ? ` · ${MOOD_LABELS[score - 1]}` : ""}`}
-                  className={cn("flex-1 h-5 min-w-0 rounded-[4px]", score == null && "bg-white/[0.05]")}
+                  className={cn("flex-1 h-5 min-w-0 rounded-[4px]", score == null && "bg-black/[0.03]")}
                   style={
                     score != null
                       ? { backgroundColor: moodCellColor(score), opacity: 0.4 + score * 0.12 }
@@ -581,7 +581,7 @@ export function JournalScreen() {
                         aria-label={MOOD_LABELS[i]}
                         title={MOOD_LABELS[i]}
                         className={cn(
-                          "w-12 h-12 rounded-full text-[22px] flex items-center justify-center glass-soft transition-colors duration-200 hover:bg-white/10 disabled:cursor-wait",
+                          "w-12 h-12 rounded-full text-[22px] flex items-center justify-center glass-soft transition-colors duration-200 hover:bg-black/[0.05] disabled:cursor-wait",
                           selected && "ring-2 ring-primary shadow-[0_0_20px_-4px_rgba(245,185,92,0.55)]"
                         )}
                       >
@@ -598,7 +598,7 @@ export function JournalScreen() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 onClick={() => setMoodPickerOpen(true)}
-                className="mt-3 w-full h-11 rounded-2xl glass-soft border border-white/[0.06] flex items-center justify-center gap-2 text-[12px] text-foreground/85 hover:bg-white/[0.06] transition-colors"
+                className="mt-3 w-full h-11 rounded-2xl glass-soft border border-black/[0.05] flex items-center justify-center gap-2 text-[12px] text-foreground/85 hover:bg-black/[0.04] transition-colors"
               >
                 اليوم: {MOOD_FACES[moodToday.score - 1]} {MOOD_LABELS[moodToday.score - 1]}
                 <span className="text-primary font-medium">انقر للتغيير</span>
@@ -740,14 +740,14 @@ export function JournalScreen() {
                 onChange={(e) => patchEditor({ title: e.target.value })}
                 placeholder="العنوان…"
                 aria-label="عنوان اليومية"
-                className="h-11 rounded-xl bg-white/[0.05] border-white/10 text-[13px] focus-visible:ring-primary/25"
+                className="h-11 rounded-xl bg-black/[0.03] border-white/10 text-[13px] focus-visible:ring-primary/25"
               />
               <Textarea
                 value={editor.content}
                 onChange={(e) => patchEditor({ content: e.target.value })}
                 placeholder="اكتب بحرية — لا أحد يصحح هنا…"
                 aria-label="محتوى اليومية"
-                className="min-h-48 rounded-xl bg-white/[0.05] border-white/10 text-[12.5px] leading-relaxed resize-none focus-visible:ring-primary/25"
+                className="min-h-48 rounded-xl bg-black/[0.03] border-white/10 text-[12.5px] leading-relaxed resize-none focus-visible:ring-primary/25"
               />
 
               <Input
@@ -755,7 +755,7 @@ export function JournalScreen() {
                 onChange={(e) => patchEditor({ tags: e.target.value })}
                 placeholder="وسوم مفصولة بفاصلة (مثال: أفكار، عمل)"
                 aria-label="وسوم اليومية"
-                className="h-11 rounded-xl bg-white/[0.05] border-white/10 text-[12px] focus-visible:ring-primary/25"
+                className="h-11 rounded-xl bg-black/[0.03] border-white/10 text-[12px] focus-visible:ring-primary/25"
               />
 
               {/* منتقي مزاج اليومية */}
@@ -779,7 +779,7 @@ export function JournalScreen() {
                           "flex-1 h-11 rounded-xl text-[18px] flex items-center justify-center transition-all",
                           active
                             ? "bg-primary/15 border border-primary/40 scale-[1.04]"
-                            : "glass-soft border border-white/[0.06] hover:bg-white/[0.06]"
+                            : "glass-soft border border-black/[0.05] hover:bg-black/[0.04]"
                         )}
                       >
                         {face}

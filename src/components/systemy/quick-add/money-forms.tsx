@@ -68,7 +68,7 @@ export function GoalForm() {
               aria-pressed={emoji === e}
               className={cn(
                 "w-11 h-11 rounded-xl border text-[20px] transition-all",
-                emoji === e ? "bg-primary/20 border-primary/50 scale-105" : "glass-soft border-white/[0.08]"
+                emoji === e ? "bg-primary/20 border-primary/50 scale-105" : "glass-soft border-black/[0.07]"
               )}
             >
               {e}

@@ -61,8 +61,8 @@ function dueBadge(nextDate: string, today: string): { text: string; cls: string 
   if (d < 0) return { text: `متأخر ${formatNumber(Math.abs(d))} ${Math.abs(d) === 1 ? "يوم" : "أيام"}`, cls: "bg-[#FF8E7A]/15 text-coral" };
   if (d === 0) return { text: "يستحق اليوم", cls: "bg-[#FF8E7A]/15 text-coral" };
   if (d === 1) return { text: "غداً", cls: "bg-[#F5B95C]/15 text-gold" };
-  if (d <= 7) return { text: `بعد ${formatNumber(d)} أيام`, cls: "bg-white/[0.06] text-muted-foreground" };
-  return { text: relativeDay(nextDate), cls: "bg-white/[0.06] text-muted-foreground" };
+  if (d <= 7) return { text: `بعد ${formatNumber(d)} أيام`, cls: "bg-black/[0.04] text-muted-foreground" };
+  return { text: relativeDay(nextDate), cls: "bg-black/[0.04] text-muted-foreground" };
 }
 
 /* ═══════════════════════ القسم ═══════════════════════ */
@@ -211,7 +211,7 @@ export function RecurringSection({ data }: { data: MoneyData }) {
                                 setPayingId(null);
                                 void payRecurring(r.id, { accountId: a.id });
                               }}
-                              className="h-11 px-3 rounded-xl glass-soft border border-white/[0.08] flex items-center gap-1.5 shrink-0 hover:bg-white/[0.07] transition-colors"
+                              className="h-11 px-3 rounded-xl glass-soft border border-black/[0.07] flex items-center gap-1.5 shrink-0 hover:bg-black/[0.04] transition-colors"
                             >
                               <span className="w-2 h-2 rounded-full" style={{ background: a.color }} aria-hidden="true" />
                               <span className="text-[11.5px] font-medium">{a.name}</span>

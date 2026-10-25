@@ -74,7 +74,7 @@ export function AssetsDebtsSection({ data }: { data: MoneyData }) {
     const pct = d.amount > 0 ? Math.min(100, Math.round((d.paid / d.amount) * 100)) : 0;
     const done = remaining === 0;
     return (
-      <div key={d.id} className="px-4 py-3 border-t border-white/[0.04] first:border-t-0">
+      <div key={d.id} className="px-4 py-3 border-t border-black/[0.04] first:border-t-0">
         <div className="flex items-center gap-3 min-h-11">
           <span
             className={cn(
@@ -120,7 +120,7 @@ export function AssetsDebtsSection({ data }: { data: MoneyData }) {
         </div>
         {/* شريط التقدم */}
         <div className="mt-2 flex items-center gap-2">
-          <div className="flex-1 h-1.5 rounded-full bg-white/[0.05] overflow-hidden">
+          <div className="flex-1 h-1.5 rounded-full bg-black/[0.03] overflow-hidden">
             <div
               className="h-full rounded-full"
               style={{ width: `${pct}%`, background: d.direction === "payable" ? "#FF8E7A" : "#5CE1E6" }}
@@ -211,7 +211,7 @@ export function AssetsDebtsSection({ data }: { data: MoneyData }) {
                     setAssetEditing(a);
                   }
                 }}
-                className="flex items-center gap-3 px-4 py-3 min-h-[60px] cursor-pointer hover:bg-white/[0.03] transition-colors border-t border-white/[0.04] first:border-t-0"
+                className="flex items-center gap-3 px-4 py-3 min-h-[60px] cursor-pointer hover:bg-black/[0.02] transition-colors border-t border-black/[0.04] first:border-t-0"
               >
                 <IconBubble icon={a.icon} color="#6EE7A8" className="w-10 h-10" iconClassName="w-[18px] h-[18px]" />
                 <div className="flex-1 min-w-0">
@@ -226,7 +226,7 @@ export function AssetsDebtsSection({ data }: { data: MoneyData }) {
                 </PrivateAmount>
               </div>
             ))}
-            <div className="px-4 py-2.5 border-t border-white/[0.06] flex items-center justify-between bg-white/[0.02]">
+            <div className="px-4 py-2.5 border-t border-black/[0.05] flex items-center justify-between bg-black/[0.02]">
               <span className="text-[11px] text-muted-foreground">إجمالي الأصول</span>
               <PrivateAmount className="text-[13.5px] font-bold tabular text-mint">
                 {formatMoney(assetsTotal, cur)}
@@ -269,7 +269,7 @@ export function AssetsDebtsSection({ data }: { data: MoneyData }) {
           <div className="space-y-3">
             {payables.length > 0 && (
               <GlassCard className="overflow-hidden">
-                <div className="px-4 py-2.5 border-b border-white/[0.05] flex items-center justify-between">
+                <div className="px-4 py-2.5 border-b border-black/[0.04] flex items-center justify-between">
                   <span className="text-[12px] font-bold text-foreground/90">عليك — ديون بذمتك</span>
                   <PrivateAmount className="text-[12px] font-bold tabular text-coral">{formatMoney(owed, cur)}</PrivateAmount>
                 </div>
@@ -278,7 +278,7 @@ export function AssetsDebtsSection({ data }: { data: MoneyData }) {
             )}
             {receivables.length > 0 && (
               <GlassCard className="overflow-hidden">
-                <div className="px-4 py-2.5 border-b border-white/[0.05] flex items-center justify-between">
+                <div className="px-4 py-2.5 border-b border-black/[0.04] flex items-center justify-between">
                   <span className="text-[12px] font-bold text-foreground/90">لك — مستحق لك عند الناس</span>
                   <PrivateAmount className="text-[12px] font-bold tabular text-cyan">{formatMoney(dueToMe, cur)}</PrivateAmount>
                 </div>
@@ -381,7 +381,7 @@ function SettleSheet({
                 "h-11 px-3.5 rounded-xl border text-[12px] font-medium shrink-0 transition-all",
                 accountId === "none"
                   ? "bg-primary/20 border-primary/50 text-primary"
-                  : "glass-soft border-white/[0.08] text-foreground/75 hover:text-foreground"
+                  : "glass-soft border-black/[0.07] text-foreground/75 hover:text-foreground"
               )}
             >
               بدون معاملة
@@ -397,7 +397,7 @@ function SettleSheet({
                   "h-11 px-3.5 rounded-xl border text-[12px] font-medium flex items-center gap-1.5 shrink-0 transition-all",
                   accountId === a.id
                     ? "bg-primary/20 border-primary/50 text-primary"
-                    : "glass-soft border-white/[0.08] text-foreground/75 hover:text-foreground"
+                    : "glass-soft border-black/[0.07] text-foreground/75 hover:text-foreground"
                 )}
               >
                 <span className="w-2 h-2 rounded-full" style={{ background: a.color }} aria-hidden="true" />
@@ -638,7 +638,7 @@ function DebtSheet({ editing, data, onClose }: { editing: Debt | "new"; data: Mo
             <input
               value={person}
               onChange={(e) => setPerson(e.target.value)}
-              placeholder="خالد، المؤجر…"
+              placeholder="محمد، المؤجر…"
               className={inputCls}
             />
           </Field>

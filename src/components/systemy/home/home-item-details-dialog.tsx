@@ -80,7 +80,7 @@ export function HomeItemDetailsDialog({ item, onClose, onEdit }: HomeItemDetails
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent
         dir="rtl"
-        className="mx-auto max-w-sm rounded-3xl border-white/10 bg-[#0B0F1A]/95 p-5 backdrop-blur-2xl max-h-[85dvh] overflow-y-auto sys-scroll"
+        className="mx-auto max-w-sm rounded-3xl border-black/[0.08] bg-white/95 p-5 backdrop-blur-xl shadow-[0_24px_60px_-20px_rgba(23,33,43,0.35)] max-h-[85dvh] overflow-y-auto sys-scroll"
       >
         <DialogHeader className="space-y-2 text-right">
           <div className="flex items-center gap-3">
@@ -159,7 +159,7 @@ export function HomeItemDetailsDialog({ item, onClose, onEdit }: HomeItemDetails
                   type="button"
                   onClick={() => setServiceOpen(false)}
                   disabled={busy}
-                  className="flex-1 h-11 rounded-xl glass-soft border border-white/[0.08] text-[12.5px] font-medium transition-colors hover:bg-white/[0.06] disabled:opacity-50"
+                  className="flex-1 h-11 rounded-xl glass-soft border border-black/[0.07] text-[12.5px] font-medium transition-colors hover:bg-black/[0.04] disabled:opacity-50"
                 >
                   إلغاء
                 </button>

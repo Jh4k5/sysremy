@@ -388,7 +388,7 @@ export function QuickAddSheet() {
     if (mode !== "money") return null;
     if (moneyKind === "expense") {
       if (outsideBudget) {
-        return <p className="text-[var(--ribbon-cyan)] font-medium">خارج ميزانية المعيشة — لا يستهلك رصيد أسبوعك</p>;
+        return <p className="text-cyan font-medium">خارج ميزانية المعيشة — لا يستهلك رصيد أسبوعك</p>;
       }
       if (!status || !hasBudget) return null;
       if (status.weekRemaining < 0) {
@@ -403,11 +403,11 @@ export function QuickAddSheet() {
       return (
         <p className="tabular">
           <span className="text-muted-foreground">اليوم: متبقي </span>
-          <span className={todayRem < 0 ? "text-coral font-semibold" : "text-[var(--ribbon-cyan)] font-semibold"}>
+          <span className={todayRem < 0 ? "text-coral font-semibold" : "text-cyan font-semibold"}>
             {formatMoney(todayRem, currency)}
           </span>
           <span className="text-muted-foreground"> · الأسبوع: متبقي </span>
-          <span className="text-[var(--ribbon-cyan)] font-semibold">{formatMoney(status.weekRemaining, currency)}</span>
+          <span className="text-cyan font-semibold">{formatMoney(status.weekRemaining, currency)}</span>
         </p>
       );
     }
@@ -436,12 +436,12 @@ export function QuickAddSheet() {
     // التزام — خارج ميزانية المعيشة دائماً
     if (status) {
       return (
-        <p className="text-[var(--ribbon-cyan)] tabular">
+        <p className="text-cyan tabular">
           خارج ميزانية المعيشة · التزامات الشهر: {formatMoney(status.outsideSpent, currency)}
         </p>
       );
     }
-    return <p className="text-[var(--ribbon-cyan)]">خارج ميزانية المعيشة — لا يستهلك رصيد أسبوعك</p>;
+    return <p className="text-cyan">خارج ميزانية المعيشة — لا يستهلك رصيد أسبوعك</p>;
   };
 
   /* ─── ملخص الخيارات المطوية ─── */
@@ -505,7 +505,7 @@ body:has(#quick-add-sheet[data-state="closed"]) [data-slot="drawer-overlay"]{ani
               type="button"
               onClick={close}
               aria-label="إغلاق لوحة الإضافة"
-              className="h-11 w-11 min-h-11 min-w-11 shrink-0 rounded-xl glass-soft border border-white/[0.08] flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-white/[0.06] transition-[color,background-color,transform,scale] duration-[150ms] ease-out active:scale-[0.96]"
+              className="h-11 w-11 min-h-11 min-w-11 shrink-0 rounded-xl glass-soft border border-black/[0.07] flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-black/[0.04] transition-[color,background-color,transform,scale] duration-[150ms] ease-out active:scale-[0.96]"
             >
               <X className="h-4.5 w-4.5" aria-hidden="true" />
             </button>
@@ -518,7 +518,7 @@ body:has(#quick-add-sheet[data-state="closed"]) [data-slot="drawer-overlay"]{ani
         {/* ═══ وضع تعديل معاملة قائمة — TxForm كما هو (لا يُكسر) ═══ */}
         {editTxId ? (
           <motion.div {...sheetSection(0.04)} className="flex min-h-0 flex-1 flex-col">
-            <p className="shrink-0 px-4 pt-2 text-[11px] text-[var(--ribbon-cyan)] font-medium text-center">
+            <p className="shrink-0 px-4 pt-2 text-[11px] text-cyan font-medium text-center">
               تعديل معاملة قائمة
             </p>
             <TxForm
@@ -564,7 +564,7 @@ body:has(#quick-add-sheet[data-state="closed"]) [data-slot="drawer-overlay"]{ani
                         // V5-س: النشط = سطح الشريط الخافت + نص واضح، ومؤشر شريط متدرج أسفله
                         active
                           ? "ribbon-soft border-transparent text-foreground"
-                          : "glass-soft border-white/[0.08] text-muted-foreground hover:text-foreground"
+                          : "glass-soft border-black/[0.07] text-muted-foreground hover:text-foreground"
                       )}
                     >
                       <Icon className="h-4.5 w-4.5" aria-hidden="true" />
@@ -582,7 +582,8 @@ body:has(#quick-add-sheet[data-state="closed"]) [data-slot="drawer-overlay"]{ani
                   );
                 })}
               </div>
-              <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-1 px-1 pb-0.5">
+              {/* شبكة الكيانات — 5 أعمدة × صفان، لا تمرير ولا اقتطاع */}
+              <div className="grid grid-cols-5 gap-1.5">
                 {ENTITY_TABS.map((t) => {
                   const Icon = t.icon;
                   const active = mode === "entity" && tab === t.key;
@@ -597,15 +598,15 @@ body:has(#quick-add-sheet[data-state="closed"]) [data-slot="drawer-overlay"]{ani
                         setTab(t.key);
                       }}
                       className={cn(
-                        "h-11 min-h-11 shrink-0 px-4 rounded-full border flex items-center gap-1.5 text-[11.5px] font-medium whitespace-nowrap",
-                        "transition-[color,border-color,transform,scale] duration-[150ms] ease-out active:scale-[0.96]",
+                        "min-h-[56px] px-1 rounded-2xl border flex flex-col items-center justify-center gap-1",
+                        "transition-[color,border-color,background-color,transform,scale] duration-[150ms] ease-out active:scale-[0.96]",
                         active
                           ? "ribbon-soft border-transparent text-foreground"
-                          : "glass-soft border-white/[0.08] text-muted-foreground hover:text-foreground"
+                          : "glass-soft border-black/[0.07] text-muted-foreground hover:text-foreground"
                       )}
                     >
-                      <Icon className="h-3.5 w-3.5" aria-hidden="true" />
-                      {t.label}
+                      <Icon className="h-4.5 w-4.5 shrink-0" aria-hidden="true" />
+                      <span className="text-[9.5px] font-semibold leading-none text-center leading-tight">{t.label}</span>
                     </button>
                   );
                 })}
@@ -697,7 +698,7 @@ body:has(#quick-add-sheet[data-state="closed"]) [data-slot="drawer-overlay"]{ani
                               : "في أيش انصرف؟ مثال: قهوة"
                         }
                         aria-label="الوصف — في أيش انصرف؟"
-                        className="w-full h-12 rounded-2xl glass-soft border border-white/[0.08] ps-4 pe-12 text-[14px] text-foreground placeholder:text-muted-foreground/50 focus:border-primary/40 focus:outline-none transition-colors"
+                        className="w-full h-12 rounded-2xl glass-soft border border-black/[0.07] ps-4 pe-12 text-[14px] text-foreground placeholder:text-muted-foreground/50 focus:border-primary/40 focus:outline-none transition-colors"
                         dir="auto"
                         enterKeyHint="next"
                       />
@@ -717,7 +718,7 @@ body:has(#quick-add-sheet[data-state="closed"]) [data-slot="drawer-overlay"]{ani
                   <div
                     className={cn(
                       "mt-2.5 rounded-2xl border p-3 transition-colors",
-                      amountStr ? "glass-soft border-primary/30" : "glass border-white/[0.06]"
+                      amountStr ? "glass-soft border-primary/30" : "glass border-black/[0.05]"
                     )}
                     role="status"
                     aria-label="شاشة المبلغ"
@@ -737,12 +738,12 @@ body:has(#quick-add-sheet[data-state="closed"]) [data-slot="drawer-overlay"]{ani
                         onClick={backspace}
                         aria-label="حذف آخر رقم"
                         disabled={!amountStr}
-                        className="h-11 w-11 min-h-11 min-w-11 shrink-0 rounded-xl glass-soft border border-white/[0.08] flex items-center justify-center text-muted-foreground enabled:hover:text-foreground enabled:hover:bg-white/[0.06] disabled:opacity-30 transition-[color,background-color,transform,scale] duration-[150ms] ease-out active:scale-[0.96]"
+                        className="h-11 w-11 min-h-11 min-w-11 shrink-0 rounded-xl glass-soft border border-black/[0.07] flex items-center justify-center text-muted-foreground enabled:hover:text-foreground enabled:hover:bg-black/[0.04] disabled:opacity-30 transition-[color,background-color,transform,scale] duration-[150ms] ease-out active:scale-[0.96]"
                       >
                         <Delete className="h-5 w-5" aria-hidden="true" />
                       </button>
                     </div>
-                    <div className="mt-2 pt-2 border-t border-white/[0.06] text-[10.5px] leading-relaxed">
+                    <div className="mt-2 pt-2 border-t border-black/[0.05] text-[10.5px] leading-relaxed">
                       {renderContext()}
                     </div>
                   </div>
@@ -763,7 +764,7 @@ body:has(#quick-add-sheet[data-state="closed"]) [data-slot="drawer-overlay"]{ani
                             if (!amountStr) setAmountStr(String(c.amount));
                           }}
                           aria-label={`تعبئة: ${c.desc} بمبلغ ${c.amount}`}
-                          className="h-11 min-h-11 shrink-0 px-3.5 rounded-full glass-soft border border-white/[0.08] text-[11.5px] font-medium text-foreground/90 whitespace-nowrap hover:bg-white/[0.06] transition-[color,background-color,transform,scale] duration-[150ms] ease-out active:scale-[0.96]"
+                          className="h-11 min-h-11 shrink-0 px-3.5 rounded-full glass-soft border border-black/[0.07] text-[11.5px] font-medium text-foreground/90 whitespace-nowrap hover:bg-black/[0.04] transition-[color,background-color,transform,scale] duration-[150ms] ease-out active:scale-[0.96]"
                         >
                           {c.desc}
                           <span className="text-muted-foreground/70"> · </span>
@@ -791,7 +792,7 @@ body:has(#quick-add-sheet[data-state="closed"]) [data-slot="drawer-overlay"]{ani
                   </div>
 
                   {/* خيارات إضافية — كلها اختيارية */}
-                  <div className="mt-3 mb-1 rounded-2xl glass-soft border border-white/[0.06] overflow-hidden">
+                  <div className="mt-3 mb-1 rounded-2xl glass-soft border border-black/[0.05] overflow-hidden">
                     <button
                       type="button"
                       onClick={() => setOptionsOpen((v) => !v)}
@@ -824,7 +825,7 @@ body:has(#quick-add-sheet[data-state="closed"]) [data-slot="drawer-overlay"]{ani
                           transition={{ duration: 0.35, ease: EASE_SMOOTH_OUT }}
                           className="overflow-hidden"
                         >
-                        <div className="px-3.5 pb-3.5 pt-3 space-y-3.5 border-t border-white/[0.06]">
+                        <div className="px-3.5 pb-3.5 pt-3 space-y-3.5 border-t border-black/[0.05]">
                           {/* الحساب */}
                           <div className="space-y-1.5">
                             <p className="text-[11px] font-medium text-muted-foreground">
@@ -845,8 +846,8 @@ body:has(#quick-add-sheet[data-state="closed"]) [data-slot="drawer-overlay"]{ani
                                       "h-11 min-h-11 px-3.5 rounded-full border text-[11.5px] font-medium flex items-center gap-1.5",
                                       "transition-[color,background-color,border-color,transform,scale] duration-[150ms] ease-out active:scale-[0.96]",
                                       active
-                                        ? "bg-primary/20 border-primary/50 text-primary"
-                                        : "border-white/[0.08] text-foreground/80 hover:bg-white/[0.06] glass-soft"
+                                        ? "bg-primary/15 border-primary/40 text-gold"
+                                        : "border-black/[0.07] text-foreground/80 hover:bg-black/[0.04] glass-soft"
                                     )}
                                   >
                                     <I className="w-3.5 h-3.5" style={{ color: a.color }} aria-hidden="true" />
@@ -855,7 +856,7 @@ body:has(#quick-add-sheet[data-state="closed"]) [data-slot="drawer-overlay"]{ani
                                 );
                               })}
                               {activeAccounts.length === 0 && (
-                                <p className="text-[11px] text-primary/90">
+                                <p className="text-[11px] text-gold">
                                   سيُنشأ حساب «نقد» تلقائياً عند الحفظ ✓
                                 </p>
                               )}
@@ -888,8 +889,8 @@ body:has(#quick-add-sheet[data-state="closed"]) [data-slot="drawer-overlay"]{ani
                                         "h-11 min-h-11 px-3.5 rounded-full border text-[11.5px] font-medium inline-flex items-center gap-1",
                                         "transition-[color,background-color,border-color,transform,scale] duration-[150ms] ease-out active:scale-[0.96]",
                                         !categoryPicked
-                                          ? "bg-primary/20 border-primary/50 text-primary"
-                                          : "glass-soft border-white/[0.08] text-muted-foreground"
+                                          ? "bg-primary/15 border-primary/40 text-gold"
+                                          : "glass-soft border-black/[0.07] text-muted-foreground"
                                       )}
                                     >
                                       <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
@@ -913,8 +914,8 @@ body:has(#quick-add-sheet[data-state="closed"]) [data-slot="drawer-overlay"]{ani
                                             "h-11 min-h-11 px-3.5 rounded-full border text-[11.5px] font-medium flex items-center gap-1.5",
                                             "transition-[color,background-color,border-color,transform,scale] duration-[150ms] ease-out active:scale-[0.96]",
                                             active
-                                              ? "bg-primary/20 border-primary/50 text-primary"
-                                              : "glass-soft border-white/[0.08] text-foreground/80 hover:bg-white/[0.06]"
+                                              ? "bg-primary/15 border-primary/40 text-gold"
+                                              : "glass-soft border-black/[0.07] text-foreground/80 hover:bg-black/[0.04]"
                                           )}
                                         >
                                           <I className="w-3.5 h-3.5" style={{ color: c.color }} aria-hidden="true" />
@@ -931,8 +932,8 @@ body:has(#quick-add-sheet[data-state="closed"]) [data-slot="drawer-overlay"]{ani
                                       "h-11 min-h-11 px-3.5 rounded-full border text-[11.5px] font-medium flex items-center gap-1.5",
                                       "transition-[color,background-color,border-color,transform,scale] duration-[150ms] ease-out active:scale-[0.96]",
                                       selectedCategory
-                                        ? "bg-primary/20 border-primary/50 text-primary"
-                                        : "glass-soft border-white/[0.08] text-muted-foreground hover:text-foreground"
+                                        ? "bg-primary/15 border-primary/40 text-gold"
+                                        : "glass-soft border-black/[0.07] text-muted-foreground hover:text-foreground"
                                     )}
                                   >
                                     {selectedCategory ? (
@@ -970,8 +971,8 @@ body:has(#quick-add-sheet[data-state="closed"]) [data-slot="drawer-overlay"]{ani
                                     "h-11 min-h-11 px-3.5 rounded-full border text-[11.5px] font-medium",
                                     "transition-[color,background-color,border-color,transform,scale] duration-[150ms] ease-out active:scale-[0.96]",
                                     date === d.iso
-                                      ? "bg-primary/20 border-primary/50 text-primary"
-                                      : "glass-soft border-white/[0.08] text-foreground/80 hover:bg-white/[0.06]"
+                                      ? "bg-primary/15 border-primary/40 text-gold"
+                                      : "glass-soft border-black/[0.07] text-foreground/80 hover:bg-black/[0.04]"
                                   )}
                                 >
                                   {d.label}
@@ -982,7 +983,7 @@ body:has(#quick-add-sheet[data-state="closed"]) [data-slot="drawer-overlay"]{ani
                                 value={date}
                                 onChange={(e) => setDate(e.target.value || todayISO())}
                                 aria-label="اختيار تاريخ حر"
-                                className="h-11 min-h-11 px-2.5 rounded-full glass-soft border border-white/[0.08] text-[11px] text-foreground/80 tabular focus:border-primary/40 focus:outline-none transition-colors"
+                                className="h-11 min-h-11 px-2.5 rounded-full glass-soft border border-black/[0.07] text-[11px] text-foreground/80 tabular focus:border-primary/40 focus:outline-none transition-colors"
                                 dir="ltr"
                               />
                             </div>
@@ -1003,7 +1004,7 @@ body:has(#quick-add-sheet[data-state="closed"]) [data-slot="drawer-overlay"]{ani
                                   "mt-0.5 w-5 h-5 shrink-0 rounded-md border flex items-center justify-center transition-colors",
                                   outsideBudget || moneyKind === "commitment"
                                     ? "bg-primary/80 border-primary text-primary-foreground"
-                                    : "glass-soft border-white/[0.14] text-transparent"
+                                    : "glass-soft border-black/[0.1] text-transparent"
                                 )}
                                 aria-hidden="true"
                               >
@@ -1012,7 +1013,7 @@ body:has(#quick-add-sheet[data-state="closed"]) [data-slot="drawer-overlay"]{ani
                               <span className="text-[11.5px] leading-relaxed text-foreground/85">
                                 هذا الصرف خارج ميزانية المعيشة (التزام/استثنائي)
                                 {moneyKind === "commitment" && (
-                                  <span className="block text-[10px] text-[var(--ribbon-cyan)]">
+                                  <span className="block text-[10px] text-cyan">
                                     مفعّل تلقائياً للالتزامات — لا يستهلك رصيد أسبوعك
                                   </span>
                                 )}
@@ -1030,7 +1031,7 @@ body:has(#quick-add-sheet[data-state="closed"]) [data-slot="drawer-overlay"]{ani
                                 onChange={(e) => setTags(e.target.value)}
                                 placeholder="وسم (اختياري)"
                                 aria-label="وسم"
-                                className="h-11 rounded-xl glass-soft border border-white/[0.08] px-3 text-[12px] text-foreground placeholder:text-muted-foreground/50 focus:border-primary/40 focus:outline-none transition-colors"
+                                className="h-11 rounded-xl glass-soft border border-black/[0.07] px-3 text-[12px] text-foreground placeholder:text-muted-foreground/50 focus:border-primary/40 focus:outline-none transition-colors"
                                 dir="auto"
                               />
                               {moneyKind !== "income" && (
@@ -1039,7 +1040,7 @@ body:has(#quick-add-sheet[data-state="closed"]) [data-slot="drawer-overlay"]{ani
                                   onChange={(e) => setPerson(e.target.value)}
                                   placeholder="شخص (اختياري)"
                                   aria-label="شخص"
-                                  className="h-11 rounded-xl glass-soft border border-white/[0.08] px-3 text-[12px] text-foreground placeholder:text-muted-foreground/50 focus:border-primary/40 focus:outline-none transition-colors"
+                                  className="h-11 rounded-xl glass-soft border border-black/[0.07] px-3 text-[12px] text-foreground placeholder:text-muted-foreground/50 focus:border-primary/40 focus:outline-none transition-colors"
                                   dir="auto"
                                 />
                               )}
@@ -1055,10 +1056,10 @@ body:has(#quick-add-sheet[data-state="closed"]) [data-slot="drawer-overlay"]{ani
                 {/* ═══ زر الحفظ — ثابت في التذييل، مرئي دائماً ═══ */}
                 <motion.div
                   {...sheetSection(0.12)}
-                  className="shrink-0 px-4 pt-2 pb-3 border-t border-white/[0.07] bg-[#0B0F1A]/95 backdrop-blur-md"
+                  className="kb-safe shrink-0 px-4 pt-2 pb-3 border-t border-black/[0.06] bg-white/95 backdrop-blur-md"
                 >
                   {moneyKind === "commitment" && (
-                    <p className="mb-1.5 text-center text-[10px] text-[var(--ribbon-cyan)] font-medium">
+                    <p className="mb-1.5 text-center text-[10px] text-cyan font-medium">
                       خارج ميزانية المعيشة
                     </p>
                   )}
