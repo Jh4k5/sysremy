@@ -306,7 +306,8 @@ function matchCategory(text: string, kind: Kind, cats: Category[]): { id: string
   const haystack = normalizeDigits(text).toLowerCase();
   for (const c of ordered) {
     const candidates = [
-      ...c.keywords.split(",").map((k) => k.trim()).filter((k) => k.length >= 2),
+      // دفاعي: صف قديم/مستورد قد يفتقد keywords — لا يُسقط التطبيق كله
+      ...(c.keywords ?? "").split(",").map((k) => k.trim()).filter((k) => k.length >= 2),
       c.name,
     ];
     for (const kw of candidates) {

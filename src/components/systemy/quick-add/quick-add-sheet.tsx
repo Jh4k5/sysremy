@@ -223,7 +223,8 @@ export function QuickAddSheet() {
     );
     for (const t of sorted) {
       if (t.type !== "expense") continue;
-      const d = t.description.trim();
+      // دفاعي: معاملة قديمة/مستوردة بلا وصف — لا تُسقط اللوحة
+      const d = (t.description ?? "").trim();
       if (!d || seen.has(d)) continue;
       seen.add(d);
       out.push({ desc: d, amount: t.amount });
