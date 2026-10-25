@@ -4,7 +4,7 @@
  * الجزء الأول من سلسلة تكامل Life-os (الخيار A — انظر docs/integration/architecture-decision.md).
  *
  * يحوّل ملف تصدير Life-os (db.exportAll من AsyncStorage — تنسيق
- * { collections: { <name>: rows[] } }) إلى نسخة احتياطية Systemy v2
+ * { data: { <name>: rows[] } }) إلى نسخة احتياطية Systemy v2
  * (BackupFile — { app:"Systemy", version:2, tables: {...} }) تُستورد
  * من: الإعدادات ← بياناتك ← استيراد (وضع الدمج merge لا يمسّ بياناتك).
  *
@@ -19,6 +19,9 @@
  *  - لا ترحيل لأسرار أو تفضيلات جهاز (settings/profile) — هذه بيئة مختلفة.
  *  - كل جدول مخرج موصوف بنوع Systemy الحقيقي من src/lib/types — تحقق
  *    زمن الترجمة أن المخرج مطابق للمخطط الذي ستستورده قاعدة البيانات.
+ *  - حساب المدخلات صارم: لكل مجموعة مصدر «المدخلات = المُرحّلة + المتخطاة»،
+ *    والإجمالي يُطبع مع تحقق مطابق (✓/⚠) — عمود «صفوف الناتج» منفصل
+ *    لأن بعض التحويلات توسّع السجل (امتحان←مهمة+كتلة، قياس صحي←حتى 4 سجلات).
  */
 
 import { readFileSync, writeFileSync } from "node:fs";
@@ -52,10 +55,13 @@ interface LoExport {
   // بعض نسخ exportAll تستخدم التنسيق المسطح
   [k: string]: unknown;
 }
+/** جرد مجموعة مصدر واحدة: المدخلات = المُرحّلة + المتخطاة (ثابت رياضي مضمون) */
 interface Counts {
-  table: string;
+  source: string;
+  input: number;
   migrated: number;
   skipped: number;
+  outputs: number;
   note?: string;
 }
 
@@ -135,10 +141,18 @@ function readCollections(source: LoExport): Record<string, LoRow[]> {
 function buildTables(c: Record<string, LoRow[]>) {
   const t: Record<string, unknown[]> = {};
   const counts: Counts[] = [];
-  const track = (table: string, migrated: number, skipped: number, note?: string) =>
-    counts.push({ table, migrated, skipped, note });
-
-  const rows = (name: string): LoRow[] => (Array.isArray(c[name]) ? c[name] : []);
+  /** تتبّع مجموعة مصدر: المدخلات يجب أن تساوي المُرحّلة + المتخطاة دائماً.
+   *  الصفوف الفارغة (0 مدخل) لا تُطبع ص戸اً — لا تضيف شيئاً للجرد. */
+  const track = (source: string, input: number, migrated: number, skipped: number, outputs: number, note?: string) => {
+    if (input === 0 && migrated === 0 && skipped === 0 && outputs === 0) return;
+    counts.push({ source, input, migrated, skipped, outputs, note });
+  };
+  /** المجموعات المصدر التي استهلكتها قاعدة تحويل (لايُعاد عدّها «مجهولة») */
+  const handled = new Set<string>();
+  const rows = (name: string): LoRow[] => {
+    handled.add(name);
+    return Array.isArray(c[name]) ? c[name] : [];
+  };
 
   // ── المهام ──
   {
@@ -163,7 +177,7 @@ function buildTables(c: Record<string, LoRow[]>) {
       });
     }
     t.tasks = out;
-    track("tasks", out.length, skipped, "energy → priority (high/low)، الوصف إن وجد");
+    track("tasks", out.length + skipped, out.length, skipped, out.length, "energy → priority (high/low)، الوصف إن وجد");
   }
 
   // ── العادات ──
@@ -179,7 +193,7 @@ function buildTables(c: Record<string, LoRow[]>) {
         id: oid(r),
         name,
         icon: "flame",
-        // لون العادة الحقيقي من Life-os يُنقل كما هو (hex صالح)، والاحتياط مرجاني Systemy
+        // لون العادة الحقيقي من Life-os يُنقل كما هو (hex صالح)، والاحتياط مرجالي Systemy
         color: /^#[0-9a-fA-F]{6}$/.test(normDigits(r.color)) ? normDigits(r.color) : "#FF8E7A",
         target: target > 0 ? target : 1,
         unit: normDigits(r.unit) || "مرة",
@@ -191,7 +205,7 @@ function buildTables(c: Record<string, LoRow[]>) {
       });
     }
     t.habits = out;
-    track("habits", out.length, skipped, "freq→cadence، time_pref→remindAt");
+    track("habits", out.length + skipped, out.length, skipped, out.length, "freq→cadence، time_pref→remindAt");
   }
 
   // ── سجلات العادات ──
@@ -212,7 +226,7 @@ function buildTables(c: Record<string, LoRow[]>) {
       });
     }
     t.habitLogs = out;
-    track("habitLogs", out.length, skipped);
+    track("habit_logs", out.length + skipped, out.length, skipped, out.length);
   }
 
   // ── اليوميات ──
@@ -237,16 +251,18 @@ function buildTables(c: Record<string, LoRow[]>) {
       });
     }
     t.notes = out;
-    track("notes (journal)", out.length, skipped);
+    track("journal_entries", out.length + skipped, out.length, skipped, out.length);
   }
 
   // ── مكتبة التعلم → ملاحظات ──
   {
     const out = (t.notes ?? []) as Note[];
     let skipped = 0;
+    let migrated = 0;
     for (const r of rows("learning_items")) {
       const title = normDigits(r.title);
       if (!title) { skipped++; continue; }
+      migrated++;
       const author = normDigits(r.author);
       const status = normDigits(r.status);
       const progress = num(r.progress, 0);
@@ -264,7 +280,7 @@ function buildTables(c: Record<string, LoRow[]>) {
       });
     }
     t.notes = out;
-    track("notes (library→note)", rows("learning_items").length - skipped, skipped, "الحالة والتقدم داخل المحتوى");
+    track("learning_items", migrated + skipped, migrated, skipped, migrated, "الحالة والتقدم داخل المحتوى");
   }
 
   // ── المقررات ──
@@ -286,7 +302,7 @@ function buildTables(c: Record<string, LoRow[]>) {
       });
     }
     t.courses = out;
-    track("courses", out.length, skipped);
+    track("study_courses", out.length + skipped, out.length, skipped, out.length);
   }
 
   // ── البطاقات (SM-2 → لايتنر) ──
@@ -312,7 +328,7 @@ function buildTables(c: Record<string, LoRow[]>) {
       });
     }
     t.flashcards = out;
-    track("flashcards", out.length, skipped, "ease/interval SM-2 → صندوق لايتنر 1-5");
+    track("flashcards", out.length + skipped, out.length, skipped, out.length, "ease/interval SM-2 → صندوق لايتنر 1-5");
   }
 
   // ── الأحداث → كتل تقويم ──
@@ -343,7 +359,7 @@ function buildTables(c: Record<string, LoRow[]>) {
       });
     }
     t.blocks = out;
-    track("blocks (events)", out.length, skipped, "all_day→كتلة 09:00-10:00");
+    track("events", out.length + skipped, out.length, skipped, out.length, "all_day→كتلة 09:00-10:00");
   }
 
   // ── الامتحانات → مهمة عالية الأولوية + كتلة يوم كامل ──
@@ -351,10 +367,12 @@ function buildTables(c: Record<string, LoRow[]>) {
     const taskOut = (t.tasks ?? []) as Task[];
     const blockOut = (t.blocks ?? []) as TimeBlock[];
     let skipped = 0;
+    let migrated = 0;
     for (const r of rows("exams")) {
       const name = normDigits(r.name);
       const date = isoDate(r.exam_date);
       if (!name || !date) { skipped++; continue; }
+      migrated++;
       taskOut.push({
         id: oid(r),
         title: `📝 امتحان: ${name}`,
@@ -379,40 +397,51 @@ function buildTables(c: Record<string, LoRow[]>) {
     }
     t.tasks = taskOut;
     t.blocks = blockOut;
-    track("exams → task+block", rows("exams").length - skipped, skipped);
+    track("exams", migrated + skipped, migrated, skipped, migrated * 2, "كل امتحان ← مهمة عالية + كتلة (صفان)");
   }
 
-  // ── قياسات الصحة ──
+  // ── قياسات الصحة (سجل واحد قد يولّد حتى 4 سجلات Systemy) ──
   {
     const out: HealthLog[] = [];
     let skipped = 0;
+    let migrated = 0;
     for (const r of rows("health_metrics")) {
       const date = isoDate(r.day);
       if (!date) { skipped++; continue; }
-      const entries: Array<[HealthKind, number, string, string]> = [
-        ["water", num(r.water_ml, 0) / 250, "كوب", "water_ml÷250→أكواب"],
-        ["sleep", num(r.sleep_min, 0) / 60, "ساعة", "sleep_min÷60→ساعات"],
-        ["steps", num(r.steps, 0), "خطوة", ""],
-        ["weight", num(r.weight_kg, 0), "كجم", ""],
+      const entries: Array<[HealthKind, number, string]> = [
+        ["water", num(r.water_ml, 0) / 250, "كوب"],
+        ["sleep", num(r.sleep_min, 0) / 60, "ساعة"],
+        ["steps", num(r.steps, 0), "خطوة"],
+        ["weight", num(r.weight_kg, 0), "كجم"],
       ];
+      let produced = 0;
       for (const [kind, value, unit] of entries) {
         if (value > 0) {
           out.push({ id: `${oid(r)}-${kind}`, date, kind, value: Math.round(value * 10) / 10, unit, createdAt: stamp(r) });
+          produced++;
         }
+      }
+      if (produced === 0) {
+        // تاريخ سليم لكن كل القياسات صفر/فارغة — لا شيء يُرحَّل منه
+        skipped++;
+      } else {
+        migrated++;
       }
     }
     t.healthLogs = out;
-    track("healthLogs", out.length, skipped, "ملّي/دقائق → أكواب/ساعات");
+    track("health_metrics", migrated + skipped, migrated, skipped, out.length, "ملّي/دقائق → أكواب/ساعات (سجل←حتى 4)");
   }
 
   // ── التمارين → سجل نشاط ──
   {
     const out = (t.healthLogs ?? []) as HealthLog[];
     let skipped = 0;
+    let migrated = 0;
     for (const r of rows("workouts")) {
       const date = isoDate(r.done_at) ?? isoDate(r.created_at);
       const name = normDigits(r.name);
       if (!date || !name) { skipped++; continue; }
+      migrated++;
       out.push({
         id: oid(r),
         date,
@@ -424,7 +453,7 @@ function buildTables(c: Record<string, LoRow[]>) {
       });
     }
     t.healthLogs = out;
-    track("workouts → exercise", rows("workouts").length - skipped, skipped);
+    track("workouts", migrated + skipped, migrated, skipped, migrated);
   }
 
   // ── جلسات التركيز ──
@@ -449,30 +478,27 @@ function buildTables(c: Record<string, LoRow[]>) {
       });
     }
     t.focusSessions = out;
-    track("focusSessions", out.length, skipped);
+    track("focus_sessions", out.length + skipped, out.length, skipped, out.length);
   }
 
   // ── العافية ──
   {
     const acts: WellbeingActivity[] = [];
     let skippedA = 0;
-    const kindMap = new Map<string, "healthy" | "draining">();
     for (const r of rows("wellbeing_activities")) {
       const name = normDigits(r.name);
       if (!name) { skippedA++; continue; }
-      const kind = normDigits(r.type).includes("drain") ? "draining" : "healthy";
-      kindMap.set(normDigits(r.id), kind);
       acts.push({
         id: oid(r),
         name,
-        kind,
-        icon: kind === "healthy" ? "heart-pulse" : "battery-low",
+        kind: normDigits(r.type).includes("drain") ? "draining" : "healthy",
+        icon: normDigits(r.type).includes("drain") ? "battery-low" : "heart-pulse",
         archived: false,
         createdAt: stamp(r),
       });
     }
     t.wellbeingActivities = acts;
-    track("wellbeingActivities", acts.length, skippedA);
+    track("wellbeing_activities", acts.length + skippedA, acts.length, skippedA, acts.length);
 
     const logs: WellbeingLog[] = [];
     let skippedL = 0;
@@ -483,7 +509,7 @@ function buildTables(c: Record<string, LoRow[]>) {
       logs.push({ id: oid(r), activityId: `lo-${activityId}`, date, createdAt: stamp(r) });
     }
     t.wellbeingLogs = logs;
-    track("wellbeingLogs", logs.length, skippedL);
+    track("wellbeing_logs", logs.length + skippedL, logs.length, skippedL, logs.length);
 
     const rules: WellbeingRule[] = [];
     let skippedR = 0;
@@ -499,7 +525,7 @@ function buildTables(c: Record<string, LoRow[]>) {
       });
     }
     t.wellbeingRules = rules;
-    track("wellbeingRules", rules.length, skippedR);
+    track("wellbeing_rules", rules.length + skippedR, rules.length, skippedR, rules.length);
   }
 
   // ── المناطق والمشاريع → مشاريع ──
@@ -507,10 +533,13 @@ function buildTables(c: Record<string, LoRow[]>) {
     const out: Project[] = [];
     let skipped = 0;
     const areaName = new Map<string, string>();
-    for (const r of rows("areas")) {
+    const areaRows = rows("areas");
+    for (const r of areaRows) {
       const name = normDigits(r.name);
       if (name) areaName.set(normDigits(r.id), name);
     }
+    // المناطق تُستهلك للإثراء فقط — سجلها نفسه لا يصبح صف Systemy مستقلاً
+    track("areas", areaRows.length, 0, areaRows.length, 0, "تُستهلك للإثراء — اسمها يُدمج في اسم المشروع (لا صف مستقل)");
     for (const r of rows("projects")) {
       const name = normDigits(r.name);
       if (!name) { skipped++; continue; }
@@ -526,12 +555,19 @@ function buildTables(c: Record<string, LoRow[]>) {
         createdAt: stamp(r),
       });
     }
-    // الأهداف الميتة في Life-os → معالم مهام داخل المشاريع المرتبطة
+    t.projects = out;
+    track("projects", out.length + skipped, out.length, skipped, out.length, "اسم المنطقة يُدمج في اسم المشروع");
+  }
+
+  // ── الأهداف الميتة في Life-os → مهام معالم ──
+  {
     const taskOut = (t.tasks ?? []) as Task[];
-    let goalSkipped = 0;
+    let skipped = 0;
+    let migrated = 0;
     for (const r of rows("goals")) {
       const title = normDigits(r.title);
-      if (!title) { goalSkipped++; continue; }
+      if (!title) { skipped++; continue; }
+      migrated++;
       taskOut.push({
         id: oid(r),
         title: `🎯 ${title}`,
@@ -544,11 +580,10 @@ function buildTables(c: Record<string, LoRow[]>) {
       });
     }
     t.tasks = taskOut;
-    t.projects = out;
-    track("projects", out.length, skipped, "أهداف Life-os → مهام معالم (الهدف المالي في Systemy مختلف البنية)");
+    track("goals", migrated + skipped, migrated, skipped, migrated, "الهدف المالي في Systemy مختلف البنية → مهمة معلم");
   }
 
-  // ── المزاج من إشارات اليوميات (إن وجدت journal_signals) ──
+  // ── المزاج من إشارات اليوميات ──
   {
     const out: Mood[] = [];
     let skipped = 0;
@@ -564,21 +599,27 @@ function buildTables(c: Record<string, LoRow[]>) {
         createdAt: stamp(r),
       });
     }
-    if (out.length) {
-      t.moods = out;
-      track("moods (signals)", out.length, skipped, "mood_score 1-5 مباشرة");
-    }
+    // تُتتبَّع دائماً متى وُجدت مدخلات — حتى لو فشلت كلها (لا اختفاء صامت)
+    if (out.length) t.moods = out;
+    track("journal_signals", out.length + skipped, out.length, skipped, out.length, "mood_score 1-5 مباشرة");
   }
 
   // ── سجلات جداول Life-os بلا مقابل مقصود ──
   const intentionallySkipped = [
-    "meals", "insights", "memory_nodes", "memory_edges", "areas",
+    "meals", "insights", "memory_nodes", "memory_edges",
     "captures", "files", "shares", "study_sessions", "body_logs",
     "analytics_events", "app_usage", "journal_signals_used",
   ];
   for (const name of intentionallySkipped) {
-    if (rows(name).length) {
-      track(name, 0, rows(name).length, "بلا مقابل في Systemy — موثّق في docs/integration");
+    const n = rows(name).length;
+    if (n) track(name, n, 0, n, 0, "بلا مقابل في Systemy — موثّق في docs/integration");
+  }
+
+  // ── شبكة الأمان: أي مجموعة مصدر لم تستهلكها قاعدة تحويل ──
+  // (كانت تختفي من الجرد كلياً — الآن تُعدّ متخطاة بشفافية)
+  for (const [name, arr] of Object.entries(c)) {
+    if (!handled.has(name) && Array.isArray(arr) && arr.length > 0) {
+      track(name, arr.length, 0, arr.length, 0, "مجموعة غير معروفة — لا قاعدة تحويل");
     }
   }
 
@@ -616,8 +657,8 @@ function main(): void {
   }
 
   const collections = readCollections(parsed);
-  const totalSource = Object.values(collections).reduce((n, arr) => n + arr.length, 0);
-  if (totalSource === 0) {
+  const totalInput = Object.values(collections).reduce((n, arr) => n + arr.length, 0);
+  if (totalInput === 0) {
     console.error("❌ لا مجموعات بيانات في الملف — تأكد أنه تصدير Life-os (db.exportAll).");
     process.exit(1);
   }
@@ -625,22 +666,32 @@ function main(): void {
   console.log("\n╔══════════════════════════════════════════════════╗");
   console.log("║   ترحيل Life-os → Systemy — جرد التحويل          ║");
   console.log("╚══════════════════════════════════════════════════╝");
-  console.log(`المصدر: ${src} (${totalSource} سجلاً في ${Object.keys(collections).length} مجموعة)\n`);
+  console.log(`المصدر: ${src} (${totalInput} سجلاً في ${Object.keys(collections).length} مجموعة)\n`);
 
   const { tables, counts } = buildTables(collections);
 
-  const pad = (s: string, n: number) => s.padEnd(n, " ");
-  console.log(`${pad("جدول Systemy", 24)}${pad("مُرحَّل", 8)}${pad("متخطى", 8)}ملاحظة`);
-  console.log("─".repeat(78));
+  const pad = (s: string, n: number) => s.padEnd(n);
+  console.log(`${pad("مجموعة المصدر", 22)}${pad("مدخلات", 8)}${pad("مُرحّلة", 9)}${pad("متخطاة", 8)}${pad("صفوف", 7)}ملاحظة`);
+  console.log("─".repeat(95));
   let totalMigrated = 0;
   let totalSkipped = 0;
+  let totalOutputs = 0;
   for (const c of counts) {
-    console.log(`${pad(c.table, 24)}${pad(String(c.migrated), 8)}${pad(String(c.skipped), 8)}${c.note ?? ""}`);
+    console.log(`${pad(c.source, 22)}${pad(String(c.input), 8)}${pad(String(c.migrated), 9)}${pad(String(c.skipped), 8)}${pad(String(c.outputs), 7)}${c.note ?? ""}`);
     totalMigrated += c.migrated;
     totalSkipped += c.skipped;
+    totalOutputs += c.outputs;
   }
-  console.log("─".repeat(78));
-  console.log(`${pad("الإجمالي", 24)}${pad(String(totalMigrated), 8)}${pad(String(totalSkipped), 8)}\n`);
+  console.log("─".repeat(95));
+  console.log(`${pad("الإجمالي", 22)}${pad(String(totalInput), 8)}${pad(String(totalMigrated), 9)}${pad(String(totalSkipped), 8)}${pad(String(totalOutputs), 7)}\n`);
+
+  // ═══ التحقق الصارم: المدخلات = المُرحّلة + المتخطاة (يجب أن يتطابق دائماً) ═══
+  if (totalInput === totalMigrated + totalSkipped) {
+    console.log(`✓ الحساب متطابق: ${totalInput} مدخلاً = ${totalMigrated} مُرحّلة + ${totalSkipped} متخطاة`);
+    console.log(`  صفوف Systemy الناتجة: ${totalOutputs} (بعض التحويلات توسّع السجل — العمود معلوماتي)\n`);
+  } else {
+    console.log(`⚠ عدم تطابق في الحساب! مدخلات ${totalInput} ≠ مُرحّلة ${totalMigrated} + متخطاة ${totalSkipped} — عطل في الجرد، أبلغ عنه.\n`);
+  }
 
   if (dryRun) {
     console.log("🔍 وضع الجرد (dry-run) — لم يُكتب أي ملف.");
@@ -655,7 +706,7 @@ function main(): void {
     tables,
   };
   writeFileSync(outPath!, JSON.stringify(backup, null, 2), "utf-8");
-  console.log(`✅ كُتب الملف: ${outPath} (${totalMigrated} سجلاً)`);
+  console.log(`✅ كُتب الملف: ${outPath} (${totalMigrated} سجلاً مصدراً، ${totalOutputs} صفاً في Systemy)`);
   console.log("   استورده من: Systemy → الإعدادات → بياناتك → استيراد → وضع الدمج\n");
 }
 
