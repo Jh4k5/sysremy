@@ -1360,3 +1360,26 @@ Stage Summary:
 - **الدخول بالبريد وجوجل مربوطان فعلياً ويعملان ضد Supabase الحقيقي**: سلسلة Google مثبتة بشبكة المتصفح حتى صفحة جوجل، وأخطاء البريد صادقة بالعربية، والدخول الكامل مختبر بمحاكاة مطابقة حرفياً.
 - الخطوة الوحيدة المتبقية (على المستخدم، بلا كود): نسخ الهجرة من زر «انسخ أوامر التهيئة» داخل التطبيق → SQL Editor → Run — تنقلب الشارة «متزامن» تلقائياً خلال دقيقة.
 - الأدلة: upload/auth-live/ (7 لقطات) · سكربت المحاكاة القابل لإعادة الاستخدام: /home/z/.tmp-scripts/mock-supabase.mjs.
+
+---
+Task ID: SQL-FINAL
+Agent: main (Z.ai Code)
+Task: طلب المستخدم «أعطني ملف SQL النهائي المصحح والآمن مع إصلاح صلاحيات sync_push — بلا أي حذف، وبخطوة واحدة من لوحة Supabase»
+
+Work Log:
+- فحص حي مباشر للمشروع ymzwfqqijtbmmclfuwcz (بالمفتاح الناشر): **Google OAuth يعمل فعلاً** (authorize → 302 → accounts.google.com بمفتاح 671470048964-mj0pd9…) · لكن records=‏PGRST205 وprofiles=‏PGRST205 وsync_push=‏PGRST202 — أي أن الهجرة لم تُشغَّل قط والقاعدة فارغة من الجداول (لا يوجد ما يُحذف).
+- اكتُشف أن .env فقد متغيرات Supabase (مسح إعادة نشر الصندوق) — أُعيد ضبطها (URL + publishable key) وتأكد "Reload env" في dev.log وأن /api/auth/google-status يرد ready.
+- مراجعة الملف مقابل الكود الحالي سطراً سطراً: sync-engine.ts (rpc('sync_push',{items}) + select id,kind,data,client_ms,deleted,updated_at بترتيب updated_at + LWW بـ client_ms بـ >= + شواهد قبور) وdb.ts (ALL_TABLES = أسماء kind) وauth-store.ts (profiles: display_name/avatar_url فقط + insert fallback).
+- كُتبت النسخة النهائية المصححة في docs/ui-redesign/sync-migration.sql (12,515 بايت — مصدر الحقيقة الوحيد الذي يخدمه /api/sync/migration-sql لزر «انسخ أوامر التهيئة»):
+  * إصلاح صلاحيات sync_push: إسقاط أي توقيع قديم/خاطئ (jsonb وjsonb[]) ثم إنشاء بمعامل items jsonb حرفياً + revoke execute من public + grant لـ authenticated + revoke من anon + alter owner to postgres + grant usage على المخطط.
+  * منح صريحة للجدولين (select/insert/update/delete لـ authenticated، revoke all من anon) + alter owner to postgres.
+  * notify pgrst 'reload schema' — الإصلاح الفعلي لأشهر «خطأ صلاحيات» وهمي (PGRST202 بعد DDL).
+  * تعبئة profiles لأي حسابات موجودة مسبقاً (insert … on conflict do nothing — إضافي فقط) + تريغر on_auth_user_created.
+  * حارس في sync_push: تخطي العناصر بلا id بدل فشل الدفعة كلها.
+  * تقرير تحقق نهائي كآخر عبارة SELECT (يظهر تحت زر Run): status/profiles/records/sync_push/rls_policies.
+  * لا يحذف أي جدول أو بيانات — الـ DROP الوحيد لإعادة إنشاء السياسات/الدالة/التريغر نفسها (وصفية بلا بيانات) + if not exists/or replace في كل مكان = آمن لأي عدد من إعادات التشغيل.
+- تحقق التسليم: /api/sync/migration-sql يرد 200 والمحتوى مطابق بايت-بايت للملف (diff ✓) · lint نظيف · dev.log نظيف · المتصفح: البوابة تظهر (بريد/كلمة/Google/إنشاء حساب) بصفر أخطاء console (upload/sql-final/01-app-gate.png).
+
+Stage Summary:
+- الملف النهائي جاهز ومطابق 100% لمحرك المزامنة الفعلي، مع قسم إصلاح صلاحيات sync_push صريح + تحديث مخطط PostgREST + تقرير تحقق مرئي للمستخدم غير المبرمج.
+- الخطوة الوحيدة المتبقية على المستخدم: SQL Editor → New query → لصق الملف → Run. بعدها تنقلب شارة المزامنة «متزامن» تلقائياً خلال دقيقة.
