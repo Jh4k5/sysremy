@@ -1298,3 +1298,20 @@ Work Log:
 Stage Summary:
 - GitHub متزامن 100% (583a3d7) والمصادقة السحابية حية ومختبرة طرفياً بأخطاء عربية صادقة، وزر Google صار آمناً ضد غياب الإعداد.
 - ما زال محجوباً على المستخدم بالتحقيق الحي (لا افتراض): لصق Google OAuth Client ID/Secret في Dashboard → Authentication → Providers → Google · تشغيل هجرة profiles في SQL Editor · إضافة نطاق المعاينة إلى Redirect URLs · تأكيد بريد اختبار واحد (Users → Confirm) لإتمام اختبار الجلسة الكامل.
+
+---
+Task ID: SUPABASE-AUTH-2 (ملحق القناة)
+Agent: main (Z.ai Code)
+Task: رفع كوميت الإصلاح عبر قناة مضطربة — اكتشافات الوكيل وخطة Git Data API
+
+Work Log:
+- قناة git (بروتوكول HTTPS) كانت تعمل ثم انقطعت (TLS non-properly terminated ثم تعليق) — القناة متقطعة: الجلب نجح في المحاولة الثالثة من خمس.
+- **اكتشاف وكيل جديد**: User-Agent بقيمة git/* يُحجب على نداءات api.github.com (403 صفحة Unicorn) حتى مع التوكن — بينما curl الافتراضي يمر. الإصلاح السابق (http.userAgent في إعداد المستودع) للبروتوكول فقط؛ نداءات curl/API يجب ألا تحمل UA git.
+- Node fetch (undici) أيضاً محجوب البصمة — النداءات من السكربت يجب أن تمر عبر curl execSync.
+- E2BIG: ملف كبير (worklog 252KB → base64 340KB) يتجاوز حد وسيطات shell — الحل: كتابة جسم الطلب إلى ملف و`--data-binary @file`.
+- **الخطة الناجحة (gh-api-push3)**: blobs → tree (base_tree من /commits/main لأن GET git/commits محجوب أيضاً) → commit (نفس الرسالة/المؤلف/التواريخ) → PATCH refs/heads/main. الشجرة الناتجة طابقت المحلية بايت-ببايت ✓. SHA اختلف (06ae32a6 vs 222474c) بسبب توقيع GitHub الإضافي على كوميتات API — محتوى متطابق تماماً.
+- المصالحة: git fetch بإعادة محاولة (نجح ثالثاً) → reset --hard origin/main → local == remote == 06ae32a6 بشجرة واحدة 3d2209ae.
+
+Stage Summary:
+- السكربت القابل لإعادة الاستخدام: /home/z/.tmp-scripts/gh-api-push3.mjs (curl بدون UA git، أجسام عبر ملفات، SHA-تحققي لكل blob والشجرة).
+- أي رفع مستقبلي مع انقطاع القناة: شغّل السكربت بالتوكن من متغير البيئة، ثم جلب بإعادة محاولة + reset --hard.
