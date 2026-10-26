@@ -1278,3 +1278,23 @@ Work Log:
 Stage Summary:
 - GitHub محدّث بالكامل (e32dcd6) والمصادقة السحابية حية في المعاينة ضد Supabase الحقيقي — البريد/كلمة المرور/الاستعادة تعمل بجلسة دائمة، بأخطاء عربية صادقة وبلا ادعاء مزامنة.
 - محجوب على المستخدم (موثق بالتفصيل): مفاتيح Google Cloud (المزود ناقص Secret) · هجرة SQL لجدول profiles · Redirect URLs · تأكيد بريد اختبار واحد أو تسجيل بريد حقيقي لإتمام اختبار الجلسة الكامل.
+
+---
+Task ID: SUPABASE-AUTH-2
+Agent: main (Z.ai Code)
+Task: إكمال التزامن مع GitHub + إعادة تحقق حي من Supabase بعد إعادة نشر الصندوق + إصلاح تجربة زر Google
+
+Work Log:
+- الحالة عند البدء: الرفع السابق وصل 67641d1 وبقي كوميت نقطة تفتيش الصندوق 583a3d7 (تغييرات أنماط chmod فقط، صفر سطور) — رُفع بالتوكن المُعاد (تحقق API: remote main == local == 583a3d7).
+- اكتشاف بيئي: إعادة نشر الصندوق محت متغيرات Supabase من .env (بقي DATABASE_URL فقط) — أُعيد ضبط URL + publishable key (gitignored، تحقق check-ignore ✓) والتقطها الخادم (Reload env: .env).
+- التحقيق الحي الثاني (لا افتراضات): Google authorize = 400 missing OAuth secret (رغم «مفعّل» في اللوحة) · profiles = PGRST205 غير موجود · signup مفتوح · mailer_autoconfirm:false.
+- اختبار API بحساب جديد (systemy.e2e.v51.1792995809@gmail.com): signup نجح مع confirmation_sent_at فعلي · كلمة خاطئة = invalid_credentials · صحيحة قبل التأكيد = email_not_confirmed.
+- **إصلاح خلل حقيقي في التجربة**: زر Google كان يُغادر التطبيق إلى صفحة JSON خام من Supabase عند غياب الـ Secret — أُضيفت بوابة في googleSignIn على نتيجة الفحص الخادمي (google.ready): toast صادق داخل التطبيق بدل المغادرة.
+- E2E بالمتصفح (390×844): فتح الشاشة من الترتيب الأولي ✓ · دخول غير مؤكد → «بريدك ما تأكّد بعد…» ✓ · كلمة خاطئة → «البريد أو كلمة المرور غير صحيحة» ✓ · زر Google يبقى داخل التطبيق مع toast + إشعار «مزود Google مفعّل في اللوحة لكن بلا OAuth Client Secret» ✓ (قبل الإصلاح: مغادرة إلى JSON — موثقة بلقطة) · تسجيل من الواجهة → شاشة «أكّد بريدك» برسالة صادقة ✓ · استعادة → حد الإرسال معروضاً بصدق ✓ · بطاقة الحساب في «أنا» ✓ · صفر أخطاء console/page في الجلسة.
+- الجودة: tsc صفر أخطاء في src/ · ESLint نظيف · dev.log نظيف.
+- الأدلة: upload/auth-supabase/ (4 لقطات v51 جديدة + 4 من الجلسة السابقة).
+- فحص الأسرار قبل الالتزام: لا ghp_/sb_secret/كلمات مرور في الdiff.
+
+Stage Summary:
+- GitHub متزامن 100% (583a3d7) والمصادقة السحابية حية ومختبرة طرفياً بأخطاء عربية صادقة، وزر Google صار آمناً ضد غياب الإعداد.
+- ما زال محجوباً على المستخدم بالتحقيق الحي (لا افتراض): لصق Google OAuth Client ID/Secret في Dashboard → Authentication → Providers → Google · تشغيل هجرة profiles في SQL Editor · إضافة نطاق المعاينة إلى Redirect URLs · تأكيد بريد اختبار واحد (Users → Confirm) لإتمام اختبار الجلسة الكامل.

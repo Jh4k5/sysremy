@@ -343,6 +343,13 @@ function LoginScreen({
 
   const googleSignIn = async () => {
     if (!supabase) return;
+    // الفحص الخادمي قال غير جاهز؟ نبقى داخل التطبيق — لا مغادرة إلى صفحة خطأ خام
+    if (google && !google.ready) {
+      toast.error("تسجيل Google غير مهيّأ بعد", {
+        description: google.detail || "يحتاج إعداداً من لوحة Supabase",
+      });
+      return;
+    }
     const { data, error: err } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: window.location.origin, skipBrowserRedirect: true },
