@@ -46,6 +46,12 @@ interface UIState {
   sysOpen: boolean;
   setSysOpen: (b: boolean) => void;
 
+  /** شاشة الحساب السحابي (Supabase) */
+  authOpen: boolean;
+  authStart: "login" | "signup" | "forgot" | "reset" | null;
+  openAuth: (mode?: "login" | "signup" | "forgot" | "reset") => void;
+  closeAuth: () => void;
+
   /** وضع الخصوصية (إخفاء المبالغ) */
   privacyMode: boolean;
   togglePrivacy: () => void;
@@ -115,6 +121,11 @@ export const useUIStore = create<UIState>((set) => ({
 
   sysOpen: false,
   setSysOpen: (b) => set({ sysOpen: b }),
+
+  authOpen: false,
+  authStart: null,
+  openAuth: (mode) => set({ authOpen: true, authStart: mode ?? "login" }),
+  closeAuth: () => set({ authOpen: false, authStart: null }),
 
   privacyMode: false,
   togglePrivacy: () => set((s) => ({ privacyMode: !s.privacyMode })),

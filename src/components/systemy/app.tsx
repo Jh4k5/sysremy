@@ -48,6 +48,9 @@ import { TravelScreen } from "./travel/travel-screen";
 // v4 — من Life-os (شريحة E1)
 import { WellbeingScreen } from "./wellbeing/wellbeing-screen";
 import { TrustCenter } from "./trust-center";
+// 5.1 — المصادقة السحابية (Supabase)
+import { AuthScreen } from "./auth/auth-screen";
+import { useAuthStore } from "./auth/auth-store";
 
 /** (E1) قفل بذر الأنظمة على مستوى الوحدة — مرة واحدة لكل تحميل صفحة */
 let systemsSeedStarted = false;
@@ -90,6 +93,11 @@ export function SystemyApp() {
     void sweepMonthLeftover().catch(() => undefined);
   }, []);
 
+  // 5.1: تهيئة المصادقة السحابية — مستمع الجلسة (تشغيل واحد لكل تحميل)
+  useEffect(() => {
+    useAuthStore.getState().init();
+  }, []);
+
   // مزامنة العملة والألوان مع الإعدادات
   useEffect(() => {
     if (settings?.currency) setCurrency(settings.currency);
@@ -117,7 +125,15 @@ export function SystemyApp() {
     );
   }
 
-  if (!settings.onboardingDone) return <Onboarding />;
+  if (!settings.onboardingDone) {
+    return (
+      <div className="relative h-full flex flex-col">
+        <Onboarding />
+        {/* شاشة الحساب تعمل فوق الإعداد الأولي أيضاً — «لدي حساب» من الترحيب */}
+        <AuthScreen />
+      </div>
+    );
+  }
 
   return (
     <div className="relative h-full flex flex-col app-mesh select-none">
@@ -183,6 +199,8 @@ export function SystemyApp() {
       <AlertsCenter />
       <CommandBar open={commandOpen} />
       <SysChat />
+      {/* 5.1 — شاشة الحساب السحابي (دخول/تسجيل/استعادة) */}
+      <AuthScreen />
     </div>
   );
 }

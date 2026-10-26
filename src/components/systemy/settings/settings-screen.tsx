@@ -35,6 +35,8 @@ import { useUIStore } from "@/store/ui-store";
 import { Chip, GlassCard, widgetEnter } from "@/components/systemy/glass";
 import { ChipRow, ConfirmBar, Field, inputCls, NumberPad, displayAmount } from "@/components/systemy/ui-bits";
 import { PinDots, PinPad } from "@/components/systemy/lock/lock-screen";
+// 5.1 — الحساب السحابي (Supabase)
+import { AccountSection } from "@/components/systemy/auth/account-section";
 import { cn } from "@/lib/utils";
 import type { AccentKey, Category, DigitStyle, Settings, Transaction, WeekStart } from "@/lib/types";
 
@@ -232,6 +234,8 @@ export function SettingsScreen() {
           </GlassCard>
 
           <ProfileSection key={profileKey} settings={settings} />
+          {/* 5.1 — الحساب السحابي (دخول/خروج + حالة الملف الشخصي) */}
+          <AccountSection />
           <AppearanceSection settings={settings} />
           <NotificationsSection settings={settings} />
           <LockSection settings={settings} onDialog={setPinDialog} />

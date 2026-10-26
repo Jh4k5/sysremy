@@ -8,7 +8,8 @@
  *    — قابلة للتخطي بخطوة واحدة، لا يُجبر المستخدم على أي رقم مالي.
  * عند الإتمام: completeOnboarding يبذّر الفئات والأنظمة ويُنشئ حساب النقد،
  * ثم تُرتَّب الأنظمة بحسب المجالات المختارة (المختار أولاً).
- * إعداد محلي صادق: لا حساب سحابي ولا تسجيل وهمي — كل شيء على الجهاز.
+ * إعداد محلي صادق: الأساس كله على الجهاز بلا خادم — والحساب السحابي
+ * (إن فُتح من الترحيب) اختياري صريح للملف الشخصي واستعادة الوصول فقط.
  */
 
 import { useState } from "react";
@@ -23,6 +24,8 @@ import { db } from "@/lib/db";
 import { GlassCard } from "@/components/systemy/glass";
 import { ChipRow, Field, inputCls, NumberPad, displayAmount } from "@/components/systemy/ui-bits";
 import { LogoHero } from "@/components/systemy/logo";
+import { isSupabaseConfigured } from "@/lib/supabase";
+import { useUIStore } from "@/store/ui-store";
 import {
   AVATAR_EMOJIS,
   CURRENCY_CHIPS,
@@ -294,8 +297,22 @@ function StepWelcome({
         </div>
       </GlassCard>
 
+      {/* الحساب السحابي — اختياري صريح، يظهر فقط إذا ضُبط Supabase */}
+      {isSupabaseConfigured && (
+        <div className="flex items-center justify-center gap-1.5 text-[11px]">
+          <span className="text-muted-foreground">لديك حساب من قبل؟</span>
+          <button
+            type="button"
+            onClick={() => useUIStore.getState().openAuth("login")}
+            className="font-bold text-[#B45309] hover:underline underline-offset-4"
+          >
+            سجّل دخولك
+          </button>
+        </div>
+      )}
+
       <p className="text-center text-[10.5px] text-muted-foreground/80">
-        إعداد محلي على جهازك — لا حساب ولا خادم ولا تتبع
+        إعداد محلي على جهازك — لا نطلب بياناتك ولا نتتبعك
       </p>
     </div>
   );
