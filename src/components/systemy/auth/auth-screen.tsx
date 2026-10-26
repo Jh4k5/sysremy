@@ -388,6 +388,19 @@ function LoginScreen({
       toast.error("تعذر بدء تسجيل Google", { description: authErrorToArabic(err) });
       return;
     }
+    // داخل إطار (لوحة المعاينة)؟ جوجل يرفض العرض داخل الإطارات — تبويب جديد
+    const framed: boolean = window.self !== window.top;
+    if (framed) {
+      const win = window.open(data.url, "_blank", "noopener,noreferrer");
+      if (!win) {
+        toast.error("افتح التطبيق في تبويب مستقل", {
+          description:
+            "دخول Google لا يكتمل داخل إطار المعاينة — اضغط «افتح في تبويب جديد» فوق لوحة المعاينة ثم أكمل الدخول من هناك",
+          duration: 10000,
+        });
+      }
+      return;
+    }
     window.location.href = data.url;
   };
 

@@ -86,6 +86,15 @@ create policy "records: user own rows" on public.records
   using (auth.uid() = user_id)
   with check (auth.uid() = user_id);
 
+-- منح صريحة (لا نعتمد على الامتيازات الافتراضية):
+-- authenticated يقرأ/يكتب، وanon لا يلمس الجدول إطلاقاً.
+grant select, insert, update, delete on public.records to authenticated;
+revoke all on public.records from anon;
+
+-- الملف الشخصي: قراءة وكتابة لصاحبه فقط
+grant select, insert, update on public.profiles to authenticated;
+revoke all on public.profiles from anon;
+
 -- ─── 3) دالة الدفع sync_push — دفعة واحدة ذرّية بمنطق LWW ───────
 -- تستقبل مصفوفة عناصر: [{id, kind, data, client_ms, deleted}, …]
 -- المنطق:
@@ -149,6 +158,10 @@ revoke execute on function public.sync_push (jsonb) from anon;
 --   select count(*) from public.profiles;            -- 0 أو أكثر
 --   select count(*) from public.records;             -- 0
 --   select proname from pg_proc where proname = 'sync_push';  -- sync_push
+--   select has_table_privilege('authenticated', 'public.records', 'select');  -- true
+--
+-- ملاحظة: يمكنك نسخ هذه الهجرة جاهزة من داخل التطبيق نفسه —
+-- شاشة «أنا» → بطاقة الحساب السحابي → زر «انسخ أوامر التهيئة».
 --
 -- بعد نجاح الهجرة: افتح التطبيق، سجّل دخولك — ستتحول شارة المزامنة
 -- من «تحتاج إعداد الجدول» إلى «متزامن» تلقائياً خلال دقائق.

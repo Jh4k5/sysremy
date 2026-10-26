@@ -5,7 +5,8 @@
  * لذا هنا حالة الحساب داخل الجلسة: الملف الشخصي + حالة المزامنة الحقيقية
  * (متزامن/أوفلاين/تحتاج هجرة) + خروج. كل سطر مقابل حقيقة على الأرض.
  */
-import { LogOut, ShieldCheck, CloudCog, RefreshCw } from "lucide-react";
+import { useState } from "react";
+import { ClipboardCopy, LogOut, ShieldCheck, CloudCog, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { isSupabaseConfigured } from "@/lib/supabase";
 import { useUIStore } from "@/store/ui-store";
@@ -42,6 +43,7 @@ function AccountSectionInner() {
   const { ready, session, user, profile, profileStatus, signOut } = useAuthStore();
   const { phase, pending, lastSyncAt, lastError } = useSyncStore();
   const openAuth = useUIStore((s) => s.openAuth);
+  const [copying, setCopying] = useState(false);
 
   const handleSignOut = async () => {
     await signOut();
@@ -51,6 +53,42 @@ function AccountSectionInner() {
   const handleSyncNow = () => {
     syncNow();
     toast("بدأت دورة مزامنة", { description: "نرفع المحلي وننزل البعيد الآن" });
+  };
+
+  /** نسخ هجرة SQL — clipboard الحديث مع بديل execCommand للمتصفحات بلا إذن */
+  const copyMigrationSql = async () => {
+    if (copying) return;
+    setCopying(true);
+    try {
+      const res = await fetch("/api/sync/migration-sql", { cache: "no-store" });
+      if (!res.ok) throw new Error(await res.text());
+      const sql = await res.text();
+      try {
+        await navigator.clipboard.writeText(sql);
+      } catch {
+        // بديل بلا إذن: منطقة نص مخفية + أمر النسخ القديم
+        const ta = document.createElement("textarea");
+        ta.value = sql;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        const ok = document.execCommand("copy");
+        document.body.removeChild(ta);
+        if (!ok) throw new Error("copy failed");
+      }
+      toast("انسخ الأوامر ✅", {
+        description: "افتح لوحة Supabase ← SQL Editor ← New query، الصق واضغط Run — بعد دقيقة تنقلب الحالة «متزامن» هنا تلقائياً",
+        duration: 9000,
+      });
+    } catch {
+      toast.error("تعذر النسخ تلقائياً", {
+        description: "افتح docs/ui-redesign/sync-migration.sql من المستودع وانسخه يدوياً",
+        duration: 9000,
+      });
+    } finally {
+      setCopying(false);
+    }
   };
 
   if (!user || !session) {
@@ -106,7 +144,7 @@ function AccountSectionInner() {
         : phase === "offline"
           ? { text: `تعمل محلياً بلا اتصال${pending > 0 ? ` — ${pending} تغييراً بانتظار الرفع` : ""}، وتلحق تلقائياً عند عودة الإنترنت`, tone: "info" as const }
           : phase === "setup-needed"
-            ? { text: "المزامنة معطّلة: جدول records لم يُنشأ بعد — شغّل هجرة SQL من docs/ui-redesign/sync-migration.sql في لوحة Supabase وتنقلب «متزامن» تلقائياً", tone: "warn" as const }
+            ? { text: "المزامنة معطّلة — السحابة تنتظر خطوة تهيئة واحدة (بالأسفل)", tone: "warn" as const }
             : phase === "error"
               ? { text: `تعذرت المزامنة: ${lastError ?? "خطأ غير معروف"} — سنحاول مجدداً`, tone: "warn" as const }
               : { text: "المزامنة لم تبدأ بعد…", tone: "info" as const };
@@ -133,7 +171,7 @@ function AccountSectionInner() {
         </span>
       </div>
 
-      {/* حالة الملف الشخصي — صادقة بكل الفروع */}
+      {/* حالة الملف الشخصي — صادقة بكل الفروع (تفاصيل التهيئة بالأسفل إن لزمت) */}
       {profileStatus === "ok" && (
         <p className="text-[10.5px] text-muted-foreground leading-relaxed">
           ملفك الشخصي السحابي محفوظ — اسمك يظهر في أي جهاز تدخل منه.
@@ -141,8 +179,7 @@ function AccountSectionInner() {
       )}
       {profileStatus === "missing-table" && (
         <p className="text-[10.5px] leading-relaxed rounded-xl bg-[#C88725]/[0.08] border border-[#C88725]/25 text-[#8a5f13] px-3 py-2">
-          جدول <span dir="ltr">profiles</span> لم يُنشأ بعد — هجرته ضمن
-          <span dir="ltr"> docs/ui-redesign/sync-migration.sql</span>.
+          الملف الشخصي السحابي (جدول <span dir="ltr">profiles</span>) يُنشأ ضمن خطوة التهيئة بالأسفل.
         </p>
       )}
       {profileStatus === "denied" && (
@@ -171,6 +208,30 @@ function AccountSectionInner() {
           </button>
         </div>
       </div>
+
+      {/* خطوة التهيئة — خطوة واحدة تنقص المزامنة: هجرة SQL قابلة للنسخ من هنا */}
+      {(phase === "setup-needed" || profileStatus === "missing-table") && (
+        <div className="rounded-xl border border-[#C88725]/25 bg-[#C88725]/[0.06] px-3.5 py-3 space-y-2.5">
+          <p className="text-[11px] leading-relaxed text-[#8a5f13] font-medium">
+            <b>خطوة واحدة تنقص المزامنة السحابية:</b> تشغيل هجرة SQL في لوحة Supabase —
+            تنشئ جدول <span dir="ltr">records</span> (مخزن المزامنة) وجدول
+            <span dir="ltr"> profiles</span> ودالة الدفع. بياناتك محفوظة على جهازك
+            حتى ذلك، وبعد دقيقة من التشغيل تنقلب الحالة «متزامن» تلقائياً — بلا أي تغيير هنا.
+          </p>
+          <button
+            type="button"
+            onClick={() => void copyMigrationSql()}
+            disabled={copying}
+            className="press h-11 min-h-[44px] w-full rounded-xl bg-[#C88725]/[0.1] border border-[#C88725]/30 text-[12.5px] font-bold text-[#8a5f13] flex items-center justify-center gap-1.5 disabled:opacity-60"
+          >
+            <ClipboardCopy className="w-4 h-4" aria-hidden="true" />
+            {copying ? "جارٍ جلب الأوامر…" : "انسخ أوامر التهيئة (SQL)"}
+          </button>
+          <p className="text-[10px] text-muted-foreground leading-relaxed">
+            بعدها: لوحة Supabase ← SQL Editor ← New query ← الصق ← Run. إعادة التنفيذ آمنة.
+          </p>
+        </div>
+      )}
 
       <button
         type="button"
