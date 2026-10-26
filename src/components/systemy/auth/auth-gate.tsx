@@ -17,6 +17,7 @@ import { AlertTriangle } from "lucide-react";
 import { isSupabaseConfigured } from "@/lib/supabase";
 import { setActiveUser } from "@/lib/db";
 import { activateSync, deactivateSync } from "@/lib/sync/sync-engine";
+import { useSyncStore } from "@/lib/sync/sync-store";
 import { resetUIState } from "@/store/ui-store";
 import { useAuthStore } from "./auth-store";
 import { AuthGateScreen } from "./auth-screen";
@@ -50,6 +51,9 @@ let gateInitDone = false;
 export function AuthGate({ children }: { children: React.ReactNode }) {
   const ready = useAuthStore((s) => s.ready);
   const session = useAuthStore((s) => s.session);
+  // استقرار أول دورة مزامنة — يمنع سباق الإعداد الأولي فوق بيانات السحاب:
+  // قبل اكتمال أول سحب لا نعرف إن كان للمستخدم بيانات موجودة أصلاً.
+  const syncSettled = useSyncStore((s) => s.settled);
 
   useEffect(() => {
     if (gateInitDone) return;
@@ -108,8 +112,9 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // ─── أثناء التحميل أو تبديل المستخدم ───
-  if (!ready || (uid !== null && activeUid !== uid)) {
+  // ─── أثناء التحميل أو تبديل المستخدم أو انتظار أول دورة مزامنة ───
+  // (سقف الانتظار 10 ثوانٍ في المحرك — الشبكة المعلّقة لا تُجمّد التطبيق)
+  if (!ready || (uid !== null && activeUid !== uid) || (uid !== null && activeUid === uid && !syncSettled)) {
     return <Splash label={!ready ? undefined : "نجهّز ملفك…"} />;
   }
 

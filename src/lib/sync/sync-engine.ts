@@ -55,6 +55,7 @@ let busy = false;
 let pushTimer: ReturnType<typeof setTimeout> | null = null;
 let fullTimer: ReturnType<typeof setTimeout> | null = null;
 let cycleInterval: ReturnType<typeof setInterval> | null = null;
+let settleTimer: ReturnType<typeof setTimeout> | null = null;
 let unsubOps: (() => void) | null = null;
 let unsubNet: (() => void) | null = null;
 let onVisibility: (() => void) | null = null;
@@ -241,6 +242,9 @@ async function fullCycle(): Promise<void> {
     useSyncStore.getState().setError(err instanceof Error ? err.message : String(err));
   } finally {
     busy = false;
+    // أول دورة انتهت (أيّاً نتيجتها: متزامن/أوفلاين/تهيئة/خطأ) — بيانات
+    // السحاب إن وُجدت صارت محلياً، فلا يسبقها الإعداد الأولي بعد الآن.
+    if (active) useSyncStore.getState().setSettled();
   }
 }
 
@@ -302,6 +306,14 @@ export function activateSync(userId: string): void {
 
   // أول دورة فورية — السحب الكامل عند أول دخول ثم اللحاق التدريجي
   scheduleFull(300);
+
+  // شبكة معلّقة/بطيئة لا تجمّد البوابة إلى الأبد: بعد 10 ثوانٍ نعتبر أول
+  // دورة «مستقرة» ونعرض الحالة المحلية — المزامنة تكمل في الخلفية.
+  if (settleTimer) clearTimeout(settleTimer);
+  settleTimer = setTimeout(() => {
+    settleTimer = null;
+    if (active) useSyncStore.getState().setSettled();
+  }, 10_000);
 }
 
 /** إيقاف كامل — عند الخروج أو تبديل المستخدم */
@@ -311,8 +323,10 @@ export function deactivateSync(): void {
   busy = false;
   if (pushTimer) clearTimeout(pushTimer);
   if (fullTimer) clearTimeout(fullTimer);
+  if (settleTimer) clearTimeout(settleTimer);
   pushTimer = null;
   fullTimer = null;
+  settleTimer = null;
   if (cycleInterval) clearInterval(cycleInterval);
   cycleInterval = null;
   if (unsubOps) {

@@ -47,7 +47,7 @@ echo "▸ 2/8 ربط الموارد + Manifest + الأصول (aapt2 link)..."
   -I "$PLATFORM/android.jar" \
   --manifest "$APKDIR/AndroidManifest.xml" \
   --min-sdk-version 24 --target-sdk-version 34 \
-  --version-code 10 --version-name "5.2" \
+  --version-code 11 --version-name "5.2" \
   -A "$WEB" \
   --auto-add-overlay \
   "$OUT/res.zip"

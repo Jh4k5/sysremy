@@ -57,14 +57,18 @@ export async function importBackup(file: File, mode: ImportMode): Promise<void> 
 
   try {
     if (mode === "replace") {
+      // الاستبدال يجب أن يصل للسحاب أيضاً: resetAll يسجّل شواهد قبور لكل
+      // الصفوف القائمة قبل المسح (clear لا يطلق خطافات الحذف) — فيُحذف ما
+      // غاب عن النسخة من كل الأجهزة بدل أن يُبعث من السحاب في الدورة التالية.
+      // الصفوف الموجودة في النسخة تُعاد كتابتها بعدها فتترقّى إلى put.
+      const { resetAll } = await import("./db");
+      await resetAll();
       await db.transaction("rw", db.tables, async () => {
         for (const name of ALL_TABLES) {
-          await (db as unknown as Record<string, { clear: () => Promise<void> }>)[name].clear();
-        }
-        for (const name of ALL_TABLES) {
           const rows = (data.tables[name] ?? []) as { id?: string }[];
-          if (rows.length > 0) {
-            await (db as unknown as Record<string, { bulkPut: (r: unknown[]) => Promise<unknown> }>)[name].bulkPut(rows);
+          const withIds = rows.map((r) => ({ ...r, id: r.id ?? uid() }));
+          if (withIds.length > 0) {
+            await (db as unknown as Record<string, { bulkPut: (r: unknown[]) => Promise<unknown> }>)[name].bulkPut(withIds);
           }
         }
       });

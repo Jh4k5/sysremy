@@ -150,8 +150,9 @@ export async function replaceTransaction(id: string, input: Parameters<typeof ad
 
 // ═══════════════════════ الحسابات والفئات ═══════════════════════
 
-export async function addAccount(input: Omit<Account, "id" | "createdAt">): Promise<Account> {
-  const account: Account = { ...input, id: uid(), createdAt: nowISO() };
+/** إضافة حساب — id اختياري (البذر الحتمي في الإعداد الأولي يمرر acc-cash) */
+export async function addAccount(input: Omit<Account, "id" | "createdAt"> & { id?: string }): Promise<Account> {
+  const account: Account = { ...input, id: input.id ?? uid(), createdAt: nowISO() };
   await db.accounts.add(account);
   ok("أُضيف الحساب ✓", account.name);
   return account;
@@ -912,6 +913,9 @@ export async function completeOnboarding(input: {
   const activeAccounts = (await db.accounts.toArray()).filter((a) => !a.archived);
   if (activeAccounts.length === 0) {
     await addAccount({
+      // معرف حتمي: جهازان يكملان الإعداد لنفس الحساب يتقاربان عبر LWW
+      // على حساب النقد نفسه بدل حسابين مكررين.
+      id: "acc-cash",
       name: "نقد",
       type: "cash",
       color: "#F5B95C",

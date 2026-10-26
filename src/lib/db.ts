@@ -359,22 +359,27 @@ export async function saveSettings(patch: Partial<Settings>): Promise<Settings> 
 
 // ═══════════════════════ البذور الهيكلية (بلا أي بيانات شخصية) ═══════════════════════
 
-/** الفئات الافتراضية — هيكل قابل للتخصيص الكامل (بلا معاملات) */
+/**
+ * الفئات الافتراضية — هيكل قابل للتخصيص الكامل (بلا معاملات).
+ * المعرفات حتمية ثابتة (cat-*) — لكي إن أكمل جهازان الإعداد الأولي
+ * لنفس الحساب (أحدهما قبل وصول سحاب الآخر) تتقارب النسختان عبر LWW
+ * على الصفوف نفسها بدل مضاعفة الفئات إلى الأبد.
+ */
 const DEFAULT_CATEGORIES: Array<Partial<Category> & { name: string; kind: "expense" | "income" }> = [
-  { name: "بقالة وطعام", icon: "shopping-basket", color: "#F5B95C", kind: "expense", budget: 1400, keywords: "تميمي,سلة,هورا,بقالة,لؤلؤة,بندة" },
-  { name: "قهوة", icon: "coffee", color: "#C08457", kind: "expense", budget: 280, keywords: "قهوة,ستاربكس,درنك,بارنز,دنكن,لاتيه,كابتشينو" },
-  { name: "مطاعم", icon: "utensils", color: "#FFB4A2", kind: "expense", budget: 420, keywords: "مطعم,بيتزا,برجر,شاورما,كباب,مشاوي,سوشي" },
-  { name: "مواصلات", icon: "car-front", color: "#5CE1E6", kind: "expense", budget: 380, keywords: "أوبر,كريم,بنزين,وقود,محطة,مواصلات,موصل" },
-  { name: "فواتير واشتراكات", icon: "receipt", color: "#8EC5FF", kind: "expense", budget: 620, keywords: "stc,كهرباء,مياه,نتفلكس,نتفليكس,سبوتيفاي,شاهد,اشتراك,فاتورة" },
-  { name: "تسوق", icon: "shopping-bag", color: "#F8B4D9", kind: "expense", budget: 480, keywords: "نون,جرير,زارا,ايكيا,أمازون,ملابس" },
-  { name: "ترفيه", icon: "gamepad-2", color: "#C4B5FD", kind: "expense", budget: 250, keywords: "سينما,بلايستيشن,ألعاب,تذاكر" },
-  { name: "صحة", icon: "heart-pulse", color: "#6EE7A8", kind: "expense", budget: 200, keywords: "صيدلية,دكتور,نهدي,علاج,فيتامين" },
-  { name: "تعليم", icon: "graduation-cap", color: "#F5D565", kind: "expense", budget: 240, keywords: "كورس,كتاب,دورة,أوديمي,تعلم" },
-  { name: "حوالات للأهل", icon: "send", color: "#F5B95C", kind: "expense", budget: 2000, keywords: "حوالة,للأهل,الوالد,الوالدة,اهل" },
-  { name: "هدايا وصدقة", icon: "gift", color: "#FFD9A0", kind: "expense", budget: 200, keywords: "هدية,صدقة,تبرع,خيرية" },
-  { name: "راتب", icon: "briefcase", color: "#6EE7A8", kind: "income", keywords: "راتب,مرتب" },
-  { name: "عمل حر", icon: "laptop", color: "#5CE1E6", kind: "income", keywords: "عميل,مشروع,فريلانس,تصميم,برمجة" },
-  { name: "مبيعات", icon: "store", color: "#C4B5FD", kind: "income", keywords: "بيع,مبيعة,متجر" },
+  { id: "cat-grocery", name: "بقالة وطعام", icon: "shopping-basket", color: "#F5B95C", kind: "expense", budget: 1400, keywords: "تميمي,سلة,هورا,بقالة,لؤلؤة,بندة" },
+  { id: "cat-coffee", name: "قهوة", icon: "coffee", color: "#C08457", kind: "expense", budget: 280, keywords: "قهوة,ستاربكس,درنك,بارنز,دنكن,لاتيه,كابتشينو" },
+  { id: "cat-restaurants", name: "مطاعم", icon: "utensils", color: "#FFB4A2", kind: "expense", budget: 420, keywords: "مطعم,بيتزا,برجر,شاورما,كباب,مشاوي,سوشي" },
+  { id: "cat-transport", name: "مواصلات", icon: "car-front", color: "#5CE1E6", kind: "expense", budget: 380, keywords: "أوبر,كريم,بنزين,وقود,محطة,مواصلات,موصل" },
+  { id: "cat-bills", name: "فواتير واشتراكات", icon: "receipt", color: "#8EC5FF", kind: "expense", budget: 620, keywords: "stc,كهرباء,مياه,نتفلكس,نتفليكس,سبوتيفاي,شاهد,اشتراك,فاتورة" },
+  { id: "cat-shopping", name: "تسوق", icon: "shopping-bag", color: "#F8B4D9", kind: "expense", budget: 480, keywords: "نون,جرير,زارا,ايكيا,أمازون,ملابس" },
+  { id: "cat-fun", name: "ترفيه", icon: "gamepad-2", color: "#C4B5FD", kind: "expense", budget: 250, keywords: "سينما,بلايستيشن,ألعاب,تذاكر" },
+  { id: "cat-health", name: "صحة", icon: "heart-pulse", color: "#6EE7A8", kind: "expense", budget: 200, keywords: "صيدلية,دكتور,نهدي,علاج,فيتامين" },
+  { id: "cat-education", name: "تعليم", icon: "graduation-cap", color: "#F5D565", kind: "expense", budget: 240, keywords: "كورس,كتاب,دورة,أوديمي,تعلم" },
+  { id: "cat-family", name: "حوالات للأهل", icon: "send", color: "#F5B95C", kind: "expense", budget: 2000, keywords: "حوالة,للأهل,الوالد,الوالدة,اهل" },
+  { id: "cat-gifts", name: "هدايا وصدقة", icon: "gift", color: "#FFD9A0", kind: "expense", budget: 200, keywords: "هدية,صدقة,تبرع,خيرية" },
+  { id: "cat-salary", name: "راتب", icon: "briefcase", color: "#6EE7A8", kind: "income", keywords: "راتب,مرتب" },
+  { id: "cat-freelance", name: "عمل حر", icon: "laptop", color: "#5CE1E6", kind: "income", keywords: "عميل,مشروع,فريلانس,تصميم,برمجة" },
+  { id: "cat-sales", name: "مبيعات", icon: "store", color: "#C4B5FD", kind: "income", keywords: "بيع,مبيعة,متجر" },
 ];
 
 /** أنظمة v3 الثلاثة عشر — كل نظام بشاشة حقيقية (الإيمان اختياري لاحقاً) */
@@ -400,6 +405,8 @@ const DEFAULT_SYSTEMS: Array<Partial<SystemModel> & { key: string; name: string 
 /**
  * إنشاء البذور الهيكلية بعد الإعداد الأولي: فئات + أنظمة فقط.
  * لا معاملات، لا عادات، لا ملاحظات — بداية نظيفة تماماً.
+ * المعرفات الحتمية تجعل أي إعدادين متزامنين لنفس الحساب يتقاربان
+ * في السحاب (LWW) بدل مضاعفة الفئات/الأنظمة.
  */
 export async function seedStructure(): Promise<void> {
   const now = new Date().toISOString();
@@ -408,7 +415,7 @@ export async function seedStructure(): Promise<void> {
     if (existingCats === 0) {
       await db.categories.bulkPut(
         DEFAULT_CATEGORIES.map((c, i) => ({
-          id: uid(),
+          id: c.id ?? uid(),
           name: c.name,
           icon: c.icon ?? "tag",
           color: c.color ?? "#5CE1E6",
@@ -440,7 +447,7 @@ export async function seedSystems(): Promise<void> {
   const now = new Date().toISOString();
   await db.systems.bulkPut(
     missing.map((sys, i) => ({
-      id: uid(),
+      id: `sys-${sys.key}`,
       key: sys.key,
       name: sys.name,
       icon: sys.icon ?? "shapes",
