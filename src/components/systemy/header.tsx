@@ -12,6 +12,7 @@ import { buildAlerts } from "@/lib/alerts";
 import { dayName, formatDate, hijriDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Logo } from "./logo";
+import { SyncChip } from "./sync-chip";
 import "./header-extras.css";
 
 export function Header() {
@@ -59,6 +60,9 @@ export function Header() {
 
       {/* الإجراءات — لمسات 44px عبر امتداد النقر */}
       <div className="flex items-center gap-1 shrink-0">
+        {/* 5.2 — شارة المزامنة (متزامن/محلي/يزامن…) */}
+        <SyncChip />
+
         {/* البحث — شريط الأوامر */}
         <motion.button
           whileTap={{ scale: 0.92 }}

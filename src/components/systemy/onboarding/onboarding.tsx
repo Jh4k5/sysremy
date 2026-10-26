@@ -24,8 +24,6 @@ import { db } from "@/lib/db";
 import { GlassCard } from "@/components/systemy/glass";
 import { ChipRow, Field, inputCls, NumberPad, displayAmount } from "@/components/systemy/ui-bits";
 import { LogoHero } from "@/components/systemy/logo";
-import { isSupabaseConfigured } from "@/lib/supabase";
-import { useUIStore } from "@/store/ui-store";
 import {
   AVATAR_EMOJIS,
   CURRENCY_CHIPS,
@@ -297,22 +295,10 @@ function StepWelcome({
         </div>
       </GlassCard>
 
-      {/* الحساب السحابي — اختياري صريح، يظهر فقط إذا ضُبط Supabase */}
-      {isSupabaseConfigured && (
-        <div className="flex items-center justify-center gap-1.5 text-[11px]">
-          <span className="text-muted-foreground">لديك حساب من قبل؟</span>
-          <button
-            type="button"
-            onClick={() => useUIStore.getState().openAuth("login")}
-            className="font-bold text-[#B45309] hover:underline underline-offset-4"
-          >
-            سجّل دخولك
-          </button>
-        </div>
-      )}
+      {/* 5.2: الدخول إلزامي عبر البوابة قبل الإعداد — لا حاجة لرابط تسجيل هنا */}
 
       <p className="text-center text-[10.5px] text-muted-foreground/80">
-        إعداد محلي على جهازك — لا نطلب بياناتك ولا نتتبعك
+        إعدادك محفوظ على جهازك ويُزامَن بحسابك السحابي — بلا تتبع ولا مشاركة
       </p>
     </div>
   );

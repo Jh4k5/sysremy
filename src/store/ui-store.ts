@@ -139,3 +139,27 @@ export const useUIStore = create<UIState>((set) => ({
   tick: 0,
   bumpTick: () => set((s) => ({ tick: s.tick + 1 })),
 }));
+
+/**
+ * إعادة الواجهة لحالتها الأولى — عند تبديل المستخدم (خروج/دخول)
+ * حتى لا يرث المستخدم التالي شاشة/طبقات سابقه.
+ */
+export function resetUIState(): void {
+  useUIStore.setState({
+    view: "today",
+    calendarDate: null,
+    moneyTab: null,
+    quickAddDate: null,
+    quickAddOpen: false,
+    quickAddTab: "expense",
+    quickAddEditTxId: null,
+    commandOpen: false,
+    alertsOpen: false,
+    sysOpen: false,
+    authOpen: false,
+    authStart: null,
+    privacyMode: false,
+    locked: false,
+    lastCapture: null,
+  });
+}

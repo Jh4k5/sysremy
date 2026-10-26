@@ -1,13 +1,18 @@
 /**
- * عميل Supabase — المصادقة السحابية (اختيارية) فوق التخزين المحلي.
+ * عميل Supabase — المصادقة + المزامنة السحابية فوق التخزين المحلي.
  * المفتاح هنا publishable (عام بتصميم RLS) — لا سِر فيه.
- * كل بيانات التطبيق تبقى محلية (Dexie)؛ هذه الطبقة للملف الشخصي
- * واستعادة الوصول فقط — لا مزامنة سحابية للبيانات بعد.
+ * البيانات تعمل محلياً أولاً (Dexie لكل مستخدم) وتُزامَن عبر lib/sync.
  */
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+/** عنوان المشروع — لكشف الاتصال (نبضة health) — فارغ إن لم يُضبط */
+export const SUPABASE_URL = supabaseUrl ?? "";
+
+/** المفتاح الناشر (عام) — لترويسات النبضة فقط، ليس سراً */
+export const supabasePublishableKey = supabaseAnonKey ?? "";
 
 /** هل الضبط البيئي متوفر؟ (يخفي مزايا الحساب السحابي إن غاب) */
 export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);

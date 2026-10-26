@@ -48,9 +48,8 @@ import { TravelScreen } from "./travel/travel-screen";
 // v4 — من Life-os (شريحة E1)
 import { WellbeingScreen } from "./wellbeing/wellbeing-screen";
 import { TrustCenter } from "./trust-center";
-// 5.1 — المصادقة السحابية (Supabase)
+// 5.2 — شاشة استعادة كلمة المرور (البوابة الإلزامية في auth-gate فوقنا)
 import { AuthScreen } from "./auth/auth-screen";
-import { useAuthStore } from "./auth/auth-store";
 
 /** (E1) قفل بذر الأنظمة على مستوى الوحدة — مرة واحدة لكل تحميل صفحة */
 let systemsSeedStarted = false;
@@ -93,10 +92,7 @@ export function SystemyApp() {
     void sweepMonthLeftover().catch(() => undefined);
   }, []);
 
-  // 5.1: تهيئة المصادقة السحابية — مستمع الجلسة (تشغيل واحد لكل تحميل)
-  useEffect(() => {
-    useAuthStore.getState().init();
-  }, []);
+  // 5.2: تهيئة المصادقة انتقلت للبوابة الإلزامية (auth-gate) — لا تطبيق قبل حساب.
 
   // مزامنة العملة والألوان مع الإعدادات
   useEffect(() => {
@@ -199,7 +195,7 @@ export function SystemyApp() {
       <AlertsCenter />
       <CommandBar open={commandOpen} />
       <SysChat />
-      {/* 5.1 — شاشة الحساب السحابي (دخول/تسجيل/استعادة) */}
+      {/* 5.2 — استعادة كلمة المرور فوق الجلسة القائمة (البوابة نفسها في page) */}
       <AuthScreen />
     </div>
   );

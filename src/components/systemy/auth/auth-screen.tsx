@@ -17,6 +17,7 @@ import { useUIStore } from "@/store/ui-store";
 import type { AuthMode } from "./auth-store";
 import { GlassCard } from "@/components/systemy/glass";
 import { inputCls } from "@/components/systemy/ui-bits";
+import { Logo } from "@/components/systemy/logo";
 import { cn } from "@/lib/utils";
 
 /** زر الفعل الأساسي — تدرج النهار العنبري نفسه المستخدم في الإعداد الأولي */
@@ -51,7 +52,7 @@ const TITLES: Record<Screen, string> = {
   "sent-reset": "افتح بريدك",
 };
 
-/** ═══════════════ الشاشة العلوية (تُعرض من SystemyApp في كل الحالات) ═══════════════ */
+/** ═══════════════ الشاشة العلوية (تُعرض من SystemyApp لاستعادة كلمة المرور) ═══════════════ */
 export function AuthScreen() {
   const authOpen = useUIStore((s) => s.authOpen);
   const startMode = useUIStore((s) => s.authStart);
@@ -75,23 +76,50 @@ export function AuthScreen() {
   );
 }
 
+/** ═══════════════ بوابة الدخول الإلزامية — التطبيق لا يُفتح قبل حساب ═══════════════ */
+export function AuthGateScreen() {
+  const [rememberedEmail, setRememberedEmail] = useState("");
+  return (
+    <div className="relative h-full flex flex-col bg-[#F8F7F2]">
+      {/* هوية التطبيق — أول ما يراه الزائر قبل حسابه */}
+      <div className="shrink-0 flex items-center gap-3.5 px-5 pt-6 pb-3 max-w-[400px] w-full mx-auto">
+        <Logo className="w-12 h-12 rounded-2xl shrink-0" />
+        <div className="min-w-0">
+          <p className="text-[19px] font-extrabold text-foreground leading-tight">Systemy</p>
+          <p className="text-[11.5px] text-muted-foreground mt-0.5">ابنِ حياتك كنظام — سجّل دخولك للمتابعة</p>
+        </div>
+      </div>
+      <AuthPanel
+        startMode="login"
+        rememberedEmail={rememberedEmail}
+        onRemember={setRememberedEmail}
+        onClose={() => undefined}
+        gate
+      />
+    </div>
+  );
+}
+
 /** اللوحة نفسها — تركيب جديد عند كل فتح (حالة نظيفة بلا setState داخل تأثير) */
 function AuthPanel({
-  startMode, rememberedEmail, onRemember, onClose,
+  startMode, rememberedEmail, onRemember, onClose, gate = false,
 }: {
   startMode: AuthMode;
   rememberedEmail: string;
   onRemember: (v: string) => void;
   onClose: () => void;
+  /** وضع البوابة: لا إغلاق ولا Esc — التطبيق خلفها محجوب حتى الدخول */
+  gate?: boolean;
 }) {
   const [screen, setScreen] = useState<Screen>(startMode);
 
-  // غلق Esc — لوحة مفاتيح حقيقية
+  // غلق Esc — لوحة مفاتيح حقيقية (البوابة لا تُغلق)
   useEffect(() => {
+    if (gate) return;
     const h = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", h);
     return () => window.removeEventListener("keydown", h);
-  }, [onClose]);
+  }, [gate, onClose]);
 
   return (
     <motion.div
@@ -99,27 +127,29 @@ function AuthPanel({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 10 }}
       transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-      className="absolute inset-0 z-[70] bg-[#F8F7F2] flex flex-col"
+      className={cn("absolute inset-0 z-[70] bg-[#F8F7F2] flex flex-col", gate && "static")}
       role="dialog"
       aria-modal="true"
       aria-label={TITLES[screen]}
     >
-      {/* شريط علوي — عنوان وزر إغلاق 44px */}
-      <div className="shrink-0 flex items-center justify-between gap-3 px-4 pt-3 pb-2">
+      {/* شريط علوي — عنوان وزر إغلاق 44px (البوابة بلا إغلاق) */}
+      <div className="shrink-0 flex items-center justify-between gap-3 px-4 pt-3 pb-2 max-w-[400px] w-full mx-auto">
         <div className="flex items-center gap-2 min-w-0">
           <span className="w-9 h-9 rounded-xl bg-primary/12 text-primary flex items-center justify-center shrink-0" aria-hidden="true">
             <LockKeyhole className="w-[18px] h-[18px]" />
           </span>
           <h2 className="text-[17px] font-bold text-foreground truncate">{TITLES[screen]}</h2>
         </div>
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="إغلاق شاشة الحساب"
-          className="press w-11 h-11 rounded-xl glass flex items-center justify-center text-muted-foreground hover:text-foreground"
-        >
-          <X className="w-5 h-5" aria-hidden="true" />
-        </button>
+        {!gate && (
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="إغلاق شاشة الحساب"
+            className="press w-11 h-11 rounded-xl glass flex items-center justify-center text-muted-foreground hover:text-foreground"
+          >
+            <X className="w-5 h-5" aria-hidden="true" />
+          </button>
+        )}
       </div>
 
       {/* المحتوى */}
@@ -166,8 +196,8 @@ function AuthPanel({
 
           {/* الصدق الدائم — سطر واحد أسفل الشاشة */}
           <p className="text-center text-[10.5px] leading-relaxed text-muted-foreground/80 mt-5 px-2">
-            بياناتك في التطبيق محفوظة على جهازك — الحساب السحابي لملفك الشخصي واستعادة الوصول،
-            والمزامنة الكاملة للبيانات لسه ما وصلت.
+            بياناتك محفوظة على جهازك وتُزامَن بحسابك السحابي — التطبيق يعمل بلا اتصال،
+            ويلحق كل شيء عند عودة الإنترنت. ملفك مستقل عن أي مستخدم آخر.
           </p>
         </div>
       </div>

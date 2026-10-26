@@ -16,6 +16,7 @@ import {
 import { cn } from "@/lib/utils";
 import { SystemyApp } from "@/components/systemy/app";
 import { PhoneFrame } from "@/components/systemy/phone-frame";
+import { AuthGate } from "@/components/systemy/auth/auth-gate";
 import { isStandalone, standaloneServerSnapshot, subscribeNever } from "@/lib/standalone";
 import { systemyLogo, logo128 } from "@/components/systemy/logo";
 
@@ -223,7 +224,9 @@ export default function Page() {
   if (standalone) {
     return (
       <div className="h-dvh w-full overflow-hidden">
-        <SystemyApp />
+        <AuthGate>
+          <SystemyApp />
+        </AuthGate>
       </div>
     );
   }
@@ -243,7 +246,10 @@ export default function Page() {
       <main className="flex-1 flex items-center justify-center gap-20 py-0 px-0 sm:py-8 sm:px-4">
         <HeroBranding />
         <PhoneFrame>
-          <SystemyApp />
+          {/* 5.2: بوابة إلزامية — التطبيق لا يُفتح قبل تسجيل الدخول */}
+          <AuthGate>
+            <SystemyApp />
+          </AuthGate>
         </PhoneFrame>
       </main>
 

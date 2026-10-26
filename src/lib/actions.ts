@@ -8,7 +8,7 @@
 "use client";
 
 import { toast } from "sonner";
-import { db, getSettings, nowLocal, saveSettings, uid } from "./db";
+import { db, deleteWhere, getSettings, nowLocal, saveSettings, uid } from "./db";
 import type {
   Account,
   Asset,
@@ -429,7 +429,7 @@ export async function updateRecurring(id: string, patch: Partial<Recurring>): Pr
 export async function deleteRecurring(id: string): Promise<void> {
   await db.transaction("rw", db.recurrings, db.reminders, async () => {
     await db.recurrings.delete(id);
-    await db.reminders.where("sourceId").equals(id).delete();
+    await deleteWhere("reminders", "sourceId", id);
   });
   ok("حُذف الالتزام ✓");
 }
@@ -468,7 +468,7 @@ export async function payRecurring(id: string, overrides?: { date?: string; amou
     updatedAt: now,
   });
   // التذكير التالي
-  await db.reminders.where("sourceId").equals(id).delete();
+  await deleteWhere("reminders", "sourceId", id);
   const updated = await db.recurrings.get(id);
   if (updated) await scheduleRecurringReminder(updated);
 
@@ -604,7 +604,7 @@ export async function updateDebt(id: string, patch: Partial<Debt>): Promise<void
 export async function deleteDebt(id: string): Promise<void> {
   await db.transaction("rw", db.debts, db.reminders, async () => {
     await db.debts.delete(id);
-    await db.reminders.where("sourceId").equals(id).delete();
+    await deleteWhere("reminders", "sourceId", id);
   });
   ok("حُذف الدين ✓");
 }
@@ -678,8 +678,8 @@ export async function updateHabit(id: string, patch: Partial<Habit>): Promise<vo
 export async function deleteHabit(id: string): Promise<void> {
   await db.transaction("rw", db.habits, db.habitLogs, db.reminders, async () => {
     await db.habits.delete(id);
-    await db.habitLogs.where("habitId").equals(id).delete();
-    await db.reminders.where("sourceId").equals(id).delete();
+    await deleteWhere("habitLogs", "habitId", id);
+    await deleteWhere("reminders", "sourceId", id);
   });
   ok("حُذفت العادة وسجلاتها ✓");
 }
@@ -762,7 +762,7 @@ export async function toggleTask(id: string): Promise<boolean> {
   const done = !t.done;
   await db.tasks.update(id, { done, completedAt: done ? nowISO() : undefined, updatedAt: nowISO() });
   if (done) {
-    await db.reminders.where("sourceId").equals(id).delete();
+    await deleteWhere("reminders", "sourceId", id);
     ok("أنجزت مهمة ✓", t.title);
   }
   return done;
@@ -771,8 +771,8 @@ export async function toggleTask(id: string): Promise<boolean> {
 export async function deleteTask(id: string): Promise<void> {
   await db.transaction("rw", db.tasks, db.reminders, db.blocks, async () => {
     await db.tasks.delete(id);
-    await db.reminders.where("sourceId").equals(id).delete();
-    await db.blocks.where("taskId").equals(id).delete();
+    await deleteWhere("reminders", "sourceId", id);
+    await deleteWhere("blocks", "taskId", id);
   });
   ok("حُذفت المهمة ✓");
 }
@@ -838,7 +838,7 @@ export async function updateBlock(id: string, patch: Partial<TimeBlock>): Promis
 export async function deleteBlock(id: string): Promise<void> {
   await db.transaction("rw", db.blocks, db.reminders, async () => {
     await db.blocks.delete(id);
-    await db.reminders.where("sourceId").equals(id).delete();
+    await deleteWhere("reminders", "sourceId", id);
   });
   ok("حُذف الحدث ✓");
 }
@@ -986,7 +986,7 @@ export async function updateCourse(id: string, patch: Partial<Course>): Promise<
 export async function deleteCourse(id: string): Promise<void> {
   await db.transaction("rw", db.courses, db.flashcards, db.tasks, async () => {
     await db.courses.delete(id);
-    await db.flashcards.where("courseId").equals(id).delete();
+    await deleteWhere("flashcards", "courseId", id);
     // فك ارتباط المهام بالمقرر المحذوف — المهمة نفسها تبقى
     const linked = await db.tasks.where("courseId").equals(id).toArray();
     for (const t of linked) await db.tasks.update(t.id, { courseId: undefined });
@@ -1114,7 +1114,7 @@ export async function deletePerson(id: string): Promise<void> {
     for (const t of linkedTasks) await db.tasks.update(t.id, { personId: undefined });
     const linkedTx = await db.transactions.where("personId").equals(id).toArray();
     for (const t of linkedTx) await db.transactions.update(t.id, { personId: undefined });
-    await db.reminders.where("sourceId").equals(id).delete();
+    await deleteWhere("reminders", "sourceId", id);
   });
   ok("حُذف ملف الشخص ✓", "معاملاته ومهامه بقيت — بلا ربط");
 }
@@ -1153,7 +1153,7 @@ export async function updateDocument(id: string, patch: Partial<DocumentRecord>)
   await db.documents.update(id, patch);
   // إعادة جدولة التذكير إن تغير تاريخ الانتهاء
   if (patch.expiryDate !== undefined && existing) {
-    await db.reminders.where("sourceId").equals(id).delete();
+    await deleteWhere("reminders", "sourceId", id);
     if (patch.expiryDate) {
       await db.reminders.add({
         id: uid(),
@@ -1172,7 +1172,7 @@ export async function updateDocument(id: string, patch: Partial<DocumentRecord>)
 export async function deleteDocument(id: string): Promise<void> {
   await db.transaction("rw", db.documents, db.reminders, async () => {
     await db.documents.delete(id);
-    await db.reminders.where("sourceId").equals(id).delete();
+    await deleteWhere("reminders", "sourceId", id);
   });
   ok("حُذف المستند ✓");
 }
@@ -1194,14 +1194,14 @@ export async function updateTrip(id: string, patch: Partial<Trip>): Promise<void
 export async function deleteTrip(id: string): Promise<void> {
   await db.transaction("rw", [db.trips, db.listItems, db.blocks, db.transactions, db.tasks, db.reminders], async () => {
     await db.trips.delete(id);
-    await db.listItems.where("ownerId").equals(id).delete();
+    await deleteWhere("listItems", "ownerId", id);
     const linkedBlocks = await db.blocks.where("tripId").equals(id).toArray();
     for (const b of linkedBlocks) await db.blocks.update(b.id, { tripId: undefined });
     const linkedTx = await db.transactions.where("tripId").equals(id).toArray();
     for (const t of linkedTx) await db.transactions.update(t.id, { tripId: undefined });
     const linkedTasks = await db.tasks.where("tripId").equals(id).toArray();
     for (const t of linkedTasks) await db.tasks.update(t.id, { tripId: undefined });
-    await db.reminders.where("sourceId").equals(id).delete();
+    await deleteWhere("reminders", "sourceId", id);
   });
   ok("حُذفت الرحلة ✓", "مصاريفها وبرنامجها بقيت — بلا ربط");
 }
@@ -1270,7 +1270,7 @@ export async function updateHomeItem(id: string, patch: Partial<HomeItem>): Prom
 export async function deleteHomeItem(id: string): Promise<void> {
   await db.transaction("rw", db.homeItems, db.reminders, async () => {
     await db.homeItems.delete(id);
-    await db.reminders.where("sourceId").equals(id).delete();
+    await deleteWhere("reminders", "sourceId", id);
   });
   ok("حُذف الممتلك ✓");
 }
@@ -1292,7 +1292,7 @@ export async function updateWellbeingActivity(id: string, patch: Partial<Wellbei
 export async function deleteWellbeingActivity(id: string): Promise<void> {
   await db.transaction("rw", db.wellbeingActivities, db.wellbeingLogs, db.reminders, async () => {
     await db.wellbeingActivities.delete(id);
-    await db.wellbeingLogs.where("activityId").equals(id).delete();
+    await deleteWhere("wellbeingLogs", "activityId", id);
   });
   ok("حُذف النشاط ✓");
 }
@@ -1345,7 +1345,7 @@ export async function updateWellbeingRule(id: string, patch: Partial<WellbeingRu
   const next = { ...r, ...patch };
   await db.wellbeingRules.update(id, patch);
   // مزامنة التذكير مع الحالة الجديدة
-  await db.reminders.where("sourceId").equals(id).delete();
+  await deleteWhere("reminders", "sourceId", id);
   if (next.enabled && next.remindAt) await scheduleWellbeingRuleReminder(next);
   ok("حُدّثت القاعدة ✓");
 }
@@ -1353,7 +1353,7 @@ export async function updateWellbeingRule(id: string, patch: Partial<WellbeingRu
 export async function deleteWellbeingRule(id: string): Promise<void> {
   await db.transaction("rw", db.wellbeingRules, db.reminders, async () => {
     await db.wellbeingRules.delete(id);
-    await db.reminders.where("sourceId").equals(id).delete();
+    await deleteWhere("reminders", "sourceId", id);
   });
   ok("حُذفت القاعدة ✓");
 }

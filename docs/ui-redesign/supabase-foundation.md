@@ -1,101 +1,71 @@
-# أساس Supabase — خطة التفعيل والمحجوب
+# أساس Supabase 5.2 — بوابة إلزامية + ملف لكل مستخدم + مزامنة أوفلاين-أولاً
 
-## الوضع الحالي (مُتحقَّق فعلياً ضد المشروع الحي — 2026-10-26، إعادة تحقق ثانية بعد إعادة النشر)
+## المعمارية (مبنية ومُختبرة — 2026-10-26)
 
-> إعادة نشر الصندوق محت `.env` — أُعيد ضبطه (URL + publishable key، لا أسرار في Git).
-> GitHub متزامن بالكامل (main @ 583a3d7). فُحص كل بند محجوب **مجدداً بالتحقيق الحي**:
-
-- ❌ **Google OAuth ما زال ناقصاً فعلياً** (authorize = `missing OAuth secret`) — رغم أن
-  المزود يظهر «مفعّل» في اللوحة، ينقصه OAuth Client Secret من Google Cloud.
-- ❌ **جدول `profiles` ما زال غير موجود** (PGRST205).
-- ✅ signup مفتوح · `mailer_autoconfirm:false` · حدود البريد المدمجة ضيقة (429).
-
-إصلاح تجربة هذه الجلسة: زر Google كان يُخرج المستخدم من التطبيق إلى صفحة JSON خام
-عند غياب الـ Secret — الآن يبقى داخل التطبيق وي toast الحالة الصادقة (بوابة على
-نتيجة الفحص الخادمي قبل أي مغادرة).
-
-التطبيق **محلي أولاً**: بيانات Dexie/IndexedDB على الجهاز. طبقة المصادقة السحابية
-**مبنية ومفعّلة في الواجهة** الآن (شاشة دخول/تسجيل/استعادة + بطاقة حساب في «أنا»)
-وتعمل ضد المشروع الحقيقي بمفتاح publishable — والتحقق المنفذ:
-
-- ✅ **العميل**: `@supabase/supabase-js@2.118` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` بمفتاح
-  publishable (sb_publishable_…) — يعمل لكل المسارات المختبرة (لا حاجة لمفتاح anon
-  القديم؛ إن أردته أعد إرساله وسأبدّله).
-- ✅ **إنشاء حساب** (signup): حسابان اختباريان حقيقيان أُنشئا (`7c207722-…` ثم
-  `dd6f1388-…` و`systemy.e2e.ui.…`) وبريد تأكيد أُرسل فعلاً
-  (`confirmation_sent_at` مسجّل) — من الواجهة ومن API.
-- ✅ **تأكيد البريد مطلوب** (`mailer_autoconfirm:false`): الدخول قبل التأكيد يُرفض
-  بـ `email_not_confirmed` — مُتحقق من الواجهة بالعربية.
-- ✅ **رسائل خطأ الدخول**: بيانات خاطئة → `invalid_credentials` (مُتحقق).
-- ✅ **طلب استعادة كلمة المرور**: نقطة النهاية تعمل؛ بريد غير مسجّل يرجع 200 بلا
-  تعداد مستخدمين (مُتحقق). حدود الإرسال المدمجة ضيقة (استهلكناها في الاختبار —
-  والواجهة تعرضها بصدق: «كثُرت المحاولات على بريدك…»).
-- ✅ **فحص Google من الخادم**: مسار `/api/auth/google-status` يكشف الحالة الحقيقية
-  ويظهرها في الواجهة (toast + إشعار داخلي، بلا مغادرة التطبيق).
-
-## المحجوب بانتظار مالك المشروع (بالأولوية)
-
-1. **Google OAuth ناقص فعلياً**: المزود «مفعّل» في اللوحة لكن authorize يرد
-   `Unsupported provider: missing OAuth secret` — المطلوب: Google Cloud Console →
-   OAuth Client (ID/Secret) → لصقها في Supabase Dashboard → Authentication →
-   Providers → Google، مع Redirect URL
-   `${SUPABASE_URL}/auth/v1/callback`.
-2. **جدول `profiles` غير موجود** (PGRST205): شغّل الهجرة أدناه عبر SQL Editor.
-   الواجهة تعمل بدونه (بطاقة الحساب تعرض تنبيهاً صادقاً حتى تشغّله).
-3. **Site URL وRedirect URLs**: في Authentication → URL Configuration — يجب أن
-   يطابقا نطاق المعاينة الفعلي ليعمل رابط الاستعادة حتى النهاية.
-4. **حدود البريد المدمجة**: 2 رسائل/ساعة تقريباً — للإنتاج اضبط SMTP مخصصاً
-   (Authentication → SMTP).
-
-## ما لم يُختبر بعد (مسؤولية صاحب البريد)
-
-- فتح رابط التأكيد من بريد حقيقي ثم الدخول الكامل بجلسة (يحتاج صندوق بريد تملكه —
-  حساب الاختبار `systemy.e2e.2026@gmail.com` بانتظار تأكيده من Dashboard →
-  Users → Confirm، أو سجّل بريدك الحقيقي من الواجهة).
-- حلقة Google الكاملة (تحتاج حساب Google في متصفح حقيقي — «افتح في تبويب جديد»).
-- تعيين كلمة مرور جديدة من رابط البريد (النموذج جاهز يفتح تلقائياً عند
-  PASSWORD_RECOVERY).
-
-## هجرة profiles الجاهزة (RLS)
-
-```sql
--- profiles: مرتبط بمستخدمي المصادقة
-create table if not exists public.profiles (
-  id uuid primary key references auth.users(id) on delete cascade,
-  display_name text,
-  avatar_url text,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-
-alter table public.profiles enable row level security;
-
--- كل مستخدم يقرأ/يكتب ملفه فقط — الهوية عبر auth.uid()
-create policy "profiles: read own" on public.profiles
-  for select using (auth.uid() = id);
-create policy "profiles: insert own" on public.profiles
-  for insert with check (auth.uid() = id);
-create policy "profiles: update own" on public.profiles
-  for update using (auth.uid() = id);
-
--- تهيئة الملف عند أول تسجيل (من بيانات المصادقة — مدخلات غير موثوقة)
-create or replace function public.handle_new_profile()
-returns trigger language plpgsql security definer set search_path = public as $$
-begin
-  insert into public.profiles (id, display_name)
-  values (new.id, coalesce(new.raw_user_meta_data->>'full_name', ''))
-  on conflict (id) do nothing;
-  return new;
-end $$;
-
-drop trigger if exists on_auth_user_created on auth.users;
-create trigger on_auth_user_created
-  after insert on auth.users
-  for each row execute function public.handle_new_profile();
+```
+زائر ──► بوابة الدخول الإلزامية (auth-gate.tsx)
+          │ لا تطبيق إطلاقاً قبل جلسة صالحة — بريد/كلمة أو Google
+          ▼
+     جلسة Supabase (uid)
+          │ 1) setActiveUser(uid) → قاعدة Dexie مستقلة: SystemyDB-u-{uid}
+          │ 2) activateSync(uid)  → محرك المزامنة
+          ▼
+     التطبيق كاملاً على قاعدة مستخدمه (كل الاشتراكات تنشأ بعدها)
+          │
+          ├─ كتابة محلية ──► خطافات Dexie تختم syncMs وتسجّل في syncOutbox
+          │                   (حذف = شاهد قبر، والأوفلاين يعمل طبيعياً)
+          ├─ متصل؟ ──► دفع دفعات (RPC sync_push بمنطق LWW) + سحب تدريجي
+          │            (records?updated_at>=مؤشر) وتطبيق محلي بـ LWW
+          └─ انقطع؟ ──► الشارة «محلي»؛ عند العودة: دورة فورية تلحق كل شيء
 ```
 
-## قاعدة الترحيل المستقبلي
+- **العزل**: كل مستخدم قاعدة IndexedDB باسمه (`SystemyDB-u-{uid}`) + RLS على
+  السحابة (`auth.uid() = user_id`) — لا يرى أحدٌ بيانات غيره محلياً ولا سحابياً.
+- **الدقة**: كل كتابة تختم `syncMs` (إيبوك مللي) — الصراع بين جهازين يحسمه
+  «آخر كتابة تفوز» (LWW) على الخادم والعميل معاً؛ الحذف ينتشر بشواهد القبور.
+- **المحفزات**: كتابة محلية (تراجع 1.5ث) · عودة الاتصال (نبضة health فورية) ·
+  كل 60ث · رجوع التبويب · زر «زامن الآن» اليدوي.
+- **كشف الاتصال**: أحداث المتصفح + نبضة فعلية إلى `/auth/v1/health` كل 20ث —
+  لأن navigator.onLine يكذب خلف البروكسيات.
 
-لا ترحيل بيانات محلية ولا مزامنة سحابية قبل خطة صريحة ونسخة احتياطية.
-عمل المصادقة لا يعني أن البيانات متزامنة — والواجهة لا تدّعي ذلك (نص صريح
-في شاشة الحساب وبطاقة الإعدادات).
+## ما هو مُختبر فعلياً (بالمتصفح، 390×844 RTL)
+
+- ✅ **البوابة تحجب كل شيء**: زائر جديد يرى شاشة الدخول فقط — لا إعداد أولي،
+  لا شاشات، لا قاعدة بيانات تُنشأ أصلاً قبل الدخول.
+- ✅ **ملف لكل مستخدم**: بعد الدخول أُنشئت `SystemyDB-u-{uid}` خاصة به؛
+  الخروج يحفظها، والعودة تدخل مباشرة لشاشة اليوم ببياناته (بلا إعداد أولي).
+- ✅ **الأوفلاين الكامل**: قطع الاتصال → الشارة «محلي — تعمل طبيعياً وتلحق عند
+  العودة» → كتابة مصروف ناجحة محلياً → عودة الاتصال → دورة مزامنة فورية.
+- ✅ **الصادر يلتقط كل شيء**: 33 عملية بعد الإعداد الأولي (فئات+أنظمة+إعدادات)
+  + كل مصروف جديد؛ الحذف الجماعي (19 موقعاً في actions.ts) حُوّل إلى
+  `deleteWhere` يسجّل قبوراً فينتشر الحذف للأجهزة الأخرى.
+- ✅ **صدق الحالة**: بجلسة مُصطنعة (توكن محلي) الشارة تقول «خطأ مزامنة» بتفصيل
+  الخادم الحقيقي، وبطاقة الحساب تعرضه + زر «زامن الآن» يعمل.
+- ✅ وضع standalone (APK) يحترم البوابة نفسها. صفر أخطاء console في كل الجلسة.
+
+## ما يحتاجك أنت (خطوتان في لوحة Supabase — لا يفتح التطبيق بدونهما معقولاً)
+
+1. **هجرة SQL — لتشغيل المزامنة** (بدونها: التطبيق يعمل كاملاً محلياً بشارة
+   «مزامنة معطّلة» الصادقة): انسخ محتوى
+   `docs/ui-redesign/sync-migration.sql` → SQL Editor → Run.
+   تنشئ: جدول `profiles` + جدول `records` (المخزن العام) + دالة `sync_push`
+   بمنطق LWW المحصّن + سياسات RLS. إعادة التنفيذ آمنة. بعد دقائق تنقلب
+   الشارة «متزامن» تلقائياً — بلا أي تغيير كود.
+2. **تأكيد بريد أو تسجيل دخول حقيقي — لاختبار الجلسة الفعلية**: مشروعك يطلب
+   تأكيد البريد (`mailer_autoconfirm:false`). لتجربة الدخول الكامل: إما افتح
+   رابط التأكيد الذي وصلك عند التسجيل، أو أكّد حساباً من
+   Authentication → Users → Confirm. (أو عطّل «Confirm email» للتجربة).
+   - **Google OAuth** ما زال ناقص OAuth Client Secret (تحقق حي: authorize يرد
+     `missing OAuth secret`) — الصق مفاتيح Google Cloud في
+     Authentication → Providers → Google عند الحاجة.
+
+## حدود معروفة (موثقة بلا تجميل)
+
+- دفع/سحب الشبكة الحقيقي لم يُختبر بعد ضد `records` لأن الجدول والدالة لم
+  يُنشآ (بانتظار الخطوة 1 أعلاه) — كل شيء آخر (البوابة، العزل، الأوفلاين،
+  الصادر، القبور، الحالات) مُختبر فعلياً.
+- LWW بحسابات ساعات الأجهزة: من يكتب أخيراً يفوز؛ ساعة جهاز خاطئة بفارق
+  كبير قد تطغى كتابتها — سلوك قياسي لأنظمة local-first، مقبول لاستخدام فردي.
+- رابط استعادة كلمة المرور يتطلب إضافة نطاق المعاينة إلى
+  Authentication → URL Configuration (Site URL + Redirect URLs).
+- حدود بريد Supabase المدمجة ضيقة (2-3 رسائل/ساعة) — للإنتاج اضبط SMTP.

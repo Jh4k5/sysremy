@@ -1,6 +1,8 @@
 /**
  * Systemy v2 — قاعدة البيانات المحلية (Dexie / IndexedDB)
- * كل البيانات على الجهاز — لا خادم إطلاقاً. reactive عبر useLive.
+ * 5.2: قاعدة منفصلة لكل مستخدم سحابي (ملفه الخاص) + طبقة مزامنة:
+ * خطافات تختم syncMs على كل كتابة، وصندوق صادر (syncOutbox) يلتقط
+ * العمليات بما فيها شواهد القبور — والمحرك في lib/sync يدفع/يسحب.
  */
 "use client";
 
@@ -72,9 +74,12 @@ export class SystemyDB extends Dexie {
   wellbeingLogs!: Table<WellbeingLog, string>;
   wellbeingRules!: Table<WellbeingRule, string>;
   focusSessions!: Table<FocusSession, string>;
+  // v5 — طبقة المزامنة
+  syncOutbox!: Table<OutboxOp, string>;
+  syncState!: Table<SyncStateRow, string>;
 
-  constructor() {
-    super("SystemyDB");
+  constructor(name = "SystemyDB") {
+    super(name);
     this.version(1).stores({
       settings: "id",
       accounts: "id, type, archived, order",
@@ -121,12 +126,187 @@ export class SystemyDB extends Dexie {
       wellbeingRules: "id, enabled",
       focusSessions: "id, date, technique, taskId",
     });
+    // v5 (المزامنة السحابية): صندوق الصادر + حالة المؤشر — إضافي فقط.
+    this.version(5).stores({
+      syncOutbox: "id, table, at",
+      syncState: "key",
+    });
   }
 }
 
-/** نسخة وحيدة من القاعدة (client فقط) */
+// ═══════════════════════ 5.2 — المزامنة: الصادر والخطافات ═══════════════════════
+
+/** عملية صادرة — تنتظر الدفع للسحابة */
+export interface OutboxOp {
+  /** مفتاح فريد: `${table}:${rid}` — إعادة الوضع تحل محل السابقة */
+  id: string;
+  table: TableName;
+  rid: string;
+  op: "put" | "del";
+  at: number;
+}
+
+/** قيمة حالة عامة (مؤشر السحب وغيره) */
+export interface SyncStateRow {
+  key: string;
+  value: string;
+}
+
+/** الصادر المؤقت في الذاكرة — تُصفّى دورياً إلى syncOutbox */
+const opBuffer = new Map<string, OutboxOp>();
+let flushTimer: ReturnType<typeof setTimeout> | null = null;
+
+/** نُطبّق صفوفاً قادمة من السحابة؟ إذن لا تُسجّل عمليات صادرة (منع الصدى) */
+export let applyingRemote = false;
+export function setApplyingRemote(v: boolean): void {
+  applyingRemote = v;
+}
+
+/** مستمعو توفر عمليات محلية جديدة (المحرك يجدول الدفع) */
+type OpsListener = () => void;
+const opsListeners = new Set<OpsListener>();
+export function onLocalOps(l: OpsListener): () => void {
+  opsListeners.add(l);
+  return () => opsListeners.delete(l);
+}
+function notifyOps(): void {
+  for (const l of opsListeners) {
+    try {
+      l();
+    } catch {
+      /* تجاهل */
+    }
+  }
+}
+
+function bufferOp(table: TableName, rid: string, op: "put" | "del"): void {
+  if (applyingRemote) return; // كتابة واردة من السحابة — ليست عملية محلية
+  const id = `${table}:${rid}`;
+  opBuffer.set(id, { id, table, rid, op, at: Date.now() });
+  if (flushTimer) return;
+  flushTimer = setTimeout(() => {
+    flushTimer = null;
+    void flushOps();
+  }, 200);
+}
+
+/** عدد العمليات في الصادر المؤقت (ذاكرة) — للمحرك والعرض الصادق */
+export function bufferedOps(): number {
+  return opBuffer.size;
+}
+
+/** تصفية الصادر إلى القاعدة — تُستدعى دورياً وقبل تبديل المستخدم */
+export async function flushOps(): Promise<void> {
+  if (flushTimer) {
+    clearTimeout(flushTimer);
+    flushTimer = null;
+  }
+  if (opBuffer.size === 0) return;
+  const ops = [...opBuffer.values()];
+  for (const o of ops) opBuffer.delete(o.id);
+  try {
+    await activeDB().syncOutbox.bulkPut(ops);
+    notifyOps();
+  } catch {
+    // فشلت الكتابة؟ أعدها للصادر المؤقت ليحاول لاحقاً
+    for (const o of ops) opBuffer.set(o.id, o);
+  }
+}
+
+/**
+ * خطافات الختم والالتقاط — على كل جداول المجال:
+ * • creating/updating يختمان syncMs (إيبوك مللي) إن غاب — لا يدانسان
+ *   تعديلاً. اسم مستقل عن updatedAt المجالي (نص ISO) حتى لا يتصادما.
+ * • كل عملية تُسجّل في الصادر: put أو del (شاهد قبر).
+ * الخطافات تعمل تزامنياً لحظة الاستدعاء — لذا علم applyingRemote قاطع.
+ */
+function installSyncHooks(d: SystemyDB): void {
+  for (const name of ALL_TABLES) {
+    const t = (d as unknown as Record<string, Table<Record<string, unknown>, string>>)[name];
+    // معاملات بلا تعليقات — يستدلها TS من توقيعات خطافات Dexie نفسها
+    t.hook("creating", function (primKey, obj) {
+      if (obj && typeof obj === "object" && !("syncMs" in obj)) obj.syncMs = Date.now();
+      const rid = String(primKey ?? (obj as { id?: unknown } | null)?.id ?? "");
+      if (rid) bufferOp(name, rid, "put");
+    });
+    t.hook("updating", function (mods, primKey) {
+      bufferOp(name, String(primKey), "put");
+      if (mods && "syncMs" in mods) return undefined; // القادم من السحابة بختمه
+      return { ...mods, syncMs: Date.now() };
+    });
+    t.hook("deleting", function (primKey) {
+      bufferOp(name, String(primKey), "del");
+    });
+  }
+}
+
+// ═══════════════════════ 5.2 — قاعدة لكل مستخدم ═══════════════════════
+
+const GUEST_DB = "SystemyDB";
+let current: SystemyDB | null = null;
+
+function activeDB(): SystemyDB {
+  if (!current) current = newInstance(GUEST_DB);
+  return current;
+}
+
+/** النسخة النشطة حالياً (للمحرك — يثبّت القاعدة الصحيحة في كل دورة) */
+export function currentDB(): SystemyDB {
+  return activeDB();
+}
+
+function newInstance(name: string): SystemyDB {
+  const d = new SystemyDB(name);
+  installSyncHooks(d);
+  return d;
+}
+
+/** اسم القاعدة النشطة (لتشخيص الجهاز) */
+export function activeDBName(): string {
+  return activeDB().name;
+}
+
+/**
+ * تبديل القاعدة النشطة حسب المستخدم — ملف مستقل لكل حساب:
+ * • دخول: SystemyDB-u-{uid} — عزل كامل، لا يرى أحدٌ بيانات غيره.
+ * • خروج/بلا حساب: SystemyDB (ضيف).
+ * يُصفّى الصادر المعلق أولاً (أمان آخر كتابة) ثم تفتح القاعدة الجديدة.
+ */
+export async function setActiveUser(userId: string | null): Promise<SystemyDB> {
+  const name = userId
+    ? `SystemyDB-u-${userId.replace(/[^a-zA-Z0-9-]/g, "").slice(0, 40)}`
+    : GUEST_DB;
+  if (current?.name === name) return current;
+  await flushOps();
+  opBuffer.clear();
+  if (current) {
+    try {
+      current.close();
+    } catch {
+      /* تجاهل */
+    }
+    current = null;
+  }
+  current = newInstance(name);
+  return current;
+}
+
+/**
+ * نسخة وحيدة للتصدير — وكيل يوجّه كل وصول للقاعدة النشطة الحالية.
+ * الدوال تُربط بالنسخة الهدف (this صحيح)، والوصول دائماً يُحل لحظتها،
+ * لذا التبديل بين المستخدمين ينعكس على أي كود جديد فوراً.
+ */
 export const db: SystemyDB =
-  typeof window !== "undefined" ? new SystemyDB() : (null as unknown as SystemyDB);
+  typeof window !== "undefined"
+    ? (new Proxy({} as SystemyDB, {
+        get(_t, prop) {
+          if (prop === "then") return undefined; // لسنا thenable
+          const target = activeDB();
+          const value = Reflect.get(target, prop, target);
+          return typeof value === "function" ? (value as (...a: unknown[]) => unknown).bind(target) : value;
+        },
+      }) as SystemyDB)
+    : (null as unknown as SystemyDB);
 
 /** معرف فريد */
 export function uid(): string {
@@ -331,11 +511,39 @@ export const ALL_TABLES = [
 
 export type TableName = (typeof ALL_TABLES)[number];
 
-/** مسح كل البيانات نهائياً (حذف الحساب) */
+/** قراءة حالة المزامنة المخزنة (مؤشر السحب…) */
+export async function getSyncState(key: string): Promise<string | null> {
+  const row = await activeDB().syncState.get(key);
+  return row?.value ?? null;
+}
+
+/** حفظ حالة مزامنة */
+export async function setSyncState(key: string, value: string): Promise<void> {
+  await activeDB().syncState.put({ key, value });
+}
+
+/**
+ * حذف جماعي متزامن — يسجّل شواهد قبور لكل المحذوف قبل الحذف،
+ * فينتشر الحذف لأجهزة المستخدم الأخرى (بلا بقايا شبح).
+ */
+export async function deleteWhere(table: TableName, index: string, value: string): Promise<void> {
+  const t = (activeDB() as unknown as Record<string, Table<Record<string, unknown>, string>>)[table];
+  const keys = await t.where(index).equals(value).primaryKeys();
+  if (keys.length === 0) return;
+  for (const k of keys) bufferOp(table, String(k), "del");
+  await flushOps(); // القبور في الصادر قبل الحذف — أمان الانهيار
+  await t.where(index).equals(value).delete();
+}
+
+/** مسح كل البيانات نهائياً (حذف الحساب) — مع شواهد قبور للمزامنة */
 export async function resetAll(): Promise<void> {
   for (const name of ALL_TABLES) {
-    await (db as unknown as Record<string, Table>)[name].clear();
+    const t = (activeDB() as unknown as Record<string, Table<Record<string, unknown>, string>>)[name];
+    const keys = await t.toCollection().primaryKeys();
+    for (const k of keys) bufferOp(name as TableName, String(k), "del");
+    await t.clear(); // clear لا يطلق خطافات الحذف — لذا سجّلنا القبور أولاً
   }
+  void flushOps();
 }
 
 /** نطاقات إعادة الضبط الانتقائي */
@@ -386,12 +594,14 @@ export const RESET_SCOPE_LABELS: Record<ResetScope, string> = {
   focus: "سجل جلسات التركيز",
 };
 
-/** إعادة ضبط نطاق محدد — الفئات والأنظمة تبقى (هيكل) */
+/** إعادة ضبط نطاق محدد — الفئات والأنظمة تبقى (هيكل)، مع قبور للمزامنة */
 export async function resetScope(scope: ResetScope): Promise<void> {
   const tables = RESET_SCOPES[scope];
-  await db.transaction("rw", db.tables, async () => {
-    for (const name of tables) {
-      await (db as unknown as Record<string, Table>)[name].clear();
-    }
-  });
+  for (const name of tables) {
+    const t = (activeDB() as unknown as Record<string, Table<Record<string, unknown>, string>>)[name];
+    const keys = await t.toCollection().primaryKeys();
+    for (const k of keys) bufferOp(name as TableName, String(k), "del");
+    await t.clear(); // شواهد القبور سُجّلت أعلاه — الحذف ينتشر للأجهزة الأخرى
+  }
+  void flushOps();
 }

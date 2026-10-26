@@ -1,14 +1,16 @@
 "use client";
 
 /**
- * قسم «الحساب السحابي» في شاشة أنا — صادق بحالتين:
- * داخل: بطاقة الحساب + حالة الملف الشخصي + خروج.
- * خارج: دعوة اختيارية للدخول (بلا ضغط) — البيانات المحلية تكفي للتطبيق.
+ * قسم «الحساب السحابي» في شاشة أنا — 5.2: الدخول إلزامي عبر البوابة،
+ * لذا هنا حالة الحساب داخل الجلسة: الملف الشخصي + حالة المزامنة الحقيقية
+ * (متزامن/أوفلاين/تحتاج هجرة) + خروج. كل سطر مقابل حقيقة على الأرض.
  */
-import { LogOut, ShieldCheck, CloudCog, ChevronLeft } from "lucide-react";
+import { LogOut, ShieldCheck, CloudCog, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { isSupabaseConfigured } from "@/lib/supabase";
 import { useUIStore } from "@/store/ui-store";
+import { useSyncStore } from "@/lib/sync/sync-store";
+import { syncNow } from "@/lib/sync/sync-engine";
 import { useAuthStore } from "./auth-store";
 import { GlassCard, widgetEnter } from "@/components/systemy/glass";
 
@@ -31,22 +33,28 @@ function Initial({ name, email }: { name: string | null; email?: string }) {
 }
 
 export function AccountSection() {
-  // غير مهيأ بيئياً؟ القسم كله يختفي (ميزة اختيارية — لا ندّعي وجودها)
+  // غير مهيأ بيئياً؟ القسم كله يختفي (البوابة تعرض الخطأ البيئي بنفسها)
   if (!isSupabaseConfigured) return null;
   return <AccountSectionInner />;
 }
 
 function AccountSectionInner() {
   const { ready, session, user, profile, profileStatus, signOut } = useAuthStore();
+  const { phase, pending, lastSyncAt, lastError } = useSyncStore();
   const openAuth = useUIStore((s) => s.openAuth);
 
   const handleSignOut = async () => {
     await signOut();
-    toast("سجّلنا خروجك", { description: "بياناتك في التطبيق كما هي على جهازك" });
+    toast("سجّلنا خروجك", { description: "ملفك محفوظ — ستجده كما هو عند عودتك" });
+  };
+
+  const handleSyncNow = () => {
+    syncNow();
+    toast("بدأت دورة مزامنة", { description: "نرفع المحلي وننزل البعيد الآن" });
   };
 
   if (!user || !session) {
-    // ⏳ قبل جهوزية الجلسة: هياكل صامتة (منع وميض «سجّل دخولك» الخاطئ)
+    // ⏳ قبل جهوزية الجلسة: هياكل صامتة (منع وميض خاطئ)
     if (!ready) {
       return (
         <GlassCard className="p-4 flex items-center gap-3.5 animate-pulse" aria-busy="true" aria-label="جارٍ فحص الحساب">
@@ -67,22 +75,18 @@ function AccountSectionInner() {
           <div className="flex-1 min-w-0">
             <p className="text-[13.5px] font-bold text-foreground">الحساب السحابي</p>
             <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">
-              اختياري — لملفك الشخصي واستعادة وصولك من أي جهاز
+              سجّل دخولك للوصول إلى ملفك من أي جهاز
             </p>
           </div>
         </div>
         <div className="flex gap-2">
           <button type="button" onClick={() => openAuth("login")} className={`${btnGhost} flex-1`}>
             تسجيل الدخول
-            <ChevronLeft className="w-4 h-4" aria-hidden="true" />
           </button>
           <button type="button" onClick={() => openAuth("signup")} className={`${btnGhost} flex-1`}>
             حساب جديد
           </button>
         </div>
-        <p className="text-[10px] leading-relaxed text-muted-foreground/80">
-          تطبيقك يعمل كاملاً بلا حساب — بياناتك محلية على جهازك دائماً.
-        </p>
       </GlassCard>
     );
   }
@@ -93,6 +97,25 @@ function AccountSectionInner() {
     || user.email?.split("@")[0]
     || "حسابك";
   const email = user.email ?? "";
+
+  const syncLine =
+    phase === "synced"
+      ? { text: `كل شيء متزامن${lastSyncAt ? ` — آخر دورة ${new Date(lastSyncAt).toLocaleTimeString("ar")}` : ""}`, tone: "ok" as const }
+      : phase === "syncing"
+        ? { text: "دورة مزامنة جارٍة الآن…", tone: "ok" as const }
+        : phase === "offline"
+          ? { text: `تعمل محلياً بلا اتصال${pending > 0 ? ` — ${pending} تغييراً بانتظار الرفع` : ""}، وتلحق تلقائياً عند عودة الإنترنت`, tone: "info" as const }
+          : phase === "setup-needed"
+            ? { text: "المزامنة معطّلة: جدول records لم يُنشأ بعد — شغّل هجرة SQL من docs/ui-redesign/sync-migration.sql في لوحة Supabase وتنقلب «متزامن» تلقائياً", tone: "warn" as const }
+            : phase === "error"
+              ? { text: `تعذرت المزامنة: ${lastError ?? "خطأ غير معروف"} — سنحاول مجدداً`, tone: "warn" as const }
+              : { text: "المزامنة لم تبدأ بعد…", tone: "info" as const };
+
+  const syncCls = {
+    ok: "bg-[#198768]/[0.09] border-[#198768]/30 text-[#0f5c47]",
+    info: "bg-[#16B8B0]/[0.08] border-[#16B8B0]/30 text-[#0E7C84]",
+    warn: "bg-[#C88725]/[0.08] border-[#C88725]/25 text-[#8a5f13]",
+  }[syncLine.tone];
 
   return (
     <GlassCard {...widgetEnter()} className="p-4 space-y-3.5">
@@ -118,20 +141,36 @@ function AccountSectionInner() {
       )}
       {profileStatus === "missing-table" && (
         <p className="text-[10.5px] leading-relaxed rounded-xl bg-[#C88725]/[0.08] border border-[#C88725]/25 text-[#8a5f13] px-3 py-2">
-          جدول <span dir="ltr">profiles</span> لم يُنشأ بعد في قاعدة بياناتك — شغّل هجرة SQL من
-          <span dir="ltr"> docs/ui-redesign/supabase-foundation.md</span> ليكتمل الملف الشخصي.
+          جدول <span dir="ltr">profiles</span> لم يُنشأ بعد — هجرته ضمن
+          <span dir="ltr"> docs/ui-redesign/sync-migration.sql</span>.
         </p>
       )}
       {profileStatus === "denied" && (
         <p className="text-[10.5px] leading-relaxed rounded-xl bg-[#C88725]/[0.08] border border-[#C88725]/25 text-[#8a5f13] px-3 py-2">
-          سياسات RLS تمنع قراءة/كتابة الملف الشخصي — تأكد من تطبيق الهجرة كاملة (الجدول + السياسات).
+          سياسات RLS تمنع قراءة/كتابة الملف الشخصي — تأكد من تطبيق الهجرة كاملة.
         </p>
       )}
       {profileStatus === "error" && (
         <p className="text-[10.5px] leading-relaxed rounded-xl bg-[#D95E65]/[0.08] border border-[#D95E65]/25 text-[#8f2f36] px-3 py-2">
-          تعذر الوصول للملف الشخصي السحابي — دخولك سليم، والملف يحاول مجدداً لاحقاً.
+          تعذر الوصول للملف الشخصي السحابي — دخولك سليم، وسنحاول مجدداً.
         </p>
       )}
+
+      {/* 5.2 — حالة المزامنة الحقيقية + زر يدوي */}
+      <div className={`rounded-xl border px-3 py-2.5 text-[11px] leading-relaxed font-medium ${syncCls}`} role="status">
+        <div className="flex items-center gap-2">
+          <CloudCog className="w-4 h-4 shrink-0" aria-hidden="true" />
+          <span className="min-w-0 flex-1">{syncLine.text}</span>
+          <button
+            type="button"
+            onClick={handleSyncNow}
+            aria-label="زامن الآن"
+            className="press w-8 h-8 rounded-lg bg-white/60 flex items-center justify-center shrink-0"
+          >
+            <RefreshCw className="w-[15px] h-[15px]" aria-hidden="true" />
+          </button>
+        </div>
+      </div>
 
       <button
         type="button"
@@ -143,8 +182,8 @@ function AccountSectionInner() {
       </button>
 
       <p className="text-[10px] leading-relaxed text-muted-foreground/80">
-        بيانات التطبيق (المال، العادات، المهام…) تبقى على جهازك فقط — لا مزامنة سحابية بعد،
-        وعند توفرها ستكون خياراً صريحاً.
+        بياناتك (المال، العادات، المهام…) محفوظة على جهازك أولاً وتُزامَن بحسابك —
+        ملفك مستقل لا يراه أي مستخدم آخر، وكل حذف ينتشر بلا بقايا أطياف.
       </p>
     </GlassCard>
   );
