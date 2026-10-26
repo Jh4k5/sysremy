@@ -20,10 +20,10 @@ import { AuthGate } from "@/components/systemy/auth/auth-gate";
 import { isStandalone, standaloneServerSnapshot, subscribeNever } from "@/lib/standalone";
 import { systemyLogo, logo128 } from "@/components/systemy/logo";
 
-const APK_URL = "/downloads/Systemy-v5.0.apk";
-const APK_SIZE = "3.3MB";
-const APK_VERSION = "Systemy 5.1";
-const APK_NAME = "Systemy-v5.0.apk";
+const APK_URL = "/downloads/Systemy-v5.2.apk";
+const APK_SIZE = "7MB";
+const APK_VERSION = "Systemy 5.2";
+const APK_NAME = "Systemy-v5.2.apk";
 
 /**
  * عالم الصفحة النهاري 5.1 «النهار»: خلفية دافئة #F8F7F2 مع لمستين خافتتين
@@ -175,12 +175,12 @@ function DownloadCard() {
           className="rounded-[18px] shrink-0 shadow-[0_1px_2px_rgba(23,33,43,0.12),0_10px_24px_-12px_rgba(23,33,43,0.35)]"
         />
         <div className="min-w-0">
-          <div className="text-[14px] font-bold">تطبيق أندرويد — Systemy 5.1</div>
+          <div className="text-[14px] font-bold">تطبيق أندرويد — Systemy 5.2</div>
           <div className="text-[11px] text-[#17212B]/70 mt-1 leading-5">
             {APK_SIZE} · أندرويد 7.0+ · موقّع وموثوق · بقاعدة بيانات على جهازك
           </div>
           <div className="text-[10px] text-[#9A620C] mt-1.5 leading-5">
-            جديد 5.1: هوية النهار الفاتحة — نظام تصميم موحد، شاشة يوم أذكى، وإضافة سريعة أدق
+            جديد 5.2: حساب سحابي (بريد أو Google) مع مزامنة أذكى لبياناتك بين الأجهزة — أوفلاين أولاً
           </div>
           <div className="flex items-center gap-3 mt-1.5 text-[10px] text-[#17212B]/70">
             <span className="flex items-center gap-1">
@@ -256,9 +256,8 @@ export default function Page() {
       {/* التذييل — على الجوال تُخفى أزرار التنزيل كي لا تلاصق شريط تنقل التطبيق
           (معاينة نقية للتطبيق)، وعلى سطح المكتب يبقى رابط التنزيل النصي */}
       <footer className="mt-auto shrink-0 lg:py-3.5 border-t border-[#17212B]/[0.07] text-center text-[11px] text-[#17212B]/70 hidden lg:block">
-        {APK_VERSION} — نظام تشغيلك الشخصي بهوية «النهار» · 16 نظاماً مرتبة بالسحب · ميزانية
-        بالفلس: حد أسبوعي ويومي حي وادخار تلقائي · إضافة سريعة بلوحة أرقام · بياناتك على جهازك
-        دائماً ·{" "}
+        {APK_VERSION} — نظام تشغيلك الشخصي بهوية «النهار» · حساب سحابي ومزامنة بين أجهزتك · 16
+        نظاماً مرتبة بالسحب · إضافة سريعة بلوحة أرقام · بياناتك على جهازك دائماً ·{" "}
         <a
           href={APK_URL}
           download={APK_NAME}

@@ -12,7 +12,11 @@ import {
   ShieldCheck, Sparkles, UserRound, X,
 } from "lucide-react";
 import { toast } from "sonner";
-import { isSupabaseConfigured, supabase, authErrorToArabic } from "@/lib/supabase";
+import {
+  isSupabaseConfigured, supabase, authErrorToArabic,
+  SUPABASE_URL, supabasePublishableKey,
+} from "@/lib/supabase";
+import { isStandalone } from "@/lib/standalone";
 import { useUIStore } from "@/store/ui-store";
 import type { AuthMode } from "./auth-store";
 import { GlassCard } from "@/components/systemy/glass";
@@ -334,7 +338,8 @@ function LoginScreen({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // فحص Google من الخادم — مرة واحدة عند التركيب (صادق: قد يكون غير مهيأ)
+  // فحص Google — خادمي أولاً؛ وإن غاب الخادم (تصدير ثابت/APK) ففحص
+  // مباشر من Supabase (نفس endpoint العام الذي يقرأه supabase-js)
   const [google, setGoogle] = useState<{ ready: boolean; detail: string } | null>(null);
   useEffect(() => {
     let alive = true;
@@ -343,7 +348,21 @@ function LoginScreen({
       .then((d: { ready?: boolean; detail?: string }) => {
         if (alive) setGoogle({ ready: Boolean(d.ready), detail: d.detail ?? "" });
       })
-      .catch(() => alive && setGoogle({ ready: false, detail: "" }));
+      .catch(() => {
+        // لا خادم — نسخة الـ APK: اسأل Supabase مباشرة عن حالة مزوّد Google
+        if (!SUPABASE_URL || !supabasePublishableKey) {
+          if (alive) setGoogle({ ready: false, detail: "" });
+          return;
+        }
+        fetch(`${SUPABASE_URL}/auth/v1/settings`, {
+          headers: { apikey: supabasePublishableKey },
+        })
+          .then((r) => r.json())
+          .then((d: { external?: { google?: boolean } }) => {
+            if (alive) setGoogle({ ready: Boolean(d?.external?.google), detail: "" });
+          })
+          .catch(() => alive && setGoogle({ ready: false, detail: "" }));
+      });
     return () => { alive = false; };
   }, []);
 
@@ -377,6 +396,14 @@ function LoginScreen({
     if (google && !google.ready) {
       toast.error("تسجيل Google غير مهيّأ بعد", {
         description: google.detail || "يحتاج إعداداً من لوحة Supabase",
+      });
+      return;
+    }
+    // داخل التطبيق المثبّت (APK — بلا خادم): رحلة OAuth تفتح المتصفح الخارجي
+    // وجلستها لا تعود إلى التطبيق — إرشاد صادق بدل مغادرة تتركه في طريق مسدود
+    if (isStandalone()) {
+      toast("داخل التطبيق المثبّت سجّل بالبريد وكلمة المرور", {
+        description: "دخول Google متاح من نسخة الويب — جلسة المتصفح الخارجي لا تعود إلى التطبيق",
       });
       return;
     }
@@ -445,6 +472,12 @@ function LoginScreen({
         <Notice kind="info">
           تسجيل Google <b>غير مهيّأ بعد</b> — {google.detail || "يحتاج إعداداً من لوحة Supabase"}.
           الدخول بالبريد وكلمة المرور يعمل الآن.
+        </Notice>
+      )}
+      {google && google.ready && isStandalone() && (
+        <Notice kind="info">
+          داخل التطبيق المثبّت سجّل بـ<b>البريد وكلمة المرور</b> — دخول Google متاح من نسخة الويب
+          (جلسة المتصفح الخارجي لا تعود إلى التطبيق).
         </Notice>
       )}
 

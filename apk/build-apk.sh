@@ -15,7 +15,7 @@ PLATFORM=$SDK/platforms/android-34
 APKDIR="$(cd "$(dirname "$0")" && pwd)"
 WEB="${1:-$APKDIR/web-assets}"
 OUT=$APKDIR/dist
-APK_NAME="Systemy-v5.0.apk"
+APK_NAME="Systemy-v5.2.apk"
 
 # ─── بيانات التوقيع (سرية — خارج المستودع) ───
 ENV_FILE="${SYSTEMY_SECRETS_ENV:-/home/z/.systemy-secrets/env}"
@@ -47,7 +47,7 @@ echo "▸ 2/8 ربط الموارد + Manifest + الأصول (aapt2 link)..."
   -I "$PLATFORM/android.jar" \
   --manifest "$APKDIR/AndroidManifest.xml" \
   --min-sdk-version 24 --target-sdk-version 34 \
-  --version-code 9 --version-name "5.0" \
+  --version-code 10 --version-name "5.2" \
   -A "$WEB" \
   --auto-add-overlay \
   "$OUT/res.zip"
