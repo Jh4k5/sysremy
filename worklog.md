@@ -1475,3 +1475,31 @@ Work Log:
 Stage Summary:
 - كل ادعاءات التسليم أعيد التحقق منها حيًا في هذه الجلسة: APK بالبايت والتجزئة، البوابة تعمل، المصادقة تتكلم فعلاً مع Supabase المستضاف، الهجرة مطبقة والمنح/RLS يعملان كما صُمم، تأكيد البريد إلزامي كما هو.
 - المتبقي على المستخدم فقط: (1) اختبار الجهاز الحقيقي بخطة الـ9 خطوات (2) دفع الكوميتات بتوكن ghp_ (3) اختياريًا: ضبط URI إعادة توجيه Google للـAPK.
+
+---
+Task ID: GOOGLE-OAUTH-APK
+Agent: main (Z.ai Code)
+Task: طلب المستخدم — إصلاح دخول Google داخل الـAPK فعلياً (العودة كانت تسقط في localhost:3000 على الجهاز)، باختبار كامل للرحلة لا مجرد فتح صفحة جوجل، مع الحفاظ على دخول البريد وإصدار APK جديد بلا حذف القديم
+
+Work Log:
+- **تتبع الخلل الجذري**: redirectTo كان window.location.origin (file:// داخل WebView) → Supabase يسقطه إلى Site URL الافتراضي http://localhost:3000 → على الجهاز ERR_CONNECTION_REFUSED. فحص حي: /authorize لا يتحقق من allowlist مطلقاً (نطاق مهاجم يمر 302) — التحقق عند التوجيه النهائي فقط → إضافة الرابط للوحة مطلوبة.
+- **التنفيذ (نمط Supabase الرسمي للجوال)**:
+  * src/lib/oauth-bridge.ts (جديد): معالج window.__systemyOAuthCallback — يحلل systemy://auth/callback?code=… ويبدله بجلسة عبر exchangeCodeForSession (PKCE)، مع سحب الوصول البارد (takePendingOAuth)، خصم تكرار، متجر حالة (انتظار/نجاح/خطأ) يعرض في شاشة الدخول، واحتياط implicit tokens.
+  * supabase.ts: flowType: "pkce" (كود مؤقت + مُحقِن محلي — لا توكن في الرابط) — الويب أيضاً يستفيد (تبادل تلقائي عند العودة بـ ?code).
+  * auth-screen.tsx: زر Google في standalone يفتح متصفح النظام عبر الجسر الأصلي بـ redirectTo=systemy://auth/callback + واجهة «بانتظار عودتك» + إشعار خطأ صادق. الإرشاد القديم بقي فقط عند غياب الجسر.
+  * MainActivity.java: جسر SystemyNative (openExternal + takePendingOAuth synchronized) + التقاط الرابط العميق (onCreate بارد / onNewIntent حي / onPageFinished دفع evaluateJavascript بنفس نص استدعاء المعالج) + التعامل مع scheme systemy داخل WebView + jsString escaping كامل.
+  * Manifest: intent-filter VIEW/BROWSABLE/DEFAULT لنظام systemy://auth/callback + launchMode singleTask + versionCode 12 / versionName 5.3.
+  * build-apk.sh: نشر v5.3 بجانب v5.2 **بلا حذف القديم**.
+- **اختبار E2E كامل ضد التصدير الثابت نفسه (نفس أصول الـAPK) بمحاكي Supabase مطابق حرفياً** (موسّع بدعم grant_type=pkce + نقطة تفتيش /__test/pkce-exchange):
+  * E2E-1 (17 فحصاً): البوابة → المسبار البديل جاهز → نقرة Google عبر الجسر → رابط الترخيص يحمل redirect_to=systemy%3A%2F%2Fauth%2Fcallback + code_challenge s256 → واجهة الانتظار → إطلاق العودة (نفس استدعاء MainActivity.evaluateJavascript حرفياً) → تبادل PKCE وصل للسحاب بالكود والمُحقِن → SIGNED_IN والبوابة انفتحت → الجلسة دائمة بعد إعادة التحميل → صفر أخطاء.
+  * E2E-2 (11 فحصاً): مستخدم Google جديد → إعداد أولي كامل (متابعة/التالي/ابدأ نظامي) → 32 بذرة دُفعت للسحاب بجلسة OAuth (sync_push items=32 applied=32) → إعادة تحميل تفتح التطبيق مباشرة.
+  * E2E-3 (6 فحصاً — الوصول البارد): بدء الرحلة → إعادة تحميل كاملة (تكافئ قتل أندرويد للتطبيق) → العودة العميقة → التبادل نجح بمُحقِن PKCE المحفوظ في localStorage → البوابة انفتحت.
+- **بناء Systemy-v5.3.apk**: versionCode 12 · 7,325,738 بايت · SHA-256 ‏3e09772fc1b508aac697b447ec10cce018c85a025bedcdef9ccc0e2f613c58d6 · توقيع v2+v3 يتحقق · xmltree يثبت intent-filter (scheme systemy + BROWSABLE) · dex يثبت SystemyNative/openExternal/takePendingOAuth/نص الدفع · الأصول تثبت المعالج ورابط العودة.
+- **فحص الأسرار**: URL ومفتاح ناشر مرة واحدة · sb_secret_ الوحيدة هي كود فحص بادئات supabase-js نفسه (مطابقة موثقة سابقاً كإيجابية كاذبة) · صفر توكنات/كلمات مرور/عناوين محاكاة.
+- **Smoke حي ضد Supabase الحقيقي لأصول v5.3 نفسها** (8/8): المسبار البديل رد من settings الحقيقية (شبكة المتصفح توثق) → رابط الترخيص بُني ضد ymzwfqqijtbmmclfuwcz مع redirect_to الصحيح وPKCE s256 → صفر أخطاء صفحة.
+- **الجودة**: lint نظيف · tsc صفر أخطاء في src/ · dev.log نظيف · بطاقة التحميل والتذييل والعنوان 5.3 والرابط /downloads/Systemy-v5.3.apk يخدم 7,325,738 بايت (تجزئة مطابقة) وv5.2 القديم ما زال يعمل.
+
+Stage Summary:
+- دخول Google داخل التطبيق أصبح رحلة حقيقية مكتملة ومُختبرة 34 فحصاً ( initiation + عودة + وصول بارد + إعداد + مزامنة بالجلسة): systemy://auth/callback → intent-filter → الجسر → تبادل PKCE → جلسة → الرئيسية.
+- المتعذر اختباره من الصندوق (بصدق): موافقة Google نفسها (تحتاج حساب Google حقيقي) وتوجيه intent الفعلي على الجهاز — كلاهما سيناريو المستخدم.
+- المطلوب من المستخدم (خطوة واحدة في لوحة Supabase): Auth → URL Configuration → إضافة systemy://auth/callback لقائمة Redirect URLs — بلا أي تغيير في Google Cloud (جوجل يعيد لـ Supabase لا لنا).

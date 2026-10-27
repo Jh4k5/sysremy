@@ -8,6 +8,7 @@
 import { create } from "zustand";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
+import { installOAuthBridge } from "@/lib/oauth-bridge";
 import { useUIStore } from "@/store/ui-store";
 
 export type AuthMode = "login" | "signup" | "forgot" | "reset";
@@ -48,6 +49,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   init: () => {
     if (authInitialized) return;
     authInitialized = true;
+    // جسر عودة Google داخل التطبيق المثبّت (systemy://auth/callback) — قبل كل شيء
+    installOAuthBridge();
     if (!supabase) {
       set({ ready: true });
       return;

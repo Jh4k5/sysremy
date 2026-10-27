@@ -24,8 +24,11 @@ export const supabase: SupabaseClient | null = isSupabaseConfigured
         // جلسة دائمة على هذا الجهاز + تجديد تلقائي للتوكن
         persistSession: true,
         autoRefreshToken: true,
-        // التقاط رابط استعادة كلمة المرور من الـ hash (PASSWORD_RECOVERY)
+        // التقاط رابط استعادة كلمة المرور / عودة OAuth من الـ URL (PASSWORD_RECOVERY و ?code)
         detectSessionInUrl: true,
+        // PKCE: كود مؤقت + مُحقِن محلي — لا توكن في الرابط إطلاقاً
+        // (يدعم عودة Google داخل التطبيق عبر systemy://auth/callback — lib/oauth-bridge)
+        flowType: "pkce",
         storageKey: "systemy-auth",
       },
     })

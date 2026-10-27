@@ -17,6 +17,9 @@ import {
   SUPABASE_URL, supabasePublishableKey,
 } from "@/lib/supabase";
 import { isStandalone } from "@/lib/standalone";
+import {
+  SYSTEMY_OAUTH_REDIRECT, hasNativeBridge, openExternalAuthUrl, useOAuthBridge,
+} from "@/lib/oauth-bridge";
 import { useUIStore } from "@/store/ui-store";
 import type { AuthMode } from "./auth-store";
 import { GlassCard } from "@/components/systemy/glass";
@@ -338,6 +341,13 @@ function LoginScreen({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // حالة عودة Google من متصفح النظام (جسر APK) — انتظار/خطأ
+  const oAuth = useOAuthBridge();
+  const googlePending = oAuth.phase === "pending";
+  // توفر الجسر الأصلي يُقرأ بعد التركيب فقط (window غير موجودة في SSR)
+  const [nativeBridge, setNativeBridge] = useState(false);
+  useEffect(() => { setNativeBridge(hasNativeBridge()); }, []);
+
   // فحص Google — خادمي أولاً؛ وإن غاب الخادم (تصدير ثابت/APK) ففحص
   // مباشر من Supabase (نفس endpoint العام الذي يقرأه supabase-js)
   const [google, setGoogle] = useState<{ ready: boolean; detail: string } | null>(null);
@@ -399,12 +409,34 @@ function LoginScreen({
       });
       return;
     }
-    // داخل التطبيق المثبّت (APK — بلا خادم): رحلة OAuth تفتح المتصفح الخارجي
-    // وجلستها لا تعود إلى التطبيق — إرشاد صادق بدل مغادرة تتركه في طريق مسدود
+    // داخل التطبيق المثبّت (APK): رحلة OAuth عبر متصفح النظام مع عودة فعلية
+    // systemy://auth/callback → intent-filter → MainActivity → هذا المعالج
     if (isStandalone()) {
-      toast("داخل التطبيق المثبّت سجّل بالبريد وكلمة المرور", {
-        description: "دخول Google متاح من نسخة الويب — جلسة المتصفح الخارجي لا تعود إلى التطبيق",
+      if (!hasNativeBridge()) {
+        toast("دخول Google يتطلب أحدث نسخة من التطبيق", {
+          description: "حدّث التطبيق لتدخل بحساب Google داخله — أو سجّل بالبريد وكلمة المرور الآن",
+          duration: 9000,
+        });
+        return;
+      }
+      const { data, error: err } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: SYSTEMY_OAUTH_REDIRECT, skipBrowserRedirect: true },
       });
+      if (err || !data.url) {
+        toast.error("تعذر بدء تسجيل Google", { description: authErrorToArabic(err) });
+        return;
+      }
+      const opened = openExternalAuthUrl(data.url);
+      if (!opened) {
+        toast.error("تعذر فتح المتصفح", { description: "ما قدرنا نفتح متصفح النظام لتسجيل Google" });
+        return;
+      }
+      // المتصفح الخارجي مفتوح الآن — العودة عبر الرابط العميق تُكمل الدخول تلقائياً
+      useOAuthBridge.getState().setPhase(
+        "pending",
+        "اختر حسابك في المتصفح — سيرجع للتطبيق ويكمل الدخول تلقائياً",
+      );
       return;
     }
     const { data, error: err } = await supabase.auth.signInWithOAuth({
@@ -464,9 +496,9 @@ function LoginScreen({
       <Divider />
 
       {/* Google — مع الحالة الصادقة من الفحص الخادمي */}
-      <button type="button" onClick={() => void googleSignIn()} disabled={!google} className={ghostCls}>
-        <GoogleG className="w-5 h-5 shrink-0" />
-        أكمل بحساب Google
+      <button type="button" onClick={() => void googleSignIn()} disabled={!google || googlePending} className={ghostCls}>
+        {googlePending ? <Loader2 className="w-5 h-5 shrink-0 animate-spin" aria-hidden="true" /> : <GoogleG className="w-5 h-5 shrink-0" />}
+        {googlePending ? "بانتظار عودتك من المتصفح…" : "أكمل بحساب Google"}
       </button>
       {google && !google.ready && (
         <Notice kind="info">
@@ -474,10 +506,21 @@ function LoginScreen({
           الدخول بالبريد وكلمة المرور يعمل الآن.
         </Notice>
       )}
-      {google && google.ready && isStandalone() && (
+      {/* عودة Google داخل التطبيق المثبّت — حالة حية من الجسر */}
+      {googlePending && (
         <Notice kind="info">
-          داخل التطبيق المثبّت سجّل بـ<b>البريد وكلمة المرور</b> — دخول Google متاح من نسخة الويب
-          (جلسة المتصفح الخارجي لا تعود إلى التطبيق).
+          <b>بانتظار Google…</b> أكمل اختيار حسابك في متصفح النظام — عودتك للتطبيق
+          تُكمل الدخول تلقائياً. لو ما رجعت تلقائياً، افتح التطبيق من جديد.
+        </Notice>
+      )}
+      {oAuth.phase === "error" && (
+        <Notice kind="error">
+          <b>ما اكتمل دخول Google:</b> {oAuth.message || "صار خطأ غير متوقع"} — جرّب الزر مرة أخرى.
+        </Notice>
+      )}
+      {google && google.ready && isStandalone() && !nativeBridge && (
+        <Notice kind="info">
+          دخول Google داخل التطبيق يتطلب <b>أحدث نسخة (5.3)</b> — أو سجّل بالـ<b>البريد وكلمة المرور</b> الآن.
         </Notice>
       )}
 

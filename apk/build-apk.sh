@@ -15,7 +15,7 @@ PLATFORM=$SDK/platforms/android-34
 APKDIR="$(cd "$(dirname "$0")" && pwd)"
 WEB="${1:-$APKDIR/web-assets}"
 OUT=$APKDIR/dist
-APK_NAME="Systemy-v5.2.apk"
+APK_NAME="Systemy-v5.3.apk"
 
 # ─── بيانات التوقيع (سرية — خارج المستودع) ───
 ENV_FILE="${SYSTEMY_SECRETS_ENV:-/home/z/.systemy-secrets/env}"
@@ -47,7 +47,7 @@ echo "▸ 2/8 ربط الموارد + Manifest + الأصول (aapt2 link)..."
   -I "$PLATFORM/android.jar" \
   --manifest "$APKDIR/AndroidManifest.xml" \
   --min-sdk-version 24 --target-sdk-version 34 \
-  --version-code 11 --version-name "5.2" \
+  --version-code 12 --version-name "5.3" \
   -A "$WEB" \
   --auto-add-overlay \
   "$OUT/res.zip"
@@ -80,10 +80,10 @@ echo "▸ 7/8 التوقيع (apksigner v1+v2)..."
   --out "$OUT/$APK_NAME" \
   "$OUT/app-aligned.apk"
 
-echo "▸ 8/8 النشر — النسخة الموقعة فقط إلى public/downloads..."
+echo "▸ 8/8 النشر — النسخة الموقعة فقط إلى public/downloads (بلا حذف القديمة)..."
 PUBLISH=/home/z/my-project/public/downloads
 mkdir -p "$PUBLISH"
-find "$PUBLISH" -maxdepth 1 -name "Systemy-v*.apk" -delete
+# لا نحذف النسخ السابقة — تُنشر الجديدة بجانبها (الرابط القديم يبقى يعمل)
 cp "$OUT/$APK_NAME" "$PUBLISH/$APK_NAME"
 
 echo ""

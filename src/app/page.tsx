@@ -20,10 +20,10 @@ import { AuthGate } from "@/components/systemy/auth/auth-gate";
 import { isStandalone, standaloneServerSnapshot, subscribeNever } from "@/lib/standalone";
 import { systemyLogo, logo128 } from "@/components/systemy/logo";
 
-const APK_URL = "/downloads/Systemy-v5.2.apk";
+const APK_URL = "/downloads/Systemy-v5.3.apk";
 const APK_SIZE = "7MB";
-const APK_VERSION = "Systemy 5.2";
-const APK_NAME = "Systemy-v5.2.apk";
+const APK_VERSION = "Systemy 5.3";
+const APK_NAME = "Systemy-v5.3.apk";
 
 /**
  * عالم الصفحة النهاري 5.1 «النهار»: خلفية دافئة #F8F7F2 مع لمستين خافتتين
@@ -175,12 +175,12 @@ function DownloadCard() {
           className="rounded-[18px] shrink-0 shadow-[0_1px_2px_rgba(23,33,43,0.12),0_10px_24px_-12px_rgba(23,33,43,0.35)]"
         />
         <div className="min-w-0">
-          <div className="text-[14px] font-bold">تطبيق أندرويد — Systemy 5.2</div>
+          <div className="text-[14px] font-bold">تطبيق أندرويد — Systemy 5.3</div>
           <div className="text-[11px] text-[#17212B]/70 mt-1 leading-5">
             {APK_SIZE} · أندرويد 7.0+ · موقّع وموثوق · بقاعدة بيانات على جهازك
           </div>
           <div className="text-[10px] text-[#9A620C] mt-1.5 leading-5">
-            جديد 5.2: حساب سحابي (بريد أو Google) مع مزامنة أذكى لبياناتك بين الأجهزة — أوفلاين أولاً
+            جديد 5.3: دخول Google داخل التطبيق يعود إليك تلقائياً بعد الموافقة — مع المزامنة السحابية وأوفلاين أولاً
           </div>
           <div className="flex items-center gap-3 mt-1.5 text-[10px] text-[#17212B]/70">
             <span className="flex items-center gap-1">
